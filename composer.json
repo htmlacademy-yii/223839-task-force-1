@@ -1,0 +1,22 @@
+{
+  "name": "TaskForce",
+  "description": "description",
+  "type": "project",
+  "require": {
+
+  },
+  "require-dev": {
+
+  },
+  "autoload": {
+    "psr-4":{
+
+    }
+  },
+  "authors": [
+    {
+      "name": "Steamvis",
+      "email": "steamvis@yandex.ru"
+    }
+  ]
+}

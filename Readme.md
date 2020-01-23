@@ -1,7 +1,7 @@
 # Личный проект «TaskForce»
 
 * Студент: [Алексей Пащенко](https://up.htmlacademy.ru/yii/1/user/223839).
-* Наставник: [Aнтон Минаков](https://htmlacademy.ru/profile/id1339259)
+* Наставник: [Антон Минаков](https://htmlacademy.ru/profile/id1339259)
 
 ---
 
