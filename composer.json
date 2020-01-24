@@ -1,0 +1,17 @@
+{
+  "name": "steamvis/223839-task-force-1",
+  "description": "description",
+  "type": "project",
+  "require":{},
+  "autoload": {
+    "psr-4":{
+      "src\\": "src"
+    }
+  },
+  "authors": [
+    {
+      "name": "steamvis",
+      "email": "steamvis@yandex.ru"
+    }
+  ]
+}
