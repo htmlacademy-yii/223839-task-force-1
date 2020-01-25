@@ -24,17 +24,21 @@ class Task
     const STATUS_COMPLETED = 'завершен';
     const STATUS_FAILED = 'провален';
 
-    private $currentTaskStatus = self::STATUS_ACTIVE;
-
-    private $nextStatus;
-    private $currentActive;
-
+    // users
     private $customerID;
     private $performerID;
+    // task status
+    private $currentTaskStatus = self::STATUS_ACTIVE;
+    private $nextStatus;
+    // status after action
+    private $nextStatusCustomer;
+    private $nextStatusPerformer;
 
+    // action
+    private $currentActive;
     private $allActive = [];
     private $allStatus = [];
-
+    // allow action
     private $allowActiveCustomer;
     private $allowActivePerformer;
 
@@ -48,10 +52,13 @@ class Task
         var_dump($this->allowActivePerformer);
         var_dump($this->allowActiveCustomer);
         echo '<br>';
+
+
         // вывод полученных данных
         echo 'Статус задачи: <span style="color: red;">' . $this->currentTaskStatus . '</span><br>
-        Статус после действия: <span style="color: red">' . $this->nextStatus . '</span><br>
         Текущее действие: <span style="color: red;">' . $this->currentActive . '</span><br>
+        Статус после действия заказчика: <span style="color: red">' . $this->nextStatusCustomer . '</span><br>
+        Статус после действия исполнителя: <span style="color: red">' . $this->nextStatusPerformer . '</span><br>
         Доступные действия заказчику: <span style="color: red;">' . $this->allowActiveCustomer . '</span><br>
         Доступные действия исполнителю: <span style="color: red;">' . $this->allowActivePerformer . '</span><br>';
     }
@@ -95,16 +102,12 @@ class Task
 
         // класс имеет метод для получения статуса, в которой он перейдёт после выполнения указанного действия
 
-        if ( $this->currentActive == $this->allActive['ACTIVE_START_TASK'] ) {
-            $this->nextStatus = self::STATUS_NEW;
-        } else if ( $this->currentActive == $this->allActive['ACTIVE_REFUSAL_TASK'] ) {
-            $this->nextStatus = self::STATUS_CANCELED;
-        } else if ( $this->currentActive == $this->allActive['ACTIVE_PERFORM_TASK'] ) {
-            $this->nextStatus = self::STATUS_ACTIVE;
-        } else if ( $this->currentActive == $this->allActive['ACTIVE_COMPLETE_TASK'] ) {
-            $this->nextStatus = self::STATUS_COMPLETED;
-        } else if ( $this->currentActive == $this->allActive['ACTIVE_CANCEL_TASK'] ) {
-            $this->nextStatus = self::STATUS_FAILED;
+        if ( $this->currentActive == $this->allActive['ACTIVE_START_TASK'] && $this->currentTaskStatus == self::STATUS_NEW ) {
+            $this->nextStatus = self::STATUS_ACTIVE; // начать новую задачи
+        } else if ( $this->currentActive == $this->allActive['ACTIVE_REFUSAL_TASK'] && $this->currentTaskStatus == self::STATUS_ACTIVE ) {
+            $this->nextStatus = self::STATUS_FAILED; // задача в провалена
+        } else if ( $this->currentActive == $this->allActive['ACTIVE_COMPLETE_TASK'] && $this->currentTaskStatus == self::STATUS_ACTIVE ) {
+            $this->nextStatus = self::STATUS_COMPLETED; // задача выполнена
         } else {
             null;
         }
@@ -115,40 +118,21 @@ class Task
     private function getStatus()
     {
         $this->getTaskStatus();
-        if ( $this->nextStatus == $this->currentTaskStatus && $this->currentTaskStatus == self::STATUS_NEW ) {
-            $this->allowActiveCustomer = self::ACTION_CANCEL;
-            $this->allowActivePerformer = self::ACTION_START;
-        } else if ( $this->nextStatus == $this->currentTaskStatus && $this->currentTaskStatus == self::STATUS_COMPLETED ) {
-            $this->allowActiveCustomer = 'Задание выполено';
-            $this->allowActivePerformer = 'Задание выполено';
-        } else if ( $this->nextStatus == $this->currentTaskStatus && $this->currentTaskStatus == self::STATUS_ACTIVE ) {
+        if ( $this->currentTaskStatus == self::STATUS_NEW && $this->currentActive == $this->allActive['ACTIVE_START_TASK'] ) {
+            $this->allowActiveCustomer = self::ACTION_CANCEL; // доступные действия для заказчика
+            $this->nextStatusCustomer = self::STATUS_CANCELED; // статус после действия заказчика
+
+            $this->allowActivePerformer = self::ACTION_START; // доступные действия для исполнителя
+            $this->nextStatusPerformer = self::STATUS_ACTIVE; // статус после действия исполнителя
+        } else if ( $this->currentTaskStatus == self::STATUS_ACTIVE && $this->currentActive == $this->allActive['ACTIVE_PERFORM_TASK'] ) {
             $this->allowActiveCustomer = self::ACTION_COMPLETE;
+            $this->nextStatusCustomer = self::STATUS_COMPLETED;
+
             $this->allowActivePerformer = self::ACTION_REFUSAL;
-        } else if ( $this->nextStatus == $this->currentTaskStatus && $this->currentTaskStatus == self::STATUS_CANCELED) {
-            $this->allowActiveCustomer = 'Задание отменено';
-            $this->allowActivePerformer = 'Задание отменено';
-        } else if ( $this->nextStatus == $this->currentTaskStatus && $this->currentTaskStatus == self::STATUS_FAILED ) {
-            $this->allowActiveCustomer = 'Задание провалено';
-            $this->allowActivePerformer = 'Задание провалено';
+            $this->nextStatusPerformer = self::STATUS_FAILED;
         } else {
             null;
         }
-
-
-//        switch ( $this->nextStatus == $this->currentTaskStatus ) {
-//            case self::STATUS_NEW;
-//                $this->allowActiveCustomer = self::ACTION_CANCEL;
-//                $this->allowActivePerformer = self::ACTION_START;
-//                break;
-//            case self::STATUS_ACTIVE;
-//                $this->allowActiveCustomer = self::ACTION_COMPLETE;
-//                $this->allowActivePerformer = self::ACTION_REFUSAL;
-//                break;
-//            case self::STATUS_CANCELED || self::STATUS_COMPLETED || self::STATUS_FAILED;
-//                $this->allowActiveCustomer = 'пусто';
-//                $this->allowActivePerformer = 'пусто';
-//                break;
-//        }
     }
 
 }
