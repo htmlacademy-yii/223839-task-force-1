@@ -4,18 +4,9 @@ namespace src\classes;
 
 /**
  *  Класс определяет списки действий и статусов, а также выполняет базовую работу с ними.
- *
  */
 class Task
 {
-//    внутреннее значение
-//      ROLE_GUEST так и остается
-//      Ключ
-//    guest  = гость ????
-// класс имеет методы для возврата «карты» статусов и действий.
-// Карта — это ассоциативный массив, где ключ — внутреннее имя,
-// а значение — названия статуса/действия на русском.
-// на кирилице писать??
 
     const ROLE_GUEST = 'гость';
     const ROLE_CUSTOMER = 'клиент';
@@ -32,9 +23,10 @@ class Task
     const STATUS_ACTIVE = 'в исполнении';
     const STATUS_COMPLETED = 'завершен';
     const STATUS_FAILED = 'провален';
-    const STATUS_ALL = 'все статусы';
 
-    private $currentStatus;
+    private $currentTaskStatus = self::STATUS_ACTIVE;
+
+    private $nextStatus;
     private $currentActive;
 
     private $customerID;
@@ -43,8 +35,8 @@ class Task
     private $allActive = [];
     private $allStatus = [];
 
-    private $allowActiveCustomer = [];
-    private $allowActivePerformer = [];
+    private $allowActiveCustomer;
+    private $allowActivePerformer;
 
     public function __construct($customerID, $performerID, $currentActive)
     {
@@ -53,17 +45,20 @@ class Task
         $this->currentActive= $currentActive;
         $this->getTaskStatus();
         $this->getStatus();
+        var_dump($this->allowActivePerformer);
+        var_dump($this->allowActiveCustomer);
+        echo '<br>';
         // вывод полученных данных
-        echo 'Статус: ' . $this->currentStatus . '<br>';
-        echo 'Текущее действие: ' . $this->currentActive . '<br>';
-        echo 'Доступные действия заказчику: ' . $this->allowActiveCustomer . '<br>';
-        echo 'Доступные действия исполнителю: ' . $this->allowActivePerformer . '<br>';
+        echo 'Статус задачи: <span style="color: red;">' . $this->currentTaskStatus . '</span><br>
+        Статус после действия: <span style="color: red">' . $this->nextStatus . '</span><br>
+        Текущее действие: <span style="color: red;">' . $this->currentActive . '</span><br>
+        Доступные действия заказчику: <span style="color: red;">' . $this->allowActiveCustomer . '</span><br>
+        Доступные действия исполнителю: <span style="color: red;">' . $this->allowActivePerformer . '</span><br>';
     }
 
     /**
      *  метод получения всех статусов
      */
-
     private static function getAllStatus()
     {
         return [
@@ -72,7 +67,6 @@ class Task
             'STATUS_ACTIVE_TASK' => self::STATUS_ACTIVE,
             'STATUS_COMPLETED_TASK' => self::STATUS_COMPLETED,
             'STATUS_FAILED_TASK' => self::STATUS_FAILED,
-            'STATUS_ALL_TASK' => self::STATUS_ALL
         ];
     }
 
@@ -102,18 +96,15 @@ class Task
         // класс имеет метод для получения статуса, в которой он перейдёт после выполнения указанного действия
 
         if ( $this->currentActive == $this->allActive['ACTIVE_START_TASK'] ) {
-            $this->currentStatus = self::STATUS_NEW;
+            $this->nextStatus = self::STATUS_NEW;
         } else if ( $this->currentActive == $this->allActive['ACTIVE_REFUSAL_TASK'] ) {
-            $this->currentStatus = self::STATUS_CANCELED;
+            $this->nextStatus = self::STATUS_CANCELED;
         } else if ( $this->currentActive == $this->allActive['ACTIVE_PERFORM_TASK'] ) {
-            $this->currentStatus = self::STATUS_ACTIVE;
+            $this->nextStatus = self::STATUS_ACTIVE;
         } else if ( $this->currentActive == $this->allActive['ACTIVE_COMPLETE_TASK'] ) {
-            $this->currentStatus = self::STATUS_COMPLETED;
+            $this->nextStatus = self::STATUS_COMPLETED;
         } else if ( $this->currentActive == $this->allActive['ACTIVE_CANCEL_TASK'] ) {
-            $this->currentStatus = self::STATUS_FAILED;
-//        } else if ( $this->currentActive == $this->allStatus['ACTIVE_ALL_TASK'] ) {
-//            $this->currentStatus = self::STATUS_ALL . '<br>';
-//            var_dump($this->allStatus);
+            $this->nextStatus = self::STATUS_FAILED;
         } else {
             null;
         }
@@ -124,21 +115,40 @@ class Task
     private function getStatus()
     {
         $this->getTaskStatus();
-        switch ( $this->currentStatus ) {
-            case self::STATUS_NEW;
-                $this->allowActiveCustomer = self::ACTION_CANCEL;
-                $this->allowActivePerformer = self::ACTION_START;
-                break;
-            case self::STATUS_ACTIVE;
-                $this->allowActiveCustomer = self::ACTION_COMPLETE;
-                $this->allowActivePerformer = self::ACTION_REFUSAL;
-                break;
-            case self::STATUS_CANCELED || self::STATUS_COMPLETED || self::STATUS_FAILED;
-                $this->allowActiveCustomer = 'пусто';
-                $this->allowActivePerformer = 'пусто';
-                break;
-
+        if ( $this->nextStatus == $this->currentTaskStatus && $this->currentTaskStatus == self::STATUS_NEW ) {
+            $this->allowActiveCustomer = self::ACTION_CANCEL;
+            $this->allowActivePerformer = self::ACTION_START;
+        } else if ( $this->nextStatus == $this->currentTaskStatus && $this->currentTaskStatus == self::STATUS_COMPLETED ) {
+            $this->allowActiveCustomer = 'Задание выполено';
+            $this->allowActivePerformer = 'Задание выполено';
+        } else if ( $this->nextStatus == $this->currentTaskStatus && $this->currentTaskStatus == self::STATUS_ACTIVE ) {
+            $this->allowActiveCustomer = self::ACTION_COMPLETE;
+            $this->allowActivePerformer = self::ACTION_REFUSAL;
+        } else if ( $this->nextStatus == $this->currentTaskStatus && $this->currentTaskStatus == self::STATUS_CANCELED) {
+            $this->allowActiveCustomer = 'Задание отменено';
+            $this->allowActivePerformer = 'Задание отменено';
+        } else if ( $this->nextStatus == $this->currentTaskStatus && $this->currentTaskStatus == self::STATUS_FAILED ) {
+            $this->allowActiveCustomer = 'Задание провалено';
+            $this->allowActivePerformer = 'Задание провалено';
+        } else {
+            null;
         }
+
+
+//        switch ( $this->nextStatus == $this->currentTaskStatus ) {
+//            case self::STATUS_NEW;
+//                $this->allowActiveCustomer = self::ACTION_CANCEL;
+//                $this->allowActivePerformer = self::ACTION_START;
+//                break;
+//            case self::STATUS_ACTIVE;
+//                $this->allowActiveCustomer = self::ACTION_COMPLETE;
+//                $this->allowActivePerformer = self::ACTION_REFUSAL;
+//                break;
+//            case self::STATUS_CANCELED || self::STATUS_COMPLETED || self::STATUS_FAILED;
+//                $this->allowActiveCustomer = 'пусто';
+//                $this->allowActivePerformer = 'пусто';
+//                break;
+//        }
     }
 
 }
