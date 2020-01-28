@@ -2,10 +2,10 @@
   "name": "steamvis/223839-task-force-1",
   "description": "description",
   "type": "project",
-  "require":{},
+  "require": {},
   "autoload": {
-    "psr-4":{
-      "src\\": "src"
+    "psr-4": {
+      "Logic\\": "src/classes/"
     }
   },
   "authors": [
