@@ -61,7 +61,7 @@ class Task
     }
 
     /**
-     * Метод возвращает массив доступных действий для указанного статуса, где ключ - статус, а значение - массив действий.
+     * Метод возвращает массив доступных действий для указанного статуса
      * @param $status
      * @return array
      */
@@ -74,7 +74,6 @@ class Task
                     self::ACTION_START,
                     self::ACTION_CANCEL
                 ];
-                break;
             case self::STATUS_ACTIVE:
                 return [
                     self::ACTION_COMPLETE,
