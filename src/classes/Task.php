@@ -21,10 +21,10 @@ class Task
     const STATUS_FAILED = 4;
 
     // action
-    public $action = self::ACTION_COMPLETE;
+    public $action;
 
     // task status
-    public $currentStatus = self::STATUS_ACTIVE;
+    public $currentStatus;
 
     // users
     private $customerID;
@@ -85,12 +85,15 @@ class Task
     {
         if ( $this->action === self::ACTION_START && $this->currentStatus === self::STATUS_NEW ) {
             $this->nextStatus = self::STATUS_ACTIVE;
-        } elseif ( $this->action === self::ACTION_CANCEL && $this->currentStatus === self::STATUS_NEW ) {
+        } elseif ($this->action === self::ACTION_CANCEL && $this->currentStatus === self::STATUS_NEW ) {
             $this->nextStatus = self::STATUS_CANCELED;
         } elseif ( $this->action === self::ACTION_CANCEL && $this->currentStatus === self::STATUS_ACTIVE ) {
             $this->nextStatus = self::STATUS_FAILED;
         } elseif ( $this->action === self::ACTION_COMPLETE && $this->currentStatus === self::STATUS_ACTIVE ) {
             $this->nextStatus = self::STATUS_COMPLETED;
+        } else {
+            $this->nextStatus = null;
         }
+        return $this->nextStatus;
     }
 }
