@@ -34,7 +34,8 @@ class Task
         $this->performerID = $performerID;
     }
 
-    /** метод возвращает массив всех статусов всех действий
+    /**
+     * метод возвращает массив всех статусов всех действий
      * @return array
      */
     public static function getAllStatuses()
@@ -48,9 +49,10 @@ class Task
         ];
     }
 
-    /**  метод возвращает массив всех действий
-    * @return array
-    */
+    /**
+     * метод возвращает массив всех действий
+     * @return array
+     */
     public static function getAllActions() {
         return [
             self::ACTION_START => 'Начать',
