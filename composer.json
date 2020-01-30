@@ -5,7 +5,7 @@
   "require": {},
   "autoload": {
     "psr-4": {
-      "src\\Logic\\": "src/classes/"
+      "Logic\\": "src/Logic/"
     }
   },
   "authors": [
