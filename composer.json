@@ -1,21 +1,16 @@
 {
-  "name": "TaskForce",
+  "name": "steamvis/223839-task-force-1",
   "description": "description",
   "type": "project",
-  "require": {
-
-  },
-  "require-dev": {
-
-  },
+  "require": {},
   "autoload": {
-    "psr-4":{
-
+    "psr-4": {
+      "src\\Logic\\": "src/classes/"
     }
   },
   "authors": [
     {
-      "name": "Steamvis",
+      "name": "steamvis",
       "email": "steamvis@yandex.ru"
     }
   ]

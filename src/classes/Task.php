@@ -1,73 +1,111 @@
 <?php
+namespace src\Logic;
 
 /**
- *  Класс определяет списки действий и статусов, а также выполняет базовую работу с ними.
- *
+ * Класс определяет списки действий и статусов, а также выполняет базовую работу с ними.
+ * Class Task
+ * @package Logic
  */
-
-//interface iRoleUsers
-//{
-//    const ROLE_GUEST = 'guest'; // гость;
-//    const ROLE_CUSTOMER = 'client'; // заказчик
-//    const ROLE_PERFORMER = 'performer'; // исполнитель
-//}
-
 class Task
 {
+    const ACTION_START = 0;
+    const ACTION_REFUSAL = 1;
+    const ACTION_COMPLETE = 3;
+    const ACTION_CANCEL = 4;
 
-    const ROLE_GUEST = 'guest'; // гость;
-    const ROLE_CUSTOMER = 'client'; // заказчик
-    const ROLE_PERFORMER = 'performer'; // исполнитель
+    const STATUS_NEW = 0;
+    const STATUS_CANCELED = 1;
+    const STATUS_ACTIVE = 2;
+    const STATUS_COMPLETED = 3;
+    const STATUS_FAILED = 4;
 
-    const ACTION_START = 'starting'; // начать
-    const ACTION_REFUSAL = 'refused'; //  отказаться
-    const ACTION_PERFORMED = 'performed'; // на выполнении
-    const ACTION_COMPLETE = 'completed'; // выполнено
-    const ACTION_CANCELED = 'canceled'; // провалено
+    protected $customerID;
+    protected $performerID;
 
-    const STATUS_NEW = 'new'; // новые
-    const STATUS_CANCELED = 'canceled'; // отмененные
-    const STATUS_ACTIVE = 'active'; // на исполнении
-    const STATUS_COMPLETED = 'completed'; // выполненные
-    const STATUS_FAILED = 'failed'; // проваленные
-    const STATUS_ALL = 'all'; // все статусы
-
-    public $orderInfo = [];
-
-    private $customerID;
-    private $performerID;
-    private $currentStatus;
-    static $allowActive = [];
-
-    public function __construct($customerID, $performerID, $status)
+    /**
+     * Task constructor.
+     *
+     * @param $customerID
+     * @param $performerID
+     */
+    public function __construct($customerID, $performerID)
     {
-        $this->customerID = $customerID;
+        $this->customerID  = $customerID;
         $this->performerID = $performerID;
-        $this->currentStatus = self::STATUS_NEW;
     }
 
     /**
-     *  получить константы класса
+     * метод возвращает массив всех статусов всех действий
+     * @return array
      */
-    static function getConst()
+    public static function getStatuses()
     {
-
+        return [
+            self::STATUS_NEW       => 'Новый',
+            self::STATUS_CANCELED  => 'Отмененный',
+            self::STATUS_ACTIVE    => 'Действующий',
+            self::STATUS_COMPLETED => 'Завершенный',
+            self::STATUS_FAILED    => 'Проваленный'
+        ];
     }
 
     /**
-     *  получить все статусы
+     * метод возвращает массив всех действий
+     * @return array
      */
-    static function getAllStatus()
+    public static function getActions()
     {
-
+        return [
+            self::ACTION_START    => 'Начать',
+            self::ACTION_CANCEL   => 'Отменить',
+            self::ACTION_COMPLETE => 'Завершить',
+            self::ACTION_REFUSAL  => 'Отказаться'
+        ];
     }
 
     /**
-     *  получить все доступные действия
+     * Метод возвращает массив доступных действий для указанного статуса
+     *
+     * @param $status
+     *
+     * @return array
      */
-    static function getAllowActive()
+    public function getActionForStatus($status)
     {
-
+        switch ($status) {
+            case self::STATUS_NEW:
+                return [
+                    self::ACTION_START,
+                    self::ACTION_CANCEL
+                ];
+            case self::STATUS_ACTIVE:
+                return [
+                    self::ACTION_COMPLETE,
+                    self::ACTION_REFUSAL
+                ];
+        }
+        return null;
     }
 
+    /**
+     * метод для получения статуса, в которой он перейдёт после выполнения указанного действия
+     *
+     * @param $action
+     *
+     * @return int
+     */
+    public function getNextStatus($action)
+    {
+        switch ($action) {
+            case self::ACTION_START:
+                return self::STATUS_ACTIVE;
+            case self::ACTION_CANCEL:
+                return self::STATUS_CANCELED;
+            case self::ACTION_COMPLETE:
+                return self::STATUS_COMPLETED;
+            case self::ACTION_REFUSAL:
+                return self::STATUS_FAILED;
+        }
+        return null;
+    }
 }
