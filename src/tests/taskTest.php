@@ -2,7 +2,7 @@
 $root = $_SERVER['DOCUMENT_ROOT'];
 require_once  $root . '/vendor/autoload.php';
 
-use src\Logic\Task;
+use Logic\Task;
 
 $test = new Task(169,329);
 
