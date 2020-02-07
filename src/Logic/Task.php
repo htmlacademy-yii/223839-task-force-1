@@ -1,5 +1,11 @@
 <?php
+
 namespace Logic;
+
+use src\Logic\actions\ActionCancel;
+use src\Logic\actions\ActionComplete;
+use src\Logic\actions\ActionRefusal;
+use src\Logic\actions\ActionStart;
 
 /**
  * Класс определяет списки действий и статусов, а также выполняет базовую работу с ними.
@@ -10,8 +16,8 @@ class Task
 {
     const ACTION_START = 0;
     const ACTION_REFUSAL = 1;
-    const ACTION_COMPLETE = 3;
-    const ACTION_CANCEL = 4;
+    const ACTION_COMPLETE = 2;
+    const ACTION_CANCEL = 3;
 
     const STATUS_NEW = 0;
     const STATUS_CANCELED = 1;
@@ -19,8 +25,8 @@ class Task
     const STATUS_COMPLETED = 3;
     const STATUS_FAILED = 4;
 
-    protected $customerID;
-    protected $performerID;
+    public $customerID;
+    public $performerID;
 
     /**
      * Task constructor.
@@ -73,13 +79,13 @@ class Task
         {
             case self::STATUS_NEW:
                 return [
-                    self::ACTION_START,
-                    self::ACTION_CANCEL
+                    new ActionStart(),
+                    new ActionCancel()
                 ];
             case self::STATUS_ACTIVE:
                 return [
-                    self::ACTION_COMPLETE,
-                    self::ACTION_REFUSAL
+                    new ActionComplete(),
+                    new ActionRefusal()
                 ];
         }
         return null;
@@ -94,13 +100,13 @@ class Task
     {
         switch ( $action )
         {
-            case self::ACTION_START:
+            case ActionStart::getInnerName():
                 return self::STATUS_ACTIVE;
-            case self::ACTION_CANCEL:
+            case ActionCancel::getInnerName():
                 return self::STATUS_CANCELED;
-            case self::ACTION_COMPLETE:
+            case ActionComplete::getInnerName():
                 return self::STATUS_COMPLETED;
-            case self::ACTION_REFUSAL:
+            case ActionRefusal::getInnerName():
                 return self::STATUS_FAILED;
         }
         return null;
