@@ -35,7 +35,7 @@ class Task
     }
 
     /**
-     * метод возвращает массив всех статусов всех действий
+     * метод возвращает массив всех статусов
      * @return array
      */
     public static function getAllStatuses()
