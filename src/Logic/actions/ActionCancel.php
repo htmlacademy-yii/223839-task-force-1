@@ -10,13 +10,8 @@ class ActionCancel extends Action
         return 'Отменить';
     }
 
-    public static function getInnerName()
+    public function checkRights($customerID, $performerID, $currentUserID)
     {
-        return parent::getInnerName();
-    }
-
-    public function checkRights($customerID, $performerID, $currentUserID, $taskStatus)
-    {
-        return $performerID !== $currentUserID && $customerID === $currentUserID && $taskStatus === 0;
+        return $customerID === $currentUserID;
     }
 }

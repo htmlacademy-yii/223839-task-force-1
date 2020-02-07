@@ -69,9 +69,10 @@ class Task
     }
 
     /**
-     * Метод возвращает массив доступных действий для указанного статуса
+     * Метод возвращает массив с объектами доступных действий для указанного статуса
+     *
      * @param $status
-     * @return array
+     * @return array|object
      */
     public function getActionForStatus( $status )
     {

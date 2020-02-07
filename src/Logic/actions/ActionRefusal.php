@@ -10,14 +10,8 @@ class ActionRefusal extends Action
         return 'Отказаться';
     }
 
-    public static function getInnerName()
+    public function checkRights($customerID, $performerID, $currentUserID)
     {
-        return parent::getInnerName();
-    }
-
-
-    public function checkRights($customerID, $performerID, $currentUserID, $taskStatus)
-    {
-        return $performerID === $currentUserID && $customerID !== $currentUserID && $taskStatus === 2;
+        return $performerID === $currentUserID;
     }
 }

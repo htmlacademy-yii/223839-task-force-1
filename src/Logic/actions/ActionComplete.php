@@ -10,14 +10,8 @@ class ActionComplete extends Action
         return 'Выполнить';
     }
 
-    public static function getInnerName()
+    public function checkRights($customerID, $performerID, $currentUserID)
     {
-        return parent::getInnerName();
-    }
-
-
-    public function checkRights($customerID, $performerID, $currentUserID, $taskStatus)
-    {
-        return $performerID !== $currentUserID && $customerID === $currentUserID && $taskStatus === 2;
+        return $customerID === $currentUserID;
     }
 }
