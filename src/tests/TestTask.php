@@ -4,32 +4,76 @@
 namespace src\tests;
 
 use Logic\Task;
-use src\Logic\actions\ActionCancel;
-use src\Logic\actions\ActionComplete;
-use src\Logic\actions\ActionRefusal;
-use src\Logic\actions\ActionStart;
+use src\Logic\actions\{Action, ActionStart, ActionRefusal, ActionComplete, ActionCancel};
 
-class TestTask
+
+class TestTask extends Templates
 {
-
-    public function testStatusAfterStar1t()
+    /**
+     * проверка на правильность статуса после действия
+     * @param string $action
+     * @param int $status
+     * @param int $customerID
+     * @param int $performerID
+     *
+     * @return bool
+     */
+    public static function templateAfterAction(string $action, int $status, int $customerID, int $performerID)
     {
-        assert(1==1, 'один не равен одному');
+        $task = self::getTask($customerID, $performerID);
+        return assert($task->getNextStatus($action) === $status,
+            $task->getNextStatus($action) . ' != ' .  $status . ' | ' . $action . ' действие не выполнено');
     }
+
+    /*
+     * сверяет идентичность объектов в массиве
+     */
+    public static function templateRightActionsForStatus(int $customerID, int $performerID, int $status, array $actions)
+    {
+        $task = self::getTask($customerID, $performerID);
+        return assert($task->getActionForStatus($status) == $actions);
+    }
+    /////////////////////////////////////////////////////////////////////////////////////////
 
     public function testStatusAfterStart()
     {
-        $task = new Task(1,2);
-        assert($task->getNextStatus(ActionComplete::getInnerName() === Task::STATUS_ACTIVE),
-            $task->getNextStatus(ActionStart::getInnerName()) . ' != ' .  Task::STATUS_ACTIVE);
-        //        assert($task->newInstance()->getNextStatus(ActionStart::getInnerName()) === Task::STATUS_ACTIVE);
+        $test = self::templateAfterAction(ActionStart::getInnerName(), Task::STATUS_ACTIVE, 1,1);
+        return $test;
     }
+
     public function testStatusAfterComplete()
     {
-        $task = new Task(1,2);
-        assert($task->getNextStatus(ActionComplete::getInnerName() === Task::STATUS_COMPLETED),
-            $task->getNextStatus(ActionComplete::getInnerName()) . ' != ' .  Task::STATUS_COMPLETED);
-        //        assert($task->newInstance()->getNextStatus(ActionStart::getInnerName()) === Task::STATUS_ACTIVE);
+        $test = self::templateAfterAction(ActionComplete::getInnerName(), Task::STATUS_COMPLETED, 1,1);
+        return $test;
     }
+
+    public function testStatusAfterCancel()
+    {
+        $test = self::templateAfterAction(ActionCancel::getInnerName(), Task::STATUS_CANCELED, 1,1);
+        return $test;
+    }
+
+    public function testStatusAfterRefusal()
+    {
+        $test = self::templateAfterAction(ActionRefusal::getInnerName(), Task::STATUS_FAILED, 1,1);
+        return $test;
+    }
+
+    public function testRightActionsForNew()
+    {
+        $start = new ActionStart();
+        $cancel = new ActionCancel();
+        $test = self::templateRightActionsForStatus(1,2,Task::STATUS_NEW, [$start, $cancel]);
+        return $test;
+    }
+
+    public function testRightActionsForActive()
+    {
+        $complete = new ActionComplete();
+        $refusal = new ActionRefusal();
+        $test = self::templateRightActionsForStatus(1,2,Task::STATUS_ACTIVE, [$complete, $refusal]);
+        return $test;
+    }
+
 }
 

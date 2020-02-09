@@ -1,13 +1,12 @@
 <style>
     body{
-        margin: 3.25rem 3rem;
+        margin: 3.25rem 1rem;
         background-color: rgba(53, 53, 53, 0.75);
         color: #000000;
     }
     pre {
         background: #BBBBBB;
         color: #333;
-        font-size: 16px;
         border: #2f3542 1px solid;
         padding: 10px 10px;
         box-shadow: inset 0 0 0 1px rgba(0,0,0,.15);
@@ -17,12 +16,13 @@
         background-color: #cac4b2;
         border: black solid 2px;
         margin-bottom: 20px;
-        padding: 10px 30px;
+        padding: 10px 10px;
     }
     </style>
 <?php
 $root = $_SERVER['DOCUMENT_ROOT'];
 require_once $root . '/vendor/autoload.php';
+require_once $root . '/src/tests/Templates.php';
 
 use Logic\Task;
 use src\Logic\actions\{ActionStart, ActionRefusal, ActionComplete, ActionCancel};
@@ -47,7 +47,6 @@ class StartTest
         $dir = scandir('tests\\');
         // префикс для пути к файлу
         $dirStr = 'tests/';
-        $counter = 0;
         for($i = 0; $i < count($dir); $i++ ) {
             // если значение true
             if( strstr($dir[$i], 'Test' ) ) {
@@ -56,7 +55,6 @@ class StartTest
                 // убирает лишнии классы
                 if(!strstr($dir[$i], 'Test.')) {
                     array_push(self::$pathArray, $path);
-                    $counter++;
                 }
             }
         }
@@ -75,14 +73,12 @@ class StartTest
             array_push(self::$nameClasses, $nameClass);
             include_once $item;
         }
-        // удаление абстрактного класса
-        unset(self::$nameClasses[array_search('src\tests\TestAbstract', self::$nameClasses)]);
     }
 
     /*
-     * подключает классы
+     *
      */
-    public function registerload()
+    public static function registerload()
     {
         self::getPath();
         self::includeClass();
@@ -94,43 +90,33 @@ class StartTest
     public function searchTestMethods()
     {
         self::registerload();
-
-        foreach (StartTest::$nameClasses as $title) {
-            $reflection = new ReflectionClass($title);
+        echo '<div>';
+        foreach (StartTest::$nameClasses as $name) {
+            $reflection = new ReflectionClass($name);
+//            echo $reflection->getName();
             foreach ($reflection->getMethods() as $method) {
                 if (strstr($method->name, 'test')) {
-                    echo $method->invoke($reflection->newInstance());
+//                    echo gettype($method->invoke($reflection->newInstance()));
+                    if($method->invoke($reflection->newInstance())) {
+                        echo '<p><span style="font-weight: bold">Class:</span> ' . $reflection->getShortName() .
+                             ' <span style="font-weight: bold">method: </span><span style="border-bottom: solid 0.5px; color: #262626; padding-bottom: 1px;">' . $method->name .
+                             '</span> <span style="font-weight: bold">in:</span> ' . $reflection->getFileName() .
+                             ' <span style="color: #2f802d; font-weight: bold;">is OKAY...</span></p>';
+                    } else {
 
-                    echo '<br>';
-//                    echo '<div>';
-//                    echo ('Class: ' . $reflection->getShortName() .
-//                          '<br>Method: ' . $method->name .
-//                          '<br>File: ' . $reflection->getFileName() .
-//                          '<br>Line: ' . $method->getStartLine() . '-' . $method->getEndLine() .
-//                          '<br>Namespace: ' . $reflection->getNamespaceName() .'<br><hr>');
-//                    echo $method->invoke($reflection->newInstance());
-//                    echo '</div>';
+                    }
                 }
             }
         }
+        echo '</div>';
     }
 }
+
 $startTest = new StartTest();
 //////////////////////////////////////////
-
-
-
-
-
-
-
-
-
-
 // вывод подключенные классы
 //debug(StartTest::$pathArray);
 echo '<div><h1>Подключенные классы:</h1><ol>';
-
 foreach (get_included_files() as $classes) {
     echo '<li>' . $classes . '</li>';
 }
