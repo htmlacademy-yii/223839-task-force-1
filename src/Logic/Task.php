@@ -2,10 +2,8 @@
 
 namespace Logic;
 
-use src\Logic\actions\ActionCancel;
-use src\Logic\actions\ActionComplete;
-use src\Logic\actions\ActionRefusal;
-use src\Logic\actions\ActionStart;
+use src\Logic\actions\{ActionStart, ActionRefusal, ActionComplete, ActionCancel};
+
 
 /**
  * Класс определяет списки действий и статусов, а также выполняет базовую работу с ними.
