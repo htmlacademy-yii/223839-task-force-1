@@ -12,16 +12,16 @@ use src\Logic\actions\{ActionStart, ActionRefusal, ActionComplete, ActionCancel}
  */
 class Task
 {
-    const ACTION_START = 0;
-    const ACTION_REFUSAL = 1;
-    const ACTION_COMPLETE = 2;
-    const ACTION_CANCEL = 3;
+    const ACTION_START = 1;
+    const ACTION_REFUSAL = 2;
+    const ACTION_COMPLETE = 3;
+    const ACTION_CANCEL = 4;
 
-    const STATUS_NEW = 0;
-    const STATUS_CANCELED = 1;
-    const STATUS_ACTIVE = 2;
-    const STATUS_COMPLETED = 3;
-    const STATUS_FAILED = 4;
+    const STATUS_NEW = 1;
+    const STATUS_CANCELED = 2;
+    const STATUS_ACTIVE = 3;
+    const STATUS_COMPLETED = 4;
+    const STATUS_FAILED = 5;
 
     public $customerID;
     public $performerID;
@@ -70,7 +70,7 @@ class Task
      * Метод возвращает массив с объектами доступных действий для указанного статуса
      *
      * @param $status
-     * @return array|object
+     * @return array[Actions]
      */
     public function getActionForStatus( $status )
     {
