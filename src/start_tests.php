@@ -1,4 +1,7 @@
 <style>
+    * {
+        font-size: 0.98rem;
+    }
     body{
         margin: 3.25rem 1rem;
         background-color: rgba(53, 53, 53, 0.75);
@@ -37,7 +40,7 @@ class StartTest
     {
         $this->searchTestMethods();
     }
-    ///////////////////////////////////////////////////////
+
     /*
      * получает путь к классам
      */
@@ -59,7 +62,6 @@ class StartTest
             }
         }
     }
-    ///////////////////////////////////////////////////////////////
 
     /**
      * подключает классы с префиксом test
@@ -90,33 +92,39 @@ class StartTest
     public function searchTestMethods()
     {
         self::registerload();
-        echo '<div>';
+        echo '<div><ol style="padding: 0px 30px;">';
         foreach (StartTest::$nameClasses as $name) {
             $reflection = new ReflectionClass($name);
-//            echo $reflection->getName();
             foreach ($reflection->getMethods() as $method) {
                 if (strstr($method->name, 'test')) {
-//                    echo gettype($method->invoke($reflection->newInstance()));
                     if($method->invoke($reflection->newInstance())) {
-                        echo '<p><span style="font-weight: bold">Class:</span> ' . $reflection->getShortName() .
+                        echo '<li style="margin: 10px 0;"><span style="font-weight: bold">Class:</span> ' . $reflection->getShortName() .
                              ' <span style="font-weight: bold">method: </span><span style="border-bottom: solid 0.5px; color: #262626; padding-bottom: 1px;">' . $method->name .
                              '</span> <span style="font-weight: bold">in:</span> ' . $reflection->getFileName() .
-                             ' <span style="color: #2f802d; font-weight: bold;">is OKAY...</span></p>';
+                             '</span> <span style="font-weight: bold">Line:</span> ' . $method->getStartLine() . '-' . $method->getEndLine() .
+                             ' <span style="color: #2f802d; font-weight: bold;">is OKAY...</span></li>';
                     } else {
-
+                        echo '<li><span style="color: #ba0000; font-weight: bold;">mistake in </span>' .
+                             $method->getFileName() . ' <span style="color: #ba0000; font-weight: bold;">Line:</span> ' .
+                             $method->getStartLine() . '-' . $method->getEndLine() . '</li>';
                     }
                 }
             }
         }
-        echo '</div>';
+        echo '</ol></div>';
     }
 }
 
 $startTest = new StartTest();
+
 //////////////////////////////////////////
-// вывод подключенные классы
-//debug(StartTest::$pathArray);
-echo '<div><h1>Подключенные классы:</h1><ol>';
+// вывод подключенных классов
+echo '<div>';
+echo '<pre><h2>Подключаемые тесты</h2><ol>';
+foreach (StartTest::$pathArray as $plugin) {
+    echo '<li>' . $plugin . '</li>';
+};
+echo '</ol></pre><h1>Подключенные классы:</h1><ol>';
 foreach (get_included_files() as $classes) {
     echo '<li>' . $classes . '</li>';
 }
@@ -124,37 +132,8 @@ echo '</ol></div>';
 
 
 
-$testTask = new Task(1, 2);
-$testActionComplete = new ActionComplete();
-$testActionCancel   = new ActionCancel();
-$testActionRefusal  = new ActionRefusal();
-$testActionStart    = new ActionStart();
-
-//  равен ли статус после выполнения действия ожидаемому статусу
-assert($testTask->getNextStatus($testActionStart::getInnerName()) === Task::STATUS_ACTIVE);
-assert($testTask->getNextStatus($testActionRefusal::getInnerName()) === Task::STATUS_FAILED);
-assert($testTask->getNextStatus($testActionCancel::getInnerName()) === Task::STATUS_CANCELED);
-assert($testTask->getNextStatus($testActionComplete::getInnerName()) === Task::STATUS_COMPLETED);
-
-// проверка идентичности объектов action в массиве разрешенных действий
-assert($testTask->getActionForStatus(Task::STATUS_NEW) == [$testActionStart, $testActionCancel]);
-assert($testTask->getActionForStatus(Task::STATUS_ACTIVE) == [$testActionComplete, $testActionRefusal]);
-
-// присутствует ли Action в массиве разрешенных действий для данного статуса
-assert(in_array($testActionCancel, $testTask->getActionForStatus(Task::STATUS_NEW)));
-assert(in_array($testActionStart, $testTask->getActionForStatus(Task::STATUS_NEW)));
-assert(in_array($testActionComplete, $testTask->getActionForStatus(Task::STATUS_ACTIVE)));
-assert(in_array($testActionRefusal, $testTask->getActionForStatus(Task::STATUS_ACTIVE)));
-
-// проверка прав пользователя для данного действия
-assert($testActionStart->checkRights($testTask->customerID, $testTask->performerID, 2));
-assert($testActionCancel->checkRights($testTask->customerID, $testTask->performerID, 1));
-assert($testActionRefusal->checkRights($testTask->customerID, $testTask->performerID, 2));
-assert($testActionComplete->checkRights($testTask->customerID, $testTask->performerID, 1));
-
-
+// функции удобночитаемого вывода
 function debug($arr) {
-//    <pre><h1>DEBUG<h1><br></pre>
     echo '<pre>' . print_r($arr, true) . '</pre>';
 }
 function myEcho($str) {
