@@ -23,8 +23,8 @@ class Task
     const STATUS_COMPLETED = 4;
     const STATUS_FAILED = 5;
 
-    public $customerID;
-    public $performerID;
+    protected $customerID;
+    protected $performerID;
 
     /**
      * Task constructor.
@@ -70,7 +70,7 @@ class Task
      * Метод возвращает массив с объектами доступных действий для указанного статуса
      *
      * @param $status
-     * @return array[Actions]
+     * @return Action[]
      */
     public function getActionForStatus( $status )
     {

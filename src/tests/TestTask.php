@@ -7,22 +7,31 @@ use Logic\Task;
 use src\Logic\actions\{Action, ActionStart, ActionRefusal, ActionComplete, ActionCancel};
 
 
-class TestTask extends Templates
+class TestTask
 {
+    public static function getTask($customerID, $performerID)
+    {
+        return new Task($customerID,$performerID);
+    }
+
     public function testRightActionsForNew()
     {
-        $start = new ActionStart();
-        $cancel = new ActionCancel();
-        $test = self::templateRightActionsForStatus(1,2,Task::STATUS_NEW, [$start, $cancel]);
-        return $test;
+        $task = self::getTask(1, 2);
+        $status = Task::STATUS_NEW;
+        $action1 = new ActionStart();
+        $action2 = new ActionCancel();
+        $actions = [$action1, $action2];
+        return assert($task->getActionForStatus($status) == $actions, 'идентичность объектов в массиве');
     }
 
     public function testRightActionsForActive()
     {
-        $complete = new ActionComplete();
-        $refusal = new ActionRefusal();
-        $test = self::templateRightActionsForStatus(1,2,Task::STATUS_ACTIVE, [$complete, $refusal]);
-        return $test;
+        $task = self::getTask(1, 2);
+        $status = Task::STATUS_ACTIVE;
+        $action1 = new ActionComplete();
+        $action2 = new ActionRefusal();
+        $actions = [$action1, $action2];
+        return assert($task->getActionForStatus($status) == $actions, 'идентичность объектов в массиве');
     }
 }
 
