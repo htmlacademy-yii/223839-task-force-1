@@ -1,9 +1,6 @@
 <?php
 require_once '../vendor/autoload.php';
 
-use Logic\Task;
-use src\Logic\actions\{ActionStart, ActionRefusal, ActionComplete, ActionCancel};
-
 class StartTest
 {
     public static $pathArray = [];
@@ -17,7 +14,7 @@ class StartTest
     /*
      * получает путь к классам
      */
-    public static function getPath()
+    public static function getPath() : void
     {
         // сканирует папку с тестами
         $dir = scandir('tests\\');
@@ -39,7 +36,7 @@ class StartTest
     /**
      * подключает классы с префиксом test
      */
-    public static function includeClass()
+    public static function includeClass() : void
     {
         foreach (self::$pathArray as $item) {
             $nameClass = substr($item, 0, -4);
@@ -50,10 +47,7 @@ class StartTest
         }
     }
 
-    /*
-     *
-     */
-    public static function registerload()
+    public static function registerload() : void
     {
         self::getPath();
         self::includeClass();
@@ -62,7 +56,7 @@ class StartTest
     /*
      * ищет методы для теста
      */
-    public function searchTestMethods()
+    public function searchTestMethods() : void
     {
         self::registerload();
         foreach (StartTest::$nameClasses as $name) {

@@ -2,7 +2,9 @@
 
 namespace Logic;
 
-use src\Logic\actions\{ActionStart, ActionRefusal, ActionComplete, ActionCancel};
+use src\Logic\actions\{Action, ActionStart, ActionRefusal, ActionComplete, ActionCancel};
+use src\error\ErrorHandler;
+
 
 
 /**
@@ -29,10 +31,10 @@ class Task
     /**
      * Task constructor.
      *
-     * @param $customerID
-     * @param $performerID
+     * @param int $customerID
+     * @param int $performerID
      */
-    public function __construct($customerID, $performerID)
+    public function __construct(int $customerID, int $performerID)
     {
         $this->customerID = $customerID;
         $this->performerID = $performerID;
@@ -42,7 +44,7 @@ class Task
      * метод возвращает массив всех статусов
      * @return array
      */
-    public static function getAllStatuses()
+    public static function getAllStatuses() : array
     {
         return [
             self::STATUS_NEW => 'Новый',
@@ -57,25 +59,32 @@ class Task
      * метод возвращает массив всех действий
      * @return array
      */
-    public static function getAllActions() {
+    public static function getAllActions() : array
+    {
         return [
-            self::ACTION_START => 'Начать',
-            self::ACTION_CANCEL => 'Отменить',
-            self::ACTION_COMPLETE => 'Завершить',
-            self::ACTION_REFUSAL => 'Отказаться'
+            self::ACTION_START => new ActionStart(),
+            self::ACTION_CANCEL => new ActionCancel(),
+            self::ACTION_COMPLETE => new ActionComplete(),
+            self::ACTION_REFUSAL => new ActionRefusal()
         ];
     }
 
     /**
      * Метод возвращает массив с объектами доступных действий для указанного статуса
      *
-     * @param $status
+     * @param int $status
      * @return Action[]
      */
-    public function getActionForStatus( $status )
+    public function getActionForStatus( int $status ) : array
     {
-        switch ( $status )
-        {
+        try {
+            if (!array_key_exists($status, self::getAllStatuses())) {
+                throw new ErrorHandler($status . ' статус отсутствует');
+            }
+        } catch (ErrorHandler $e) {
+            echo $e->getMessage() .'<br>';
+        }
+        switch ( $status ) {
             case self::STATUS_NEW:
                 return [
                     new ActionStart(),
@@ -92,20 +101,28 @@ class Task
 
     /**
      * метод для получения статуса, в которой он перейдёт после выполнения указанного действия
-     * @param $action
-     * @return int
+     * @param Action $action
+     *
+     * @return int|null
      */
-    public function getNextStatus( $action )
+    public function getNextStatus( Action $action ) : ?int
     {
+        try {
+            if (!in_array($action, self::getAllActions())) {
+                throw new ErrorHandler($action::getInnerName() . ' действие отсутствует');
+            }
+        } catch (ErrorHandler $e) {
+            echo $e->getMessage() .'<br>';
+        }
         switch ( $action )
         {
-            case ActionStart::getInnerName():
+            case new ActionStart():
                 return self::STATUS_ACTIVE;
-            case ActionCancel::getInnerName():
+            case new ActionCancel;
                 return self::STATUS_CANCELED;
-            case ActionComplete::getInnerName():
+            case new ActionComplete():
                 return self::STATUS_COMPLETED;
-            case ActionRefusal::getInnerName():
+            case new ActionRefusal():
                 return self::STATUS_FAILED;
         }
         return null;

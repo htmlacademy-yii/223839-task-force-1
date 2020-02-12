@@ -4,12 +4,12 @@
 namespace src\tests;
 
 use Logic\Task;
-use src\Logic\actions\{Action, ActionStart, ActionRefusal, ActionComplete, ActionCancel};
+use src\Logic\actions\{ActionStart, ActionRefusal, ActionComplete, ActionCancel};
 
 
 class TestTask
 {
-    public static function getTask($customerID, $performerID)
+    public static function getTask(int $customerID,int  $performerID)
     {
         return new Task($customerID,$performerID);
     }

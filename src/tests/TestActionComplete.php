@@ -9,29 +9,29 @@ use src\Logic\actions\ActionComplete;
 
 class TestActionComplete
 {
-    public static function getTask($customerID, $performerID)
+    public static function getTask(int $customerID, int $performerID)
     {
-        return new Task($customerID,$performerID);
+        return new Task($customerID, $performerID);
     }
 
-    public function testStartActionCheckRight()
+    public function testStartActionCheckRight() : bool
     {
         $task = self::getTask(1,2);
         $action = new ActionComplete();
         return assert(in_array($action, $task->getActionForStatus(Task::STATUS_ACTIVE)),  'Action не разрешен');
     }
 
-    public function testIsHasComplete()
+    public function testIsHasComplete() : bool
     {
         $task = self::getTask(1,2);
-        $action = ActionComplete::getInnerName();
+        $action = new ActionComplete();
         $status = Task::STATUS_COMPLETED;
         return assert($task->getNextStatus($action) === $status,
-            $task->getNextStatus($action) . ' != ' .  $status . ' |  статус после выполнения ' . $action
-            . ' не соотвутствует этому действию' );
+            $task->getNextStatus($action) . ' != ' .  $status . ' |  статус после выполнения ' . $action::getInnerName()
+            . ' не соответствует этому действию' );
     }
 
-    public function testStatusAfterComplete()
+    public function testStatusAfterComplete() : bool
     {
         $action = new ActionComplete();
         $test = $action->checkRights(1, 2, 1);

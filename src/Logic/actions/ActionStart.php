@@ -5,12 +5,12 @@ namespace src\Logic\actions;
 
 class ActionStart extends Action
 {
-    public function getPublicName()
+    public function getPublicName() : string
     {
         return 'Принять';
     }
 
-    public function checkRights($customerID, $performerID, $currentUserID)
+    public function checkRights(int $customerID, int $performerID, int $currentUserID) : bool
     {
         return $performerID === $currentUserID;
     }

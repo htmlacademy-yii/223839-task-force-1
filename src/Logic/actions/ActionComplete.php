@@ -5,12 +5,12 @@ namespace src\Logic\actions;
 
 class ActionComplete extends Action
 {
-    public function getPublicName()
+    public function getPublicName() :string
     {
         return 'Выполнить';
     }
 
-    public function checkRights($customerID, $performerID, $currentUserID)
+    public function checkRights(int $customerID, int $performerID, int $currentUserID) : bool
     {
         return $customerID === $currentUserID;
     }
