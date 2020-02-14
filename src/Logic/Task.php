@@ -2,9 +2,8 @@
 
 namespace Logic;
 
-use src\Logic\actions\{Action, ActionStart, ActionRefusal, ActionComplete, ActionCancel};
 use src\error\ErrorHandler;
-
+use src\Logic\actions\{Action, ActionCancel, ActionComplete, ActionRefusal, ActionStart};
 
 
 /**
@@ -36,55 +35,27 @@ class Task
      */
     public function __construct(int $customerID, int $performerID)
     {
-        $this->customerID = $customerID;
+        $this->customerID  = $customerID;
         $this->performerID = $performerID;
-    }
-
-    /**
-     * метод возвращает массив всех статусов
-     * @return array
-     */
-    public static function getAllStatuses() : array
-    {
-        return [
-            self::STATUS_NEW => 'Новый',
-            self::STATUS_CANCELED => 'Отмененный',
-            self::STATUS_ACTIVE => 'Действующий',
-            self::STATUS_COMPLETED => 'Завершенный',
-            self::STATUS_FAILED => 'Проваленный'
-        ];
-    }
-
-    /**
-     * метод возвращает массив всех действий
-     * @return array
-     */
-    public static function getAllActions() : array
-    {
-        return [
-            self::ACTION_START => new ActionStart(),
-            self::ACTION_CANCEL => new ActionCancel(),
-            self::ACTION_COMPLETE => new ActionComplete(),
-            self::ACTION_REFUSAL => new ActionRefusal()
-        ];
     }
 
     /**
      * Метод возвращает массив с объектами доступных действий для указанного статуса
      *
      * @param int $status
+     *
      * @return Action[]
+     * @throws ErrorHandler
      */
-    public function getActionForStatus( int $status ) : array
+    public function getActionForStatus(int $status) : array
     {
-        try {
-            if (!array_key_exists($status, self::getAllStatuses())) {
-                throw new ErrorHandler($status . ' статус отсутствует');
-            }
-        } catch (ErrorHandler $e) {
-            echo $e->getMessage() .'<br>';
+        if ( ! array_key_exists($status, Task::getAllStatuses())) {
+            throw new ErrorHandler('Статус не существует');
         }
-        switch ( $status ) {
+        if ($status != self::STATUS_NEW && $status != self::STATUS_ACTIVE) {
+            throw new ErrorHandler('У статуса нет действий');
+        }
+        switch ($status) {
             case self::STATUS_NEW:
                 return [
                     new ActionStart(),
@@ -96,35 +67,64 @@ class Task
                     new ActionRefusal()
                 ];
         }
+
         return null;
     }
 
     /**
+     * метод возвращает массив всех статусов
+     * @return array
+     */
+    public static function getAllStatuses() : array
+    {
+        return [
+            self::STATUS_NEW       => 'Новый',
+            self::STATUS_CANCELED  => 'Отмененный',
+            self::STATUS_ACTIVE    => 'Действующий',
+            self::STATUS_COMPLETED => 'Завершенный',
+            self::STATUS_FAILED    => 'Проваленный'
+        ];
+    }
+
+    /**
      * метод для получения статуса, в которой он перейдёт после выполнения указанного действия
+     *
      * @param Action $action
      *
      * @return int|null
+     * @throws ErrorHandler
      */
-    public function getNextStatus( Action $action ) : ?int
+    public function getNextStatus(Action $action) : ?int
     {
-        try {
-            if (!in_array($action, self::getAllActions())) {
-                throw new ErrorHandler($action::getInnerName() . ' действие отсутствует');
-            }
-        } catch (ErrorHandler $e) {
-            echo $e->getMessage() .'<br>';
+        $action = get_class($action);
+        if ( ! in_array($action, Task::getAllActions(), true)) {
+            throw new ErrorHandler('действие отсутствует');
         }
-        switch ( $action )
-        {
-            case new ActionStart():
+        switch ($action) {
+            case ActionStart::class:
                 return self::STATUS_ACTIVE;
-            case new ActionCancel;
+            case ActionCancel::class:
                 return self::STATUS_CANCELED;
-            case new ActionComplete():
+            case ActionComplete::class:
                 return self::STATUS_COMPLETED;
-            case new ActionRefusal():
+            case ActionRefusal::class:
                 return self::STATUS_FAILED;
         }
+
         return null;
+    }
+
+    /**
+     * метод возвращает массив всех действий
+     * @return array
+     */
+    public static function getAllActions() : array
+    {
+        return [
+            self::ACTION_START    => ActionStart::class,
+            self::ACTION_CANCEL   => ActionCancel::class,
+            self::ACTION_COMPLETE => ActionComplete::class,
+            self::ACTION_REFUSAL  => ActionRefusal::class
+        ];
     }
 }
