@@ -2,43 +2,53 @@
 
 require_once '../vendor/autoload.php';
 
-class StartTest
+class Tester
 {
-    public static $pathArray = [];
-    public static $nameClasses = [];
+    private $pathArray = [];
+    private $namespacesTests = [];
 
     public function __construct()
     {
-        $this->searchTestMethods();
+        $this->run();
     }
 
-    /*
-     * получает путь к классам
-     */
-
-    public function searchTestMethods() : void
+    private function run(): void
     {
-        self::registerload();
-        foreach (StartTest::$nameClasses as $name) {
-            $reflection = new ReflectionClass($name);
+        $this->registerload();
+        foreach ($this->namespacesTests as $namespace) {
+            $reflection = new ReflectionClass($namespace);
             foreach ($reflection->getMethods() as $method) {
                 if (strstr($method->name, 'test')) {
-                    $method->invoke($reflection->newInstance());
+                    try {
+                        if ( ! $method->invoke($reflection->newInstance())) {
+                            throw new \src\error\baseException('Ошибка вызова теста');
+                        };
+                    } catch (\src\error\ActionException $e) {
+                        echo $e->getMessage() . PHP_EOL;
+                    } catch (\src\error\TaskException $e) {
+                        echo $e->getMessage() . PHP_EOL;
+                    } catch (\src\error\BaseException $e) {
+                        echo $e->getMessage() . PHP_EOL;
+                    }
                 }
             }
         }
     }
 
-    public static function registerload() : void
+    private function registerload(): void
     {
-        self::getPath();
-        self::includeClass();
+        $this->getPath();
+        $this->includeTests();
+        $this->namespaceGenerator();
     }
 
-    public static function getPath() : void
+    /**
+     *  получает путь к классам
+     */
+    private function getPath(): void
     {
         // сканирует папку с тестами
-        $dir = scandir('tests\\');
+        $dir = scandir('tests/');
         // префикс для пути к файлу
         $dirStr = 'tests/';
         for ($i = 0; $i < count($dir); $i++) {
@@ -48,48 +58,37 @@ class StartTest
                 $path = $dirStr . strstr($dir[$i], 'Test');
                 // убирает лишнии классы
                 if ( ! strstr($dir[$i], 'Test.')) {
-                    array_push(self::$pathArray, $path);
+                    array_push($this->pathArray, $path);
                 }
             }
         }
     }
 
-    /*
-     * ищет методы для теста
-     */
-
     /**
      * подключает классы с префиксом test
      */
-    public static function includeClass() : void
+    private function includeTests(): void
     {
-        foreach (self::$pathArray as $item) {
-            $nameClass = substr($item, 0, -4);
-            $nameClass = str_replace('tests/', '', $nameClass);
-            $nameClass = ('src\tests\\' . $nameClass);
-            array_push(self::$nameClasses, $nameClass);
-            include_once $item;
+        foreach ($this->pathArray as $path) {
+            include_once $path;
         }
     }
-} $startTest = new StartTest();
 
-
-try {
-    $task = new \Logic\Task(1,2);
-    $task->getActionForStatus(1);
-    $task->getActionForStatus(3);
-    $task->getNextStatus(new \src\Logic\actions\ActionCancel());
-    $task->getNextStatus(new \src\Logic\actions\ActionStart());
-    $task->getNextStatus(new \src\Logic\actions\ActionRefusal());
-    $task->getNextStatus(new \src\Logic\actions\ActionComplete());
-    $action = new \src\Logic\actions\ActionStart();
-    $action->checkRights(1,2,2);
-    $action = new \src\Logic\actions\ActionCancel();
-    $action->checkRights(1,2,1);
-    $action = new \src\Logic\actions\ActionComplete();
-    $action->checkRights(1,2,1);
-    $action = new \src\Logic\actions\ActionRefusal();
-    $action->checkRights(1,2,2);
-} catch (\src\error\ErrorHandler $e) {
-    exit($e->getMessage());
+    /**
+     * генерирует namespace's для тестов
+     */
+    private function namespaceGenerator(): void
+    {
+        foreach ($this->pathArray as $path) {
+            // cut .php
+            $nameTest = substr($path, 0, -4);
+            // replace / on \ for correct namespace
+            $nameTest = str_replace('/', '\\', $nameTest);
+            // generate namespace
+            $nameTest = ('src\\' . $nameTest);
+            array_push($this->namespacesTests, $nameTest);
+        }
+    }
 }
+
+$startTest = new Tester();
