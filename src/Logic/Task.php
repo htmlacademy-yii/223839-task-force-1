@@ -2,8 +2,10 @@
 
 namespace Logic;
 
-use src\error\ErrorHandler;
+use src\error\ActionException;
+use src\error\baseException;
 use src\Logic\actions\{Action, ActionCancel, ActionComplete, ActionRefusal, ActionStart};
+use src\error\TaskException;
 
 
 /**
@@ -17,12 +19,19 @@ class Task
     const ACTION_REFUSAL = 2;
     const ACTION_COMPLETE = 3;
     const ACTION_CANCEL = 4;
+    const ACTIONS_NAMES = [
+        ActionStart::class,
+        ActionCancel::class,
+        ActionComplete::class,
+        ActionRefusal::class
+    ];
 
     const STATUS_NEW = 1;
     const STATUS_CANCELED = 2;
     const STATUS_ACTIVE = 3;
     const STATUS_COMPLETED = 4;
     const STATUS_FAILED = 5;
+
 
     protected $customerID;
     protected $performerID;
@@ -45,15 +54,15 @@ class Task
      * @param int $status
      *
      * @return Action[]
-     * @throws ErrorHandler
+     * @throws baseException
      */
-    public function getActionForStatus(int $status) : array
+    public function getActionForStatus(int $status): array
     {
         if ( ! array_key_exists($status, Task::getAllStatuses())) {
-            throw new ErrorHandler('Статус не существует');
+            throw new TaskException('Статус не существует', __FILE__, __LINE__, $status);
         }
         if ($status != self::STATUS_NEW && $status != self::STATUS_ACTIVE) {
-            throw new ErrorHandler('У статуса нет действий');
+            throw new TaskException('У статуса нет действий', __FILE__, __LINE__, $status);
         }
         switch ($status) {
             case self::STATUS_NEW:
@@ -75,7 +84,7 @@ class Task
      * метод возвращает массив всех статусов
      * @return array
      */
-    public static function getAllStatuses() : array
+    public static function getAllStatuses(): array
     {
         return [
             self::STATUS_NEW       => 'Новый',
@@ -92,13 +101,13 @@ class Task
      * @param Action $action
      *
      * @return int|null
-     * @throws ErrorHandler
+     * @throws baseException
      */
-    public function getNextStatus(Action $action) : ?int
+    public function getNextStatus(Action $action): ?int
     {
         $action = get_class($action);
-        if ( ! in_array($action, Task::getAllActions(), true)) {
-            throw new ErrorHandler('действие отсутствует');
+        if ( ! in_array($action, self::ACTIONS_NAMES,true)) {
+            throw new ActionException(' действие отсутствует', __FILE__, __LINE__, $action);
         }
         switch ($action) {
             case ActionStart::class:
@@ -118,13 +127,13 @@ class Task
      * метод возвращает массив всех действий
      * @return array
      */
-    public static function getAllActions() : array
+    public static function getAllActions(): array
     {
         return [
-            self::ACTION_START    => ActionStart::class,
-            self::ACTION_CANCEL   => ActionCancel::class,
-            self::ACTION_COMPLETE => ActionComplete::class,
-            self::ACTION_REFUSAL  => ActionRefusal::class
+            self::ACTION_START    => 'начать',
+            self::ACTION_CANCEL   => 'отменить',
+            self::ACTION_COMPLETE => 'завершить',
+            self::ACTION_REFUSAL  => 'отказаться'
         ];
     }
 }
