@@ -7,21 +7,16 @@ use src\Logic\actions\ActionCancel;
 
 class TestActionCancel
 {
-    public static function getTask(int $customerID, int $performerID)
-    {
-        return new Task($customerID, $performerID);
-    }
-
     public function testIsHasCancel() : bool
     {
-        $task = self::getTask(1,2);
+        $task = new Task(1,2);
         $action = new ActionCancel();
         return assert(in_array($action, $task->getActionForStatus(Task::STATUS_NEW)),  'Action не разрешен');
     }
 
     public function testStatusAfterCancel() : bool
     {
-        $task = self::getTask(1,2);
+        $task = new Task(1,2);
         $action = new ActionCancel();
         $status = Task::STATUS_CANCELED;
         return assert($task->getNextStatus($action) === $status,

@@ -9,21 +9,16 @@ use src\Logic\actions\ActionRefusal;
 
 class TestActionRefusal
 {
-    public static function getTask(int $customerID, int $performerID)
-    {
-        return new Task($customerID,$performerID);
-    }
-
     public function testIsHasRefusal() : bool
     {
-        $task = self::getTask(1,2);
+        $task = new Task(1,2);
         $action = new ActionRefusal();
         return assert(in_array($action, $task->getActionForStatus(Task::STATUS_ACTIVE)),  'Action не разрешен');
     }
 
     public function testStatusAfterRefusal() : bool
     {
-        $task = self::getTask(1,2);
+        $task = new Task(1,2);
         $action = new ActionRefusal();
         $status = Task::STATUS_FAILED;
         return assert($task->getNextStatus($action) === $status,

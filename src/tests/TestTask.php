@@ -9,14 +9,9 @@ use src\Logic\actions\{ActionStart, ActionRefusal, ActionComplete, ActionCancel}
 
 class TestTask
 {
-    public static function getTask(int $customerID,int  $performerID)
-    {
-        return new Task($customerID,$performerID);
-    }
-
     public function testRightActionsForNew()
     {
-        $task = self::getTask(1, 2);
+        $task = new Task(1, 2);
         $status = Task::STATUS_NEW;
         $action1 = new ActionStart();
         $action2 = new ActionCancel();
@@ -26,7 +21,7 @@ class TestTask
 
     public function testRightActionsForActive()
     {
-        $task = self::getTask(1, 2);
+        $task = new Task(1, 2);
         $status = Task::STATUS_ACTIVE;
         $action1 = new ActionComplete();
         $action2 = new ActionRefusal();

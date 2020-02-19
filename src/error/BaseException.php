@@ -3,12 +3,12 @@
 namespace src\error;
 
 use Exception;
-use Throwable;
 
 class ErrorHandler extends Exception
 {
-    public function __construct($message)
+    public function __construct($message, $file)
     {
+        echo $file . '<br>';
         parent::__construct($message);
     }
 }

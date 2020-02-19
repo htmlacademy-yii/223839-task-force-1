@@ -9,21 +9,16 @@ use src\Logic\actions\ActionComplete;
 
 class TestActionComplete
 {
-    public static function getTask(int $customerID, int $performerID)
-    {
-        return new Task($customerID, $performerID);
-    }
-
     public function testStartActionCheckRight() : bool
     {
-        $task = self::getTask(1,2);
+        $task = new Task(1,2);
         $action = new ActionComplete();
         return assert(in_array($action, $task->getActionForStatus(Task::STATUS_ACTIVE)),  'Action не разрешен');
     }
 
     public function testIsHasComplete() : bool
     {
-        $task = self::getTask(1,2);
+        $task = new Task(1,2);
         $action = new ActionComplete();
         $status = Task::STATUS_COMPLETED;
         return assert($task->getNextStatus($action) === $status,
