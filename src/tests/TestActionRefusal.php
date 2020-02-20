@@ -29,7 +29,7 @@ class TestActionRefusal
     public function testStartActionCheckRight() : bool
     {
         $action = new ActionRefusal();
-        $test = $action->checkRights(1, 2, '2');
+        $test = $action->checkRights(1, 2, 2);
         return assert($test, $action::getInnerName() . ' действие не доступно для пользователя');
     }
 }

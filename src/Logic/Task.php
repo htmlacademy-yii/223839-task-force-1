@@ -2,14 +2,13 @@
 
 namespace Logic;
 
-use src\error\ActionException;
-use src\error\baseException;
 use src\Logic\actions\{Action, ActionCancel, ActionComplete, ActionRefusal, ActionStart};
-use src\error\TaskException;
-
+use src\error\ActionNotExistException;
+use src\error\TaskStatusNotExistException;
+use src\error\TaskStatusNotHasActionsException;
 
 /**
- * Класс определяет списки действий и статусов, а также выполняет базовую работу с ними.
+ * Класс определяет списки действий и статусов, а также выполняет базовую работу с ними
  * Class Task
  * @package Logic
  */
@@ -54,15 +53,16 @@ class Task
      * @param int $status
      *
      * @return Action[]
-     * @throws baseException
+     * @throws TaskStatusNotExistException Статуса не существует
+     * @throws TaskStatusNotHasActionsException Статус существует, но для него нет доступных действий
      */
     public function getActionForStatus(int $status): array
     {
         if ( ! array_key_exists($status, Task::getAllStatuses())) {
-            throw new TaskException('Статус не существует', __FILE__, __LINE__, $status);
+            throw new TaskStatusNotExistException('Status not exist');
         }
         if ($status != self::STATUS_NEW && $status != self::STATUS_ACTIVE) {
-            throw new TaskException('У статуса нет действий', __FILE__, __LINE__, $status);
+            throw new TaskStatusNotHasActionsException('Status don\'t have actions');
         }
         switch ($status) {
             case self::STATUS_NEW:
@@ -75,13 +75,13 @@ class Task
                     new ActionComplete(),
                     new ActionRefusal()
                 ];
+            default:
+                return null;
         }
-
-        return null;
     }
 
     /**
-     * метод возвращает массив всех статусов
+     * Метод возвращает массив всех статусов
      * @return array
      */
     public static function getAllStatuses(): array
@@ -96,19 +96,20 @@ class Task
     }
 
     /**
-     * метод для получения статуса, в которой он перейдёт после выполнения указанного действия
+     * Метод для получения статуса, в которой он перейдёт после выполнения указанного действия
      *
      * @param Action $action
      *
      * @return int|null
-     * @throws baseException
+     * @throws ActionNotExistException Действие не существует
      */
     public function getNextStatus(Action $action): ?int
     {
         $action = get_class($action);
-        if ( ! in_array($action, self::ACTIONS_NAMES,true)) {
-            throw new ActionException(' действие отсутствует', __FILE__, __LINE__, $action);
+        if ( ! in_array($action, self::ACTIONS_NAMES, true)) {
+            throw new ActionNotExistException('Action not exist');
         }
+
         switch ($action) {
             case ActionStart::class:
                 return self::STATUS_ACTIVE;
@@ -118,13 +119,14 @@ class Task
                 return self::STATUS_COMPLETED;
             case ActionRefusal::class:
                 return self::STATUS_FAILED;
+            default:
+                return null;
         }
 
-        return null;
     }
 
     /**
-     * метод возвращает массив всех действий
+     * Метод возвращает массив всех действий
      * @return array
      */
     public static function getAllActions(): array

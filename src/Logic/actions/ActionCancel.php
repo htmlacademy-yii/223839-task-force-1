@@ -3,7 +3,7 @@
 namespace src\Logic\actions;
 
 
-use src\error\ActionException;
+use src\error\AccessIsDeniedException;
 
 class ActionCancel extends Action
 {
@@ -15,8 +15,9 @@ class ActionCancel extends Action
     public function checkRights(int $customerID, int $performerID, int $currentUserID): bool
     {
         if ($customerID !== $currentUserID) {
-            throw new ActionException(' доступ запрещен', __FILE__, __LINE__, ActionCancel::getInnerName());
+            throw new AccessIsDeniedException('Access is denied');
         }
-        return $customerID === $currentUserID;
+
+        return true;
     }
 }

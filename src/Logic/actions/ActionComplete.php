@@ -15,9 +15,9 @@ class ActionComplete extends Action
     public function checkRights(int $customerID, int $performerID, int $currentUserID): bool
     {
         if ($customerID !== $currentUserID) {
-            throw new ActionException(' доступ запрещен', __FILE__, __LINE__, ActionComplete::getInnerName());
-        } else {
-            return $customerID === $currentUserID;
+            throw new AccessIsDeniedException('Access is denied');
         }
+
+        return true;
     }
 }

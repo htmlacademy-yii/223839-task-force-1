@@ -6,7 +6,7 @@ namespace src\Logic\actions;
 abstract class Action
 {
     /**
-     * метод для возврата имени класса без namespace
+     * Метод для возврата имени класса
      * @return string
      */
     public static function getInnerName() : string
@@ -15,7 +15,7 @@ abstract class Action
     }
 
     /**
-     * метод для возврата названия
+     * Метод для возврата названия
      * @return string
      */
     abstract function getPublicName() : string;

@@ -7,12 +7,18 @@ class Tester
     private $pathArray = [];
     private $namespacesTests = [];
 
+    /**
+     * Tester constructor.
+     */
     public function __construct()
     {
-        $this->run();
+
     }
 
-    private function run(): void
+    /**
+     * @throws ReflectionException
+     */
+    public function run(): void
     {
         $this->registerload();
         foreach ($this->namespacesTests as $namespace) {
@@ -20,14 +26,14 @@ class Tester
             foreach ($reflection->getMethods() as $method) {
                 if (strstr($method->name, 'test')) {
                     try {
-                        if ( ! $method->invoke($reflection->newInstance())) {
-                            throw new \src\error\baseException('Ошибка вызова теста');
-                        };
-                    } catch (\src\error\ActionException $e) {
+                        $method->invoke($reflection->newInstance());
+                    } catch (\src\error\ActionNotExistException $e) {
                         echo $e->getMessage() . PHP_EOL;
-                    } catch (\src\error\TaskException $e) {
+                    } catch (\src\error\AccessIsDeniedException $e) {
                         echo $e->getMessage() . PHP_EOL;
-                    } catch (\src\error\BaseException $e) {
+                    } catch (\src\error\TaskStatusNotExistException $e) {
+                        echo $e->getMessage() . PHP_EOL;
+                    } catch (\src\error\TaskStatusNotHasActionsException $e) {
                         echo $e->getMessage() . PHP_EOL;
                     }
                 }
@@ -39,11 +45,11 @@ class Tester
     {
         $this->getPath();
         $this->includeTests();
-        $this->namespaceGenerator();
+        $this->generateNamespaces();
     }
 
     /**
-     *  получает путь к классам
+     *  Получает путь к классам
      */
     private function getPath(): void
     {
@@ -65,7 +71,7 @@ class Tester
     }
 
     /**
-     * подключает классы с префиксом test
+     * Подключает классы с префиксом test
      */
     private function includeTests(): void
     {
@@ -75,9 +81,9 @@ class Tester
     }
 
     /**
-     * генерирует namespace's для тестов
+     * Генерирует namespace's для тестов
      */
-    private function namespaceGenerator(): void
+    private function generateNamespaces(): void
     {
         foreach ($this->pathArray as $path) {
             // cut .php
@@ -90,5 +96,5 @@ class Tester
         }
     }
 }
-
-$startTest = new Tester();
+$tester = new Tester();
+$tester->run();

@@ -15,9 +15,9 @@ class ActionStart extends Action
     public function checkRights(int $customerID, int $performerID, int $currentUserID): bool
     {
         if ($performerID !== $currentUserID) {
-            throw new ActionException(' доступ запрещен', __FILE__, __LINE__, ActionStart::getInnerName());
+            throw new AccessIsDeniedException('Access is denied');
         }
 
-        return $performerID === $currentUserID;
+        return true;
     }
 }
