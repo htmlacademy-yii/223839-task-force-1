@@ -6,29 +6,28 @@ namespace src\Logic\actions;
 abstract class Action
 {
     /**
-     * метод для возврата названия
+     * Метод для возврата имени класса
      * @return string
      */
-    abstract function getPublicName();
+    public static function getInnerName() : string
+    {
+        return static::class;
+    }
 
     /**
-     * метод для возврата имени класса без namespace
+     * Метод для возврата названия
      * @return string
      */
-    public static function getInnerName()
-    {
-        $class = explode('\\', static::class);
-        return $class[count($class) - 1];
-    }
+    abstract function getPublicName() : string;
 
     /**
      * Метод возвращает true или false в зависимости от доступности выполнения этого действия
      *
-     * @param $customerID
-     * @param $performerID
-     * @param $currentUserID
+     * @param int $customerID
+     * @param int $performerID
+     * @param int $currentUserID
      *
      * @return bool
      */
-    abstract protected function checkRights($customerID, $performerID, $currentUserID);
+    abstract protected function checkRights(int $customerID, int $performerID, int $currentUserID) : bool;
 }

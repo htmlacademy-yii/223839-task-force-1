@@ -9,29 +9,24 @@ use src\Logic\actions\ActionStart;
 
 class TestActionStart
 {
-    public static function getTask($customerID, $performerID)
+    public function testIsHasStart() : bool
     {
-        return new Task($customerID,$performerID);
-    }
-
-    public function testIsHasStart()
-    {
-        $task = self::getTask(1,2);
+        $task = new Task(1,2);
         $action = new ActionStart();
         return assert(in_array($action, $task->getActionForStatus(Task::STATUS_NEW)),  'Action не разрешен');
     }
 
-    public function testStatusAfterStart()
+    public function testStatusAfterStart() : bool
     {
-        $task = self::getTask(1,2);
-        $action = ActionStart::getInnerName();
+        $task = new Task(1,2);
+        $action = new ActionStart();
         $status = Task::STATUS_ACTIVE;
         return assert($task->getNextStatus($action) === $status,
-            $task->getNextStatus($action) . ' != ' .  $status . ' |  статус после выполнения ' . $action
-            . ' не соотвутствует этому действию' );
+            $task->getNextStatus($action) . ' != ' .  $status . ' |  статус после выполнения ' . $action::getInnerName()
+            . ' не соответствует этому действию' );
     }
 
-    public function testStartActionCheckRight()
+    public function testStartActionCheckRight() : bool
     {
         $action = new ActionStart();
         $test = $action->checkRights(1, 2, 2);

@@ -1,78 +1,91 @@
 <?php
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
+
 require_once '../vendor/autoload.php';
 
-use Logic\Task;
-use src\Logic\actions\{ActionStart, ActionRefusal, ActionComplete, ActionCancel};
-
-class StartTest
+class Tester
 {
-    public static $pathArray = [];
-    public static $nameClasses = [];
+    private $pathArray = [];
+    private $namespacesTests = [];
 
-    public function __construct()
+    /**
+     * @throws ReflectionException
+     */
+    public function run(): void
     {
-        $this->searchTestMethods();
+        $this->registerload();
+        foreach ($this->namespacesTests as $namespace) {
+            $reflection = new ReflectionClass($namespace);
+            foreach ($reflection->getMethods() as $method) {
+                if (strstr($method->name, 'test')) {
+                    try {
+                        $method->invoke($reflection->newInstance());
+                    } catch (\src\error\BaseException $e) {
+                        echo $e->getMessage();
+                    }
+                }
+            }
+        }
     }
 
-    /*
-     * получает путь к классам
+    private function registerload(): void
+    {
+        $this->getPath();
+        $this->includeTests();
+        $this->generateNamespaces();
+    }
+
+    /**
+     *  Получает путь к классам
      */
-    public static function getPath()
+    private function getPath(): void
     {
         // сканирует папку с тестами
-        $dir = scandir('tests\\');
+        $dir = scandir('tests/');
         // префикс для пути к файлу
         $dirStr = 'tests/';
-        for($i = 0; $i < count($dir); $i++ ) {
+        for ($i = 0; $i < count($dir); $i++) {
             // если значение true
-            if( strstr($dir[$i], 'Test' ) ) {
+            if (strstr($dir[$i], 'Test')) {
                 // записываем путь к тестам
                 $path = $dirStr . strstr($dir[$i], 'Test');
                 // убирает лишнии классы
-                if(!strstr($dir[$i], 'Test.')) {
-                    array_push(self::$pathArray, $path);
+                if (!strstr($dir[$i], 'Test.')) {
+                    array_push($this->pathArray, $path);
                 }
             }
         }
     }
 
     /**
-     * подключает классы с префиксом test
+     * Подключает классы с префиксом test
      */
-    public static function includeClass()
+    private function includeTests(): void
     {
-        foreach (self::$pathArray as $item) {
-            $nameClass = substr($item, 0, -4);
-            $nameClass = str_replace('tests/', '', $nameClass);
-            $nameClass = ('src\tests\\' . $nameClass);
-            array_push(self::$nameClasses, $nameClass);
-            include_once $item;
+        foreach ($this->pathArray as $path) {
+            include_once $path;
         }
     }
 
-    /*
-     *
+    /**
+     * Генерирует namespace's для тестов
      */
-    public static function registerload()
+    private function generateNamespaces(): void
     {
-        self::getPath();
-        self::includeClass();
-    }
-
-    /*
-     * ищет методы для теста
-     */
-    public function searchTestMethods()
-    {
-        self::registerload();
-        foreach (StartTest::$nameClasses as $name) {
-            $reflection = new ReflectionClass($name);
-            foreach ($reflection->getMethods() as $method) {
-                if (strstr($method->name, 'test')) {
-                    $method->invoke($reflection->newInstance());
-                }
-            }
+        foreach ($this->pathArray as $path) {
+            // cut .php
+            $nameTest = substr($path, 0, -4);
+            // replace / on \ for correct namespace
+            $nameTest = str_replace('/', '\\', $nameTest);
+            // generate namespace
+            $nameTest = ('src\\' . $nameTest);
+            array_push($this->namespacesTests, $nameTest);
         }
     }
 }
-$startTest = new StartTest();
+
+$tester = new Tester();
+$tester->run();

@@ -9,29 +9,24 @@ use src\Logic\actions\ActionRefusal;
 
 class TestActionRefusal
 {
-    public static function getTask($customerID, $performerID)
+    public function testIsHasRefusal(): bool
     {
-        return new Task($customerID,$performerID);
-    }
-
-    public function testIsHasRefusal()
-    {
-        $task = self::getTask(1,2);
+        $task = new Task(1, 2);
         $action = new ActionRefusal();
-        return assert(in_array($action, $task->getActionForStatus(Task::STATUS_ACTIVE)),  'Action не разрешен');
+        return assert(in_array($action, $task->getActionForStatus(Task::STATUS_ACTIVE)), 'Action не разрешен');
     }
 
-    public function testStatusAfterRefusal()
+    public function testStatusAfterRefusal(): bool
     {
-        $task = self::getTask(1,2);
-        $action = ActionRefusal::getInnerName();
+        $task = new Task(1, 2);
+        $action = new ActionRefusal();
         $status = Task::STATUS_FAILED;
         return assert($task->getNextStatus($action) === $status,
-            $task->getNextStatus($action) . ' != ' .  $status . ' |  статус после выполнения ' . $action
-            . ' не соотвутствует этому действию' );
+            $task->getNextStatus($action) . ' != ' . $status . ' |  статус после выполнения ' . $action::getInnerName()
+            . ' не соответствует этому действию');
     }
 
-    public function testStartActionCheckRight()
+    public function testStartActionCheckRight(): bool
     {
         $action = new ActionRefusal();
         $test = $action->checkRights(1, 2, 2);
