@@ -6,8 +6,9 @@ namespace src\error;
 
 class AccessIsDeniedException extends BaseException
 {
-    public function __construct($message)
+    public function __construct($message = null)
     {
-        parent::__construct($message);
+        $this->message = $message ?? 'Access is denied';
+        parent::__construct($this->message);
     }
 }

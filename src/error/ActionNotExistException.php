@@ -6,8 +6,9 @@ namespace src\error;
 
 class ActionNotExistException extends BaseException
 {
-    public function __construct($message)
+    public function __construct($message = null)
     {
-        parent::__construct($message);
+        $this->message = $message ?? 'Action not exist';
+        parent::__construct($this->message);
     }
 }

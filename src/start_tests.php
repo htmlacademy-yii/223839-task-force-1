@@ -1,4 +1,8 @@
 <?php
+ini_set('error_reporting', E_ALL);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+
 
 require_once '../vendor/autoload.php';
 
@@ -6,14 +10,6 @@ class Tester
 {
     private $pathArray = [];
     private $namespacesTests = [];
-
-    /**
-     * Tester constructor.
-     */
-    public function __construct()
-    {
-
-    }
 
     /**
      * @throws ReflectionException
@@ -27,14 +23,8 @@ class Tester
                 if (strstr($method->name, 'test')) {
                     try {
                         $method->invoke($reflection->newInstance());
-                    } catch (\src\error\ActionNotExistException $e) {
-                        echo $e->getMessage() . PHP_EOL;
-                    } catch (\src\error\AccessIsDeniedException $e) {
-                        echo $e->getMessage() . PHP_EOL;
-                    } catch (\src\error\TaskStatusNotExistException $e) {
-                        echo $e->getMessage() . PHP_EOL;
-                    } catch (\src\error\TaskStatusNotHasActionsException $e) {
-                        echo $e->getMessage() . PHP_EOL;
+                    } catch (\src\error\BaseException $e) {
+                        echo $e->getMessage();
                     }
                 }
             }
@@ -63,7 +53,7 @@ class Tester
                 // записываем путь к тестам
                 $path = $dirStr . strstr($dir[$i], 'Test');
                 // убирает лишнии классы
-                if ( ! strstr($dir[$i], 'Test.')) {
+                if (!strstr($dir[$i], 'Test.')) {
                     array_push($this->pathArray, $path);
                 }
             }
@@ -96,5 +86,6 @@ class Tester
         }
     }
 }
+
 $tester = new Tester();
 $tester->run();

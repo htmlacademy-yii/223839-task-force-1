@@ -43,7 +43,7 @@ class Task
      */
     public function __construct(int $customerID, int $performerID)
     {
-        $this->customerID  = $customerID;
+        $this->customerID = $customerID;
         $this->performerID = $performerID;
     }
 
@@ -58,11 +58,11 @@ class Task
      */
     public function getActionForStatus(int $status): array
     {
-        if ( ! array_key_exists($status, Task::getAllStatuses())) {
-            throw new TaskStatusNotExistException('Status not exist');
+        if (!array_key_exists($status, Task::getAllStatuses())) {
+            throw new TaskStatusNotExistException();
         }
         if ($status != self::STATUS_NEW && $status != self::STATUS_ACTIVE) {
-            throw new TaskStatusNotHasActionsException('Status don\'t have actions');
+            throw new TaskStatusNotHasActionsException();
         }
         switch ($status) {
             case self::STATUS_NEW:
@@ -87,11 +87,11 @@ class Task
     public static function getAllStatuses(): array
     {
         return [
-            self::STATUS_NEW       => 'Новый',
-            self::STATUS_CANCELED  => 'Отмененный',
-            self::STATUS_ACTIVE    => 'Действующий',
+            self::STATUS_NEW => 'Новый',
+            self::STATUS_CANCELED => 'Отмененный',
+            self::STATUS_ACTIVE => 'Действующий',
             self::STATUS_COMPLETED => 'Завершенный',
-            self::STATUS_FAILED    => 'Проваленный'
+            self::STATUS_FAILED => 'Проваленный'
         ];
     }
 
@@ -106,8 +106,8 @@ class Task
     public function getNextStatus(Action $action): ?int
     {
         $action = get_class($action);
-        if ( ! in_array($action, self::ACTIONS_NAMES, true)) {
-            throw new ActionNotExistException('Action not exist');
+        if (!in_array($action, self::ACTIONS_NAMES, true)) {
+            throw new ActionNotExistException();
         }
 
         switch ($action) {
@@ -132,10 +132,10 @@ class Task
     public static function getAllActions(): array
     {
         return [
-            self::ACTION_START    => 'начать',
-            self::ACTION_CANCEL   => 'отменить',
+            self::ACTION_START => 'начать',
+            self::ACTION_CANCEL => 'отменить',
             self::ACTION_COMPLETE => 'завершить',
-            self::ACTION_REFUSAL  => 'отказаться'
+            self::ACTION_REFUSAL => 'отказаться'
         ];
     }
 }

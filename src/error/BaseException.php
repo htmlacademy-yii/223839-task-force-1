@@ -3,11 +3,8 @@
 namespace src\error;
 
 use Exception;
+use Throwable;
 
 class BaseException extends Exception
 {
-    public function __construct($message)
-    {
-        parent::__construct($message);
-    }
 }

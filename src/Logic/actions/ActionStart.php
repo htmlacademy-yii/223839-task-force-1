@@ -3,7 +3,7 @@
 namespace src\Logic\actions;
 
 
-use src\error\ActionException;
+use src\error\AccessIsDeniedException;
 
 class ActionStart extends Action
 {
@@ -15,7 +15,7 @@ class ActionStart extends Action
     public function checkRights(int $customerID, int $performerID, int $currentUserID): bool
     {
         if ($performerID !== $currentUserID) {
-            throw new AccessIsDeniedException('Access is denied');
+            throw new AccessIsDeniedException();
         }
 
         return true;
