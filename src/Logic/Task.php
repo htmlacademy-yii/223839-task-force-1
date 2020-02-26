@@ -53,7 +53,7 @@ class Task
      * @param int $status
      *
      * @return Action[]
-     * @throws TaskStatusNotExistException Статуса не существует
+     * @throws TaskStatusNotExistException Статус не существует
      * @throws TaskStatusNotHasActionsException Статус существует, но для него нет доступных действий
      */
     public function getActionForStatus(int $status): array

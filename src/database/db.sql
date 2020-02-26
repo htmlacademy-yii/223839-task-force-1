@@ -6,8 +6,12 @@ USE taskForce;
 -- таблица городов
 CREATE TABLE `cities` (
 	`id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	`name` VARCHAR(50) NOT NULL,
-	UNIQUE KEY `name`(`name`)
+	`city` VARCHAR(50) NOT NULL,
+	`lat` FLOAT NOT NULL,
+	`long` FLOAT NOT NULL,
+--  UNIQUE KEY `city`(`city`)
+	UNIQUE KEY `lat`(`lat`),
+	UNIQUE KEY `long`(`long`)
 )
 	ENGINE = INNODB;
 -- таблица категорий
