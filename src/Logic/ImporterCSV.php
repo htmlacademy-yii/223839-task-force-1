@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Logic;
 
 /**
@@ -14,42 +13,53 @@ class ImporterCSV
     /**
      * @var array массив с данными из файла
      */
-    private $csv_values = [];
+    private array $csv_values = [];
 
     /**
-     * @var array содержит массив с именами столбцов
+     * @var string содержит строку с именами столбцов
      */
-    private $columnNames;
+    private string $columnNames;
 
     /**
      * @var string имя таблицы
      */
-    private $tableName;
+    private string $tableName;
 
+    /**
+     * @var string sql запрос к базе данных в виде строки
+     */
+    private string $request = '';
 
-    public function run(string $filePath, string $dirSQL_files): void
+    public function run(string $dir, string $dirToSave): void
     {
-        $file = $this->initSplFile($filePath);
+        foreach (scandir($dir) as $file) {
+            $pathOfFile = "$dir/$file";
+            if (is_file($pathOfFile)) {
+                $this->setValues($pathOfFile);
 
-        $this->setValues($file);
+                $this->setColumnNames();
 
-        $this->setColumnNames();
+                $this->setRequest();
 
-        $request = $this->setRequest();
+                $this->request .= $this->setRequest();
+            }
+        }
+        $this->createFile($dirToSave, $this->request);
 
-        $this->createFile($request, $dirSQL_files);
     }
 
     /**
      * Инициализирует объект класса SplFileObject и записывает имя таблицы
-     * @param string $filePath путь к файлу
-     * @return \SplFileObject экземпляр объекта класса SplFileObject
+     * @param string $file
+     * @return \SplFileObject
      */
-    private function initSplFile(string $filePath): \SplFileObject
+    private function initSplFile(string $file): \SplFileObject
     {
-        $file = new \SplFileObject($filePath);
+        $this->tableName = pathinfo($file)['filename'];
 
-        $this->tableName = pathinfo($filePath)['filename'];
+        $this->$file = $file;
+
+        $file = new \SplFileObject($file);
 
         return $file;
     }
@@ -61,18 +71,19 @@ class ImporterCSV
      */
     private function generateValues(\SplFileObject $file): \Generator
     {
-        while (!$file->eof()) {
+        $file->setFlags(\SplFileObject::READ_CSV);
+        while ($file->valid()) {
             yield $file->fgetcsv();
         }
     }
 
     /**
-     * Метод обходит null значения и записывает сгенерированные значения в массив $csv_values
-     * @param \SplFileObject $file
+     * Метод записывает сгенерированные значения в массив $csv_values
      */
-    private function setValues(\SplFileObject $file): void
+    private function setValues($file): void
     {
-        foreach ($this->generateValues($file) as $value) {
+        $generator = $this->generateValues($this->initSplFile($file));
+        foreach ($generator as $value) {
             if (!in_array(null, $value, true)) {
                 array_push($this->csv_values, $value);
             }
@@ -85,24 +96,26 @@ class ImporterCSV
     private function setColumnNames(): void
     {
         // запись имен столбцов
-        $this->columnNames = implode('`,`', $this->csv_values[0]);
+        $this->columnNames = implode('`,`', $this->csv_values[1]);
+        $this->columnNames = trim($this->columnNames);
+
 
         // удаление имен столбца из массива со значениями
         array_shift($this->csv_values);
+
     }
 
     /**
      * Метод записывает SQL запрос к базе данных
      *
-     * @return string запрос к базе данных
      * @uses $columnNames
      * @uses $csv_values
      * @uses $tableName
      */
     private function setRequest(): string
     {
-        $columnNames = trim($this->columnNames);
-        $request = "INSERT INTO `$this->tableName`(`{$columnNames}`)\n";
+        $request = "INSERT INTO `%1s`(`%2s`)\n";
+        $request = sprintf($request, $this->tableName, $this->columnNames);
         $request .= "VALUES ";
 
         foreach ($this->csv_values as $values) {
@@ -120,19 +133,19 @@ class ImporterCSV
             $request .= "),\n";
         }
         // удаление переноса и запятой у последнего элемента
-        $request = substr($request, 0, -2);
+        $request = substr($request, 0, -2) . ";\n";
 
         return $request;
     }
 
     /**
      * Метод записывает запрос в файл
-     * @param string $request строка запроса для записи
-     * @param string $dir путь куда записать файлы
+     * @param string $dir
+     * @param string $request
      */
-    private function createFile(string $request, string $dir): void
+    private function createFile(string $dir, string $request): void
     {
-        $fp = fopen($dir . $this->tableName . '-query.sql', 'w');
+        $fp = fopen($dir . 'queries.sql', 'w');
         fwrite($fp, $request);
         fclose($fp);
     }

@@ -9,7 +9,6 @@ CREATE TABLE `cities` (
 	`city` VARCHAR(50) NOT NULL,
 	`lat` FLOAT NOT NULL,
 	`long` FLOAT NOT NULL,
---  UNIQUE KEY `city`(`city`)
 	UNIQUE KEY `lat`(`lat`),
 	UNIQUE KEY `long`(`long`)
 )
