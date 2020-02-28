@@ -28,38 +28,54 @@ class ImporterCSV
     /**
      * @var string sql запрос к базе данных в виде строки
      */
-    private string $request = '';
+    private string $request;
+
+    private array $files = [];
 
     public function run(string $dir, string $dirToSave): void
+    {
+        $this->scan($dir);
+        foreach ($this->files as $file) {
+            var_dump($file);
+
+            $file = $this->initSplFile($file);
+
+            $this->setValues($file);
+
+            $this->setColumnNames();
+
+            echo '<pre>';
+            var_dump($this->setRequest());
+            echo '</pre>';
+            $request = $this->setRequest();
+
+            $this->createFile($dirToSave, $request);
+
+            unset($request);
+        }
+
+    }
+
+    private function scan($dir): void
     {
         foreach (scandir($dir) as $file) {
             $pathOfFile = "$dir/$file";
             if (is_file($pathOfFile)) {
-                $this->setValues($pathOfFile);
-
-                $this->setColumnNames();
-
-                $this->setRequest();
-
-                $this->request .= $this->setRequest();
+                array_push($this->files, $pathOfFile);
             }
         }
-        $this->createFile($dirToSave, $this->request);
-
     }
 
     /**
      * Инициализирует объект класса SplFileObject и записывает имя таблицы
-     * @param string $file
+     * @param string $filePath
      * @return \SplFileObject
      */
-    private function initSplFile(string $file): \SplFileObject
+    private function initSplFile(string $filePath): \SplFileObject
     {
-        $this->tableName = pathinfo($file)['filename'];
+        $this->tableName = pathinfo($filePath)['filename'];
 
-        $this->$file = $file;
-
-        $file = new \SplFileObject($file);
+        $file = new \SplFileObject($filePath);
 
         return $file;
     }
@@ -82,7 +98,8 @@ class ImporterCSV
      */
     private function setValues($file): void
     {
-        $generator = $this->generateValues($this->initSplFile($file));
+        $generator = $this->generateValues($file);
+        $this->csv_values = [];
         foreach ($generator as $value) {
             if (!in_array(null, $value, true)) {
                 array_push($this->csv_values, $value);
@@ -96,13 +113,11 @@ class ImporterCSV
     private function setColumnNames(): void
     {
         // запись имен столбцов
-        $this->columnNames = implode('`,`', $this->csv_values[1]);
+        $this->columnNames = implode('`,`', $this->csv_values[0]);
         $this->columnNames = trim($this->columnNames);
-
 
         // удаление имен столбца из массива со значениями
         array_shift($this->csv_values);
-
     }
 
     /**
@@ -145,7 +160,7 @@ class ImporterCSV
      */
     private function createFile(string $dir, string $request): void
     {
-        $fp = fopen($dir . 'queries.sql', 'w');
+        $fp = fopen($dir . "{$this->tableName}_queries.sql", 'w');
         fwrite($fp, $request);
         fclose($fp);
     }
