@@ -26,17 +26,15 @@ class ImporterCSV
     private string $tableName;
 
     /**
-     * @var string sql запрос к базе данных в виде строки
+     * @var array объекты SplFileObject
      */
-    private string $request;
-
     private array $files = [];
 
     public function run(string $dir, string $dirToSave): void
     {
         $this->scan($dir);
+
         foreach ($this->files as $file) {
-            var_dump($file);
 
             $file = $this->initSplFile($file);
 
@@ -44,19 +42,12 @@ class ImporterCSV
 
             $this->setColumnNames();
 
-            echo '<pre>';
-            var_dump($this->setRequest());
-            echo '</pre>';
-            $request = $this->setRequest();
-
-            $this->createFile($dirToSave, $request);
-
-            unset($request);
+            $this->createFile($dirToSave, $this->setRequest());
         }
 
     }
 
-    private function scan($dir): void
+    private function scan(string $dir): void
     {
         foreach (scandir($dir) as $file) {
             $pathOfFile = "$dir/$file";
@@ -95,10 +86,12 @@ class ImporterCSV
 
     /**
      * Метод записывает сгенерированные значения в массив $csv_values
+     * @param \SplFileObject $file
      */
-    private function setValues($file): void
+    private function setValues(\SplFileObject $file): void
     {
         $generator = $this->generateValues($file);
+
         $this->csv_values = [];
         foreach ($generator as $value) {
             if (!in_array(null, $value, true)) {
