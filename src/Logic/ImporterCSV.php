@@ -30,6 +30,8 @@ class ImporterCSV
      */
     private array $files = [];
 
+    private string $request = '';
+
     public function run(string $dir, string $dirToSave): void
     {
         $this->scan($dir);
@@ -42,9 +44,10 @@ class ImporterCSV
 
             $this->setColumnNames();
 
-            $this->createFile($dirToSave, $this->setRequest());
-        }
+            $this->request .= $this->setRequest();
 
+            $this->createFile($dirToSave, $this->request);
+        }
     }
 
     private function scan(string $dir): void
@@ -153,7 +156,7 @@ class ImporterCSV
      */
     private function createFile(string $dir, string $request): void
     {
-        $fp = fopen($dir . "{$this->tableName}_queries.sql", 'w');
+        $fp = fopen($dir . "queries.sql", 'w');
         fwrite($fp, $request);
         fclose($fp);
     }
