@@ -1,128 +1,73 @@
 <?php
 
-
 namespace Logic\Convertors;
 
+use Logic\convertors\ConvertorTemplate\ConvertorInterface;
+use \Logic\convertors\File\File;
 
-/**
- * Класс импортирует данные из CSV в запрос в SQL файле
- *
- * Class ImporterCSV
- * @package Logic
- */
-class ConvertorCSVtoSQL extends Convertor
+class ConvertorSQL implements ConvertorInterface
 {
-    protected FileToConverting $file;
-    protected string $pathToSaveFile;
-    protected string $content = '';
+    private File $convertFile;
+    private $content;
+    private string $pathToSave;
 
-    public function __construct(string $path, string $pathToSaveFile)
+    public function __construct(string $pathToFile, string $pathToSave)
     {
-        parent::__construct($path, $pathToSaveFile);
-    }
-
-    public function convert(): void
-    {
-        $sql = new SQLquery($this->file);
-        $this->content = $sql->getRequest();
-        parent::convert();
-    }
-}
-
-class SQLquery
-{
-
-    /**
-     * @var array массив с данными из файла
-     */
-    private array $csv_values = [];
-    private FileToConverting $file;
-
-    public function __construct(FileToConverting $file)
-    {
-        $this->file = $file;
-        $this->setValues();
+        $this->convertFile = new File($pathToFile);
+        $this->pathToSave = $pathToSave;
+        $this->content = $this->convertFile->content->generateContent();
     }
 
     private function getTableName()
     {
-        return preg_replace('/\.[a-zA-Z0-9а-яА-я]*/i', '', $this->file->getFileInfo()->getFilename());
+        $ext = $this->convertFile->getFileInfo()->getExtension();
+        $pattern = '/.' . $ext . '/xi';
+        $tableName = '`' . preg_replace($pattern, '', $this->convertFile->getFileInfo()->getFilename()) . '`';
+        return $tableName;
     }
 
-    /**
-     * Метод записывает сгенерированные значения в массив $csv_values
-     */
-    private function setValues(): void
+    private function getColumnsNames()
     {
-        $this->csv_values = [];
-        foreach ($this->file->generateContent() as $value) {
-            if ($value) {
-                array_push($this->csv_values, $value);
+        $columnsNames = array_shift($this->content);
+        $lenghtArr = count($columnsNames);
+        for ($i = 0; $i < $lenghtArr; $i++) {
+            if ($i === $lenghtArr - 1) {
+                $array[] = "{$columnsNames[$i]}";
+                return '`' . implode('`,`', $columnsNames) . '`';
+            }
+            $array[] = "`{$columnsNames[$i]}`,";
+        }
+    }
+
+    public function getInsertQuery()
+    {
+        array_pop($this->content);
+        $insert = "INSERT INTO  %1s(%2s)\n";
+        $insert = sprintf($insert, $this->getTableName(), $this->getColumnsNames());
+        $insert .= 'VALUES ';
+        foreach ($this->content as $values) {
+            if (!empty($values)) {
+                $insert .= "(";
+                foreach ($values as $value) {
+                    if (is_numeric($value)) {
+                        $insert .= "{$value},";
+                    } else {
+                        $insert .= "'{$value}',";
+                    }
+                }
+                // удаление последней запятой в строке
+                $insert = substr($insert, 0, -1);
+                $insert .= "),\n";
             }
         }
-    }
-
-    private function getColumnNames()
-    {
-        $columnNames = explode(',', array_shift($this->csv_values));
-        $columnNames = '`' . trim(implode('`,`', $columnNames));
-        $columnNames .= '`';
-        return $columnNames;
-    }
-
-    private function generateInsertValues($arr)
-    {
-//        foreach ($arr as $item) {
-//            if (is_numeric($item)) {
-//                echo gettype($item) . ' INT ';
-//            } else {
-//                echo gettype($item) .' STRING ';
-//            }
-//        }
-//        debug($arr);
-
-    }
-
-    /**
-     * Method returns an array with values ​​for insert request
-     * @return array
-     */
-    private function getValuesQuery(): array
-    {
-        $this->getColumnNames();
-        $insert = [];
-        $insertEnd = trim(array_pop($this->csv_values));
-        $insertEnd = "({$insertEnd})";
-        foreach ($this->csv_values as $values) {
-            $this->csv_values;
-            $values = explode(',', $values);
-            debug($values);
-            echo gettype($values[2]);
-            $this->generateInsertValues($values);
-
-            $values = implode(',', $values);
-            array_push($insert, "({$values}),");
-        }
-        array_push($insert, $insertEnd);
+        // удаление последней запятой и переноса строки в тексте
+        $insert = substr($insert, 0, -2);
         return $insert;
     }
 
-
-    /**
-     * Метод записывает SQL запрос к базе данных
-     *
-     * @uses $csv_values
-     * @uses $tableName
-     */
-    public function getRequest(): string
+    public function convert(): void
     {
-        $request = "INSERT INTO `%1s`(%2s)\n";
-        $request = sprintf($request, $this->getTableName(), $this->getColumnNames());
-        $request .= "VALUES ";
-        foreach ($this->getValuesQuery() as $value) {
-            $request .= "{$value}\n";
-        }
-        return $request;
+        $this->getInsertQuery();
+
     }
 }
-
