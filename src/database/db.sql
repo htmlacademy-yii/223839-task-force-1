@@ -17,6 +17,7 @@ CREATE TABLE `cities` (
 CREATE TABLE `categories` (
 	`id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	`name` VARCHAR(100) NOT NULL,
+	`icon` VARCHAR(100) NOT NULL,
 	UNIQUE KEY `name`(`name`)
 )
 	ENGINE = INNODB;
@@ -26,6 +27,7 @@ CREATE TABLE `users`(
 	`first_name` VARCHAR(30) NOT NULL,
 	`last_name` VARCHAR(50) NULL,
 	`city_id` INT UNSIGNED NULL,
+	`address` VARCHAR(500) UNSIGNED NULL,
 	`email` VARCHAR(50) NOT NULL,
 	`phone` VARCHAR(11) NOT NULL,
 	`password` CHAR(32) NOT NULL,

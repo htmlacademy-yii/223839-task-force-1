@@ -4,8 +4,6 @@
 namespace src\error;
 
 
-use Throwable;
-
 class TaskStatusNotExistException extends BaseException
 {
     public function __construct($message = null)
