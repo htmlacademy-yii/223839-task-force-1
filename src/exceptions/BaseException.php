@@ -1,9 +1,8 @@
 <?php
 
-namespace src\error;
+namespace src\exceptions;
 
 use Exception;
-use Throwable;
 
 class BaseException extends Exception
 {

@@ -3,7 +3,7 @@
 namespace src\Logic\actions;
 
 
-use src\error\AccessIsDeniedException;
+use src\exceptions\AccessIsDeniedException;
 
 class ActionCancel extends Action
 {

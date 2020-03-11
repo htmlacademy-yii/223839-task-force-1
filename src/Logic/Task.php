@@ -3,9 +3,9 @@
 namespace Logic;
 
 use src\Logic\actions\{Action, ActionCancel, ActionComplete, ActionRefusal, ActionStart};
-use src\error\ActionNotExistException;
-use src\error\TaskStatusNotExistException;
-use src\error\TaskStatusNotHasActionsException;
+use src\exceptions\ActionNotExistException;
+use src\exceptions\TaskStatusNotExistException;
+use src\exceptions\TaskStatusNotHasActionsException;
 
 /**
  * Класс определяет списки действий и статусов, а также выполняет базовую работу с ними
