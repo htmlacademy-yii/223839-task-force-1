@@ -5,16 +5,16 @@ namespace src\Logic\actions;
 
 use src\exceptions\AccessIsDeniedException;
 
-class ActionStart extends Action
+class TaskActionCancel extends TaskAction
 {
     public function getPublicName(): string
     {
-        return 'Принять';
+        return 'Отменить';
     }
 
     public function checkRights(int $customerID, int $performerID, int $currentUserID): bool
     {
-        if ($performerID !== $currentUserID) {
+        if ($customerID !== $currentUserID) {
             throw new AccessIsDeniedException();
         }
 

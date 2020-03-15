@@ -1,73 +1,39 @@
 <?php
 
-namespace Logic\Convertors;
+namespace Logic\convertors;
 
-use Logic\convertors\ConvertorTemplate\ConvertorInterface;
-use \Logic\convertors\File\File;
+use Logic\convertors\ConvertorInterface;
+use Logic\FileSystem\FileSystemMediator;
+use Logic\data\sql\SQLdata;
 
 class ConvertorSQL implements ConvertorInterface
 {
-    private File $convertFile;
-    private $content;
-    private string $pathToSave;
-
-    public function __construct(string $pathToFile, string $pathToSave)
+    public function __construct(string $pathFiles)
     {
-        $this->convertFile = new File($pathToFile);
-        $this->pathToSave = $pathToSave;
-        $this->content = $this->convertFile->content->generateContent();
+        $this->fileSystemMediator = new FileSystemMediator();
+        $this->files = $this->fileSystemMediator->reader->getSPLFilesObjectsGroup($pathFiles);
     }
 
-    private function getTableName()
+    public function convert(): string
     {
-        $ext = $this->convertFile->getFileInfo()->getExtension();
-        $pattern = '/.' . $ext . '/xi';
-        $tableName = '`' . preg_replace($pattern, '', $this->convertFile->getFileInfo()->getFilename()) . '`';
-        return $tableName;
-    }
-
-    private function getColumnsNames()
-    {
-        $columnsNames = array_shift($this->content);
-        $lenghtArr = count($columnsNames);
-        for ($i = 0; $i < $lenghtArr; $i++) {
-            if ($i === $lenghtArr - 1) {
-                $array[] = "{$columnsNames[$i]}";
-                return '`' . implode('`,`', $columnsNames) . '`';
-            }
-            $array[] = "`{$columnsNames[$i]}`,";
+        $query = '';
+        foreach ($this->files as $file) {
+            $tableName = $this->getTableName($file);
+            $content = $this->fileSystemMediator->reader->getFileContent($file);
+            $columnsNames = $this->getColumnsNames($content);
+            $sql = new SQLdata($tableName, $columnsNames, $content);
+            $query .= $sql->getQuery();
         }
+        return $query;
     }
 
-    public function getInsertQuery()
+    private function getTableName($file)
     {
-        array_pop($this->content);
-        $insert = "INSERT INTO  %1s(%2s)\n";
-        $insert = sprintf($insert, $this->getTableName(), $this->getColumnsNames());
-        $insert .= 'VALUES ';
-        foreach ($this->content as $values) {
-            if (!empty($values)) {
-                $insert .= "(";
-                foreach ($values as $value) {
-                    if (is_numeric($value)) {
-                        $insert .= "{$value},";
-                    } else {
-                        $insert .= "'{$value}',";
-                    }
-                }
-                // удаление последней запятой в строке
-                $insert = substr($insert, 0, -1);
-                $insert .= "),\n";
-            }
-        }
-        // удаление последней запятой и переноса строки в тексте
-        $insert = substr($insert, 0, -2);
-        return $insert;
+        return $this->fileSystemMediator->reader->getFileNameWithoutExtension($file);
     }
 
-    public function convert(): void
+    private function getColumnsNames(array $content)
     {
-        $this->getInsertQuery();
-
+        return implode(',', $content[0]);
     }
 }

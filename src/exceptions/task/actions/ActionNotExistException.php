@@ -4,11 +4,11 @@
 namespace src\exceptions;
 
 
-class PathEmptyException extends BaseException
+class ActionNotExistException extends BaseException
 {
     public function __construct($message = null)
     {
-        $this->message = $message ?? 'Path empty';
+        $this->message = $message ?? 'TaskAction not exist';
         parent::__construct($this->message);
     }
 }

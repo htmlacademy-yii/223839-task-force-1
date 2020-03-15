@@ -27,7 +27,7 @@ CREATE TABLE `users`(
 	`first_name` VARCHAR(30) NOT NULL,
 	`last_name` VARCHAR(50) NULL,
 	`city_id` INT UNSIGNED NULL,
-	`address` VARCHAR(500) UNSIGNED NULL,
+	`address` VARCHAR(500) NULL,
 	`email` VARCHAR(50) NOT NULL,
 	`phone` VARCHAR(11) NOT NULL,
 	`password` CHAR(32) NOT NULL,
@@ -53,7 +53,8 @@ CREATE TABLE `tasks` (
 	`title` VARCHAR(255) NOT NULL,
 	`created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`updated_at` DATETIME NULL,
-	`price` INT UNSIGNED NULL,
+	`closed_at` DATETIME NULL,
+	`budget` INT UNSIGNED NULL,
 	`city_id` INT UNSIGNED NULL,
 	`lat` INT(10), -- широта
 	`lon` INT(10), -- долгота
@@ -160,7 +161,7 @@ CREATE TABLE `reviews` (
 	`customer_id` INT UNSIGNED NOT NULL,
 	`performer_id` INT UNSIGNED NOT NULL,
 	`text` TEXT NULL,
-	`raiting` TINYINT UNSIGNED NULL,
+	`rating` TINYINT UNSIGNED NULL,
 	`created_at`	 DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	FOREIGN KEY (`customer_id`) REFERENCES `users`(`id`)
 	ON DELETE CASCADE

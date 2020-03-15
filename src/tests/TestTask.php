@@ -4,7 +4,7 @@
 namespace src\tests;
 
 use Logic\Task;
-use src\Logic\actions\{ActionStart, ActionRefusal, ActionComplete, ActionCancel};
+use src\Logic\actions\{TaskActionStart, TaskActionRefusal, TaskActionComplete, TaskActionCancel};
 
 
 class TestTask
@@ -13,8 +13,8 @@ class TestTask
     {
         $task = new Task(1, 2);
         $status = Task::STATUS_NEW;
-        $action1 = new ActionStart();
-        $action2 = new ActionCancel();
+        $action1 = new TaskActionStart();
+        $action2 = new TaskActionCancel();
         $actions = [$action1, $action2];
         return assert($task->getActionForStatus($status) == $actions, 'идентичность объектов в массиве');
     }
@@ -23,8 +23,8 @@ class TestTask
     {
         $task = new Task(1, 2);
         $status = Task::STATUS_ACTIVE;
-        $action1 = new ActionComplete();
-        $action2 = new ActionRefusal();
+        $action1 = new TaskActionComplete();
+        $action2 = new TaskActionRefusal();
         $actions = [$action1, $action2];
         return assert($task->getActionForStatus($status) == $actions, 'идентичность объектов в массиве');
     }

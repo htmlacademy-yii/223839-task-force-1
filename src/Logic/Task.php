@@ -2,7 +2,7 @@
 
 namespace Logic;
 
-use src\Logic\actions\{Action, ActionCancel, ActionComplete, ActionRefusal, ActionStart};
+use src\Logic\actions\{TaskAction, TaskActionCancel, TaskActionComplete, TaskActionRefusal, TaskActionStart};
 use src\exceptions\ActionNotExistException;
 use src\exceptions\TaskStatusNotExistException;
 use src\exceptions\TaskStatusNotHasActionsException;
@@ -19,10 +19,10 @@ class Task
     const ACTION_COMPLETE = 3;
     const ACTION_CANCEL = 4;
     const ACTIONS_NAMES = [
-        ActionStart::class,
-        ActionCancel::class,
-        ActionComplete::class,
-        ActionRefusal::class
+        TaskActionStart::class,
+        TaskActionCancel::class,
+        TaskActionComplete::class,
+        TaskActionRefusal::class
     ];
 
     const STATUS_NEW = 1;
@@ -52,7 +52,7 @@ class Task
      *
      * @param int $status
      *
-     * @return Action[]
+     * @return TaskAction[]
      * @throws TaskStatusNotExistException Статус не существует
      * @throws TaskStatusNotHasActionsException Статус существует, но для него нет доступных действий
      */
@@ -67,13 +67,13 @@ class Task
         switch ($status) {
             case self::STATUS_NEW:
                 return [
-                    new ActionStart(),
-                    new ActionCancel()
+                    new TaskActionStart(),
+                    new TaskActionCancel()
                 ];
             case self::STATUS_ACTIVE:
                 return [
-                    new ActionComplete(),
-                    new ActionRefusal()
+                    new TaskActionComplete(),
+                    new TaskActionRefusal()
                 ];
             default:
                 return null;
@@ -98,12 +98,12 @@ class Task
     /**
      * Метод для получения статуса, в которой он перейдёт после выполнения указанного действия
      *
-     * @param Action $action
+     * @param TaskAction $action
      *
      * @return int|null
      * @throws ActionNotExistException Действие не существует
      */
-    public function getNextStatus(Action $action): ?int
+    public function getNextStatus(TaskAction $action): ?int
     {
         $action = get_class($action);
         if (!in_array($action, self::ACTIONS_NAMES, true)) {
@@ -111,13 +111,13 @@ class Task
         }
 
         switch ($action) {
-            case ActionStart::class:
+            case TaskActionStart::class:
                 return self::STATUS_ACTIVE;
-            case ActionCancel::class:
+            case TaskActionCancel::class:
                 return self::STATUS_CANCELED;
-            case ActionComplete::class:
+            case TaskActionComplete::class:
                 return self::STATUS_COMPLETED;
-            case ActionRefusal::class:
+            case TaskActionRefusal::class:
                 return self::STATUS_FAILED;
             default:
                 return null;

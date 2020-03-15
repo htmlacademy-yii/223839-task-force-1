@@ -3,7 +3,7 @@
 namespace src\Logic\actions;
 
 
-abstract class Action
+abstract class TaskAction
 {
     /**
      * Метод для возврата имени класса

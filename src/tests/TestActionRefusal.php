@@ -5,21 +5,21 @@ namespace src\tests;
 
 
 use Logic\Task;
-use src\Logic\actions\ActionRefusal;
+use src\Logic\actions\TaskActionRefusal;
 
 class TestActionRefusal
 {
     public function testIsHasRefusal(): bool
     {
         $task = new Task(1, 2);
-        $action = new ActionRefusal();
-        return assert(in_array($action, $task->getActionForStatus(Task::STATUS_ACTIVE)), 'Action не разрешен');
+        $action = new TaskActionRefusal();
+        return assert(in_array($action, $task->getActionForStatus(Task::STATUS_ACTIVE)), 'TaskAction не разрешен');
     }
 
     public function testStatusAfterRefusal(): bool
     {
         $task = new Task(1, 2);
-        $action = new ActionRefusal();
+        $action = new TaskActionRefusal();
         $status = Task::STATUS_FAILED;
         return assert($task->getNextStatus($action) === $status,
             $task->getNextStatus($action) . ' != ' . $status . ' |  статус после выполнения ' . $action::getInnerName()
@@ -28,7 +28,7 @@ class TestActionRefusal
 
     public function testStartActionCheckRight(): bool
     {
-        $action = new ActionRefusal();
+        $action = new TaskActionRefusal();
         $test = $action->checkRights(1, 2, 2);
         return assert($test, $action::getInnerName() . ' действие не доступно для пользователя');
     }

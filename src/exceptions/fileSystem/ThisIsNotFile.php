@@ -1,10 +1,11 @@
 <?php
 
 
-namespace src\exceptions;
+namespace src\exceptions\fileSystem;
 
+use src\exceptions\BaseException;
 
-class IsNotFileException extends BaseException
+class ThisIsNotFile extends BaseException
 {
     public function __construct($message = null)
     {

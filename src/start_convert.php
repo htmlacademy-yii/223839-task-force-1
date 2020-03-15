@@ -1,19 +1,23 @@
 <?php
+
 require_once '../vendor/autoload.php';
 
-use Logic\Convertors\ConvertorSQL;
+use Logic\convertors\ConvertorSQL;
+
+class ConvertRunner
+{
+    public function convert(string $pathFilesDir, string $pathToSaveFile)
+    {
+        $convertor = new ConvertorSQL($pathFilesDir);
+        $query = $convertor->convert();
+    }
+}
 
 $dir = '../data/';
 
 $filePath = $dir . DIRECTORY_SEPARATOR . 'cities.csv';
-$dirToSave = __DIR__ . '/database/queris/quersy.sql';
+$pathFileToSave = __DIR__ . '/database/queris/quersy.sql';
 
-$convertor = new ConvertorSQL($filePath, $dirToSave);
-try {
-    $convertor->convert();
-} catch (\src\exceptions\BaseException $e) {
-    echo $e->getMessage();
-}
-
-
+$convertor = new ConvertRunner();
+$convertor->convert($dir, $filePath);
 
