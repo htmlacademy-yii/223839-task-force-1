@@ -37,9 +37,4 @@ class FileActionOpen implements IFileActions
         return new \SplFileObject($this->path);
     }
 
-
-    protected function checkRights(int $customerID, int $performerID, int $currentUserID): bool
-    {
-        // TODO: Implement checkRights() method.
-    }
 }
