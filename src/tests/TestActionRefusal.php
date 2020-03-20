@@ -1,8 +1,6 @@
 <?php
 
-
 namespace src\tests;
-
 
 use Logic\Task;
 use src\Logic\actions\TaskActionRefusal;

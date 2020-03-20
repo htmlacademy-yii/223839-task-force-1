@@ -1,11 +1,9 @@
 <?php
 
-
 namespace src\tests;
 
 use Logic\Task;
 use src\Logic\actions\{TaskActionStart, TaskActionRefusal, TaskActionComplete, TaskActionCancel};
-
 
 class TestTask
 {
