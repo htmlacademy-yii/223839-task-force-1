@@ -54,6 +54,7 @@ CREATE TABLE `tasks` (
 	`created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`updated_at` DATETIME NULL,
 	`closed_at` DATETIME NULL,
+	`address` VARCHAR(500) NULL,
 	`budget` INT UNSIGNED NULL,
 	`city_id` INT UNSIGNED NULL,
 	`lat` INT(10), -- широта
@@ -98,7 +99,6 @@ CREATE TABLE `responses` (
 	`response_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	`text` TEXT NOT NULL,
 	`offer_price` INT UNSIGNED NULL,
-	UNIQUE KEY (`task_id`, `performer_id`),
 	FOREIGN KEY (`task_id`) REFERENCES `tasks`(`id`)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE,
