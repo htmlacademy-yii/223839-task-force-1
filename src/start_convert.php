@@ -1,21 +1,42 @@
 <?php
 
+use Logic\FileSystem\Data\IDTO;
+use Logic\FileSystem\Managers\IReader;
+use Logic\FileSystem\Managers\IWriter;
+
 require_once '../vendor/autoload.php';
 
 class ConvertRunner
 {
-    public function __construct()
+    private IReader $reader;
+    private IWriter $writer;
+    private IDTO $DTO;
+
+    private string $content = '';
+    private array $files;
+
+    public function __construct(IReader $reader, IWriter $writer)
     {
-        $this->reader    = new \Logic\FileSystem\managers\Readers\ReaderCSV();
-        $this->writer    = new \Logic\FileSystem\managers\Writers\Writer();
-        $this->convertor = new \Logic\FileSystem\Convertors\ConvertorCSVtoSQL($this->reader, $this->writer);
+        $this->reader = $reader;
+        $this->writer = $writer;
     }
 
-    public function startConvert(string $dirPath, string $fileSavePath, array $queueGroup)
+    public function startConvert(string $dirPath, string $fileSavePath, array $queueGroup): void
     {
-        $files   = $this->getSortQueueFiles($queueGroup, $dirPath);
-        $content = $this->getContentToWrite($files);
+        $this->files = $this->getSortQueueFiles($queueGroup, $dirPath);
+        foreach ($this->files as $file) {
+            $file = new SplFileObject($file);
+            $file->setFlags(SplFileObject::SKIP_EMPTY);
 
+            $this->DTO     = $this->reader->getDTO($file);
+            $this->content .= $this->writer->getContent($this->DTO);
+
+        }
+        $this->saveResult($fileSavePath);
+    }
+
+    private function saveResult(string $fileSavePath): void
+    {
         if ($this->reader->checkExistFile($fileSavePath)) {
             unlink($fileSavePath);
         }
@@ -23,7 +44,7 @@ class ConvertRunner
         $this->writer->createFile($fileSavePath);
         $file = $this->reader->openFile($fileSavePath, 'w');
 
-        $this->writer->writeInFile($file, $content);
+        $this->writer->writeInFile($file, $this->content);
         $this->writer->closeFile($file);
     }
 
@@ -37,19 +58,10 @@ class ConvertRunner
         return $files;
     }
 
-    private function getContentToWrite(array $files): string
-    {
-        $content = '';
-        foreach ($files as $filePath) {
-            $content .= $this->convertor->convertData($filePath);
-        }
-
-        return $content;
-    }
 }
 
 $dir          = '../data/';
-$pathFileSave = __DIR__.'/database/queris/query.sql';
+$fileSavePath = __DIR__.'/database/queris/query.sql';
 $queue        = [
     'cities.csv',
     'categories.csv',
@@ -58,6 +70,8 @@ $queue        = [
     'reviews.csv',
     'responses.csv',
 ];
+$reader       = new \Logic\FileSystem\Managers\Readers\ReaderCSV();
+$writer       = new \Logic\FileSystem\Managers\Writers\WriterSQL();
 
-$convertor = new ConvertRunner();
-$convertor->startConvert($dir, $pathFileSave, $queue);
+$convertRunner = new ConvertRunner($reader, $writer);
+$convertRunner->startConvert($dir, $fileSavePath, $queue);

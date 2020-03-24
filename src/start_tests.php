@@ -5,14 +5,14 @@ ini_set('display_startup_errors', 1);
 
 require_once '../vendor/autoload.php';
 
-use src\exceptions\BaseException;
+use Src\Exceptions\BaseException;
 
 
 
 
 class Tester
 {
-    private string $pathToTests = '.'.DIRECTORY_SEPARATOR.'tests'.DIRECTORY_SEPARATOR;
+    private string $pathToTests = '.'.DIRECTORY_SEPARATOR.'Tests'.DIRECTORY_SEPARATOR;
 
     private array $pathArray = [];
     private array $pathsTests = [];
