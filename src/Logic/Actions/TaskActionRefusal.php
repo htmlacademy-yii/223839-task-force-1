@@ -1,9 +1,8 @@
 <?php
 
-namespace src\Logic\actions;
+namespace Logic\Actions;
 
-
-use src\exceptions\AccessIsDeniedException;
+use Exceptions\AccessIsDeniedException;
 
 class TaskActionRefusal extends TaskAction
 {

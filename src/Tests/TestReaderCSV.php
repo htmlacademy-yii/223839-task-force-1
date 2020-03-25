@@ -1,6 +1,6 @@
 <?php
 
-namespace Src\Tests;
+namespace Tests;
 
 use Logic\FileSystem\Managers\Readers\ReaderCSV;
 

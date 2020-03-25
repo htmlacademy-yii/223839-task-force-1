@@ -2,14 +2,10 @@
 
 namespace Logic\FileSystem\Managers;
 
+use Logic\FileSystem\Data\DTO;
+use Logic\FileSystem\Data\IDTO;
+
 interface IReader
 {
-    public function openFile(string $path, string $mode);
-
-    public function checkExistFile(string $filePath) : bool;
-
-    public function readFile(\SplFileObject $file): array;
-
-    public function getDTO(\SplFileObject $file);
-
+    public function readData(string $path): array;
 }

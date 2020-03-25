@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Src\Tests;
+namespace Tests;
 
 
 use Logic\Task;
-use Src\Logic\Actions\TaskActionStart;
+use Logic\Actions\TaskActionStart;
 
 class TestActionStart
 {
@@ -30,7 +30,7 @@ class TestActionStart
     {
         $action = new TaskActionStart();
         $test = $action->checkRights(1, 2, 2);
-        return assert($test, $action::getInnerName() . ' действие не доступно для пользователя');
+        return assert($test, $action::getInnerName() . ' действие не доступно для пользователя ');
     }
 
 }

@@ -1,16 +1,16 @@
 <?php
 
 
-namespace Src\Tests;
+namespace Tests;
 
 
-use Logic\FileSystem\Managers\Writers\Writer;
+use Logic\FileSystem\Managers\Writers\WriterSQL;
 
 class TestWriter
 {
     public function testCreateFile(): bool
     {
-        $writer   = new Writer();
+        $writer   = new WriterSQL();
         $filePath = __DIR__.'/test.test';
         if (file_exists($filePath)) {
             unlink($filePath);
@@ -24,7 +24,7 @@ class TestWriter
 
     public function testWriteInFile(): void
     {
-        $writer   = new Writer();
+        $writer   = new WriterSQL();
         $filePath = 'test.csv';
         $file     = fopen($filePath, 'w');
         $writer->writeInFile($file, '');
@@ -32,7 +32,7 @@ class TestWriter
 
     public function testCloseFile()
     {
-        $writer = new Writer();
+        $writer = new WriterSQL();
         $filePath = 'test.csv';
         $file     = fopen($filePath, 'r');
         $writer->closeFile($file);

@@ -1,15 +1,14 @@
 <?php
 
-
 namespace Exceptions\FileSystem;
 
 use Exceptions\BaseException;
 
-class ThisIsNotFileException extends BaseException
+class KeyNotExistException extends BaseException
 {
     public function __construct($message = null)
     {
-        $this->message = $message ?? 'This is not a file';
+        $this->message = $message ?? 'key not exist in data';
         parent::__construct($this->message);
     }
 }

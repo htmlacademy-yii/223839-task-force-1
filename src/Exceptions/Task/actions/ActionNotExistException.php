@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Src\Exceptions;
+namespace Exceptions;
 
 
 class ActionNotExistException extends BaseException

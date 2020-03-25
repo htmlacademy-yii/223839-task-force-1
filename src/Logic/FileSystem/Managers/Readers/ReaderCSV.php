@@ -2,72 +2,35 @@
 
 namespace Logic\FileSystem\Managers\Readers;
 
-use Logic\FileSystem\Data\CSV\CSVDTO;
+use Logic\FileSystem\Data\DTO;
+use Logic\FileSystem\Data\IDTO;
 use Logic\FileSystem\Managers\IReader;
-use Src\Exceptions\FileSystem\FileDoesNotExistsException;
-use Src\Exceptions\FileSystem\ThisIsNotFileException;
 
 class ReaderCSV implements IReader
 {
-    public function openFile(string $path, string $mode = 'r')
+    public function readData(string $path): array
     {
-        if ( ! file_exists($path)) {
-            throw new FileDoesNotExistsException();
+        $data = [];
+        foreach ($this->getReaderGenerator($path) as $values) {
+            $data[] = $values;
         }
 
-        return fopen($path, $mode);
+        return $data;
     }
 
-    public function checkExistFile(string $filePath): bool
+    private function getReaderGenerator(string $path): \Generator
     {
-        if ( ! file_exists($filePath)) {
-            return false;
-        }
-        if ( ! is_file($filePath)) {
-            throw new ThisIsNotFileException();
-        }
-
-        return true;
-    }
-
-    public function readFile(\SplFileObject $file): array
-    {
-        $content = [];
-        foreach ($this->getReaderGenerator($file) as $values) {
-            $content[] = $values;
-        }
-
-        return $content;
-    }
-
-    public function getDTO(\SplFileObject $file): CSVDTO
-    {
-        return $this->initCSVDTO($file);
-    }
-
-    private function initCSVDTO(\SplFileObject $file) : CSVDTO
-    {
-        $content = $this->readFile($file);
-        $fileName = $this->getFileName($file, true);
-        return new CSVDTO($content, $fileName);
-    }
-
-    private function getReaderGenerator(\SplFileObject $file): \Generator
-    {
-        while ($file->valid()) {
-            yield $file->fgetcsv();
+        $handler = $this->initSplFileObject($path);
+        while ($handler->valid()) {
+            yield $handler->fgetcsv();
         }
     }
 
-    private function getFileName(\SplFileObject $file, bool $cutFileExtension = false)
+    private function initSplFileObject(string $path): \SplFileObject
     {
-        $fileName = $file->getFilename();
-        if ($cutFileExtension) {
-            $fileDescription = $file->getExtension();
+        $handler = new \SplFileObject($path);
+        $handler->setFlags(\SplFileObject::SKIP_EMPTY);
 
-            return str_replace(".{$fileDescription}", '', $fileName);
-        }
-
-        return $fileName;
+        return $handler;
     }
 }

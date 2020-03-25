@@ -1,67 +1,59 @@
 <?php
 
+use Logic\FileSystem\Converter;
 use Logic\FileSystem\Data\IDTO;
 use Logic\FileSystem\Managers\IReader;
 use Logic\FileSystem\Managers\IWriter;
+use Logic\FileSystem\Managers\IContentManager;
 
 require_once '../vendor/autoload.php';
 
 class ConvertRunner
 {
+    private IDTO $DTO;
     private IReader $reader;
     private IWriter $writer;
-    private IDTO $DTO;
+    private Converter $converter;
+    private IContentManager $contentManager;
+    private string $data;
 
-    private string $content = '';
-    private array $files;
-
-    public function __construct(IReader $reader, IWriter $writer)
-    {
-        $this->reader = $reader;
-        $this->writer = $writer;
+    public function __construct(
+        IDTO $dto,
+        IReader $reader,
+        IWriter $writer,
+        Converter $converter,
+        IContentManager $contentManager
+    ) {
+        $this->DTO            = $dto;
+        $this->reader         = $reader;
+        $this->writer         = $writer;
+        $this->converter      = $converter;
+        $this->contentManager = $contentManager;
     }
 
-    public function startConvert(string $dirPath, string $fileSavePath, array $queueGroup): void
+    public function startConvert(): void
     {
-        $this->files = $this->getSortQueueFiles($queueGroup, $dirPath);
-        foreach ($this->files as $file) {
-            $file = new SplFileObject($file);
-            $file->setFlags(SplFileObject::SKIP_EMPTY);
-
-            $this->DTO     = $this->reader->getDTO($file);
-            $this->content .= $this->writer->getContent($this->DTO);
-
-        }
-        $this->saveResult($fileSavePath);
+        $this->data = $this->converter->converting($this->DTO, $this->writer);
     }
 
-    private function saveResult(string $fileSavePath): void
+    public function getData(): string
     {
-        if ($this->reader->checkExistFile($fileSavePath)) {
-            unlink($fileSavePath);
-        }
-
-        $this->writer->createFile($fileSavePath);
-        $file = $this->reader->openFile($fileSavePath, 'w');
-
-        $this->writer->writeInFile($file, $this->content);
-        $this->writer->closeFile($file);
+        return $this->data;
     }
 
-    private function getSortQueueFiles(array $queueGroup, string $dirPath): array
+    public function saveData(string $pathSave, string $data): void
     {
-        $files = [];
-        for ($index = 0; $index < count($queueGroup); $index++) {
-            $files[] = $dirPath.DIRECTORY_SEPARATOR."{$queueGroup[$index]}";
-        }
-
-        return $files;
+        $this->contentManager->saveContent($pathSave, $data);
     }
-
 }
 
+
+////////////////////////////////////////////////////////////////
+////////////////////     data       ////////////////////////////
+////////////////////////////////////////////////////////////////
+
 $dir          = '../data/';
-$fileSavePath = __DIR__.'/database/queris/query.sql';
+$fileSavePath = __DIR__.'/database/queries/query.sql';
 $queue        = [
     'cities.csv',
     'categories.csv',
@@ -70,8 +62,34 @@ $queue        = [
     'reviews.csv',
     'responses.csv',
 ];
-$reader       = new \Logic\FileSystem\Managers\Readers\ReaderCSV();
-$writer       = new \Logic\FileSystem\Managers\Writers\WriterSQL();
 
-$convertRunner = new ConvertRunner($reader, $writer);
-$convertRunner->startConvert($dir, $fileSavePath, $queue);
+$files = [];
+for ($index = 0; $index < count($queue); $index++) {
+    $files[] = $dir.DIRECTORY_SEPARATOR."{$queue[$index]}";
+}
+
+$DTO            = new \Logic\FileSystem\Data\DTO();
+$reader         = new \Logic\FileSystem\Managers\Readers\ReaderCSV();
+$writer         = new \Logic\FileSystem\Managers\Writers\WriterSQL();
+$fileManager    = new \Logic\FileSystem\Managers\FileManager\FileManager();
+$converter      = new \Logic\FileSystem\Converter();
+$contentManager = new \Logic\FileSystem\Managers\SaveContentManagers\ContentFilesManager($fileManager);
+
+////////////////////////////////////////////////////////////////
+////////////////////     logic       ///////////////////////////
+////////////////////////////////////////////////////////////////
+
+$data = '';
+foreach ($files as $filePath) {
+    $fileName = $fileManager->getHandlerName($filePath);
+    $content  = $reader->readData($filePath);
+
+    $DTO->__set('fileName', $fileName);
+    $DTO->__set('content', $content);
+
+    $converterRunner = new ConvertRunner($DTO, $reader, $writer, $converter, $contentManager);
+    $converterRunner->startConvert($filePath);
+    $data .= $converterRunner->getData();
+}
+
+$converterRunner->saveData($fileSavePath, $data);

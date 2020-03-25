@@ -1,9 +1,9 @@
 <?php
 
 
-namespace Src\Exceptions\FileSystem;
+namespace Exceptions\FileSystem;
 
-use Src\Exceptions\BaseException;
+use Exceptions\BaseException;
 
 class FileExistsException extends BaseException
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Src\Exceptions\FileSystem;
+namespace Exceptions\FileSystem;
 
-use Src\Exceptions\BaseException;
+use Exceptions\BaseException;
 
 class FileNotAvailableWritableException extends BaseException
 {

@@ -2,10 +2,10 @@
 
 namespace Logic;
 
-use src\Logic\actions\{TaskAction, TaskActionCancel, TaskActionComplete, TaskActionRefusal, TaskActionStart};
-use src\exceptions\ActionNotExistException;
-use src\exceptions\TaskStatusNotExistException;
-use src\exceptions\TaskStatusNotHasActionsException;
+use Logic\Actions\{TaskAction, TaskActionCancel, TaskActionComplete, TaskActionRefusal, TaskActionStart};
+use Exceptions\ActionNotExistException;
+use Exceptions\TaskStatusNotExistException;
+use Exceptions\TaskStatusNotHasActionsException;
 
 /**
  * Класс определяет списки действий и статусов, а также выполняет базовую работу с ними
@@ -107,7 +107,7 @@ class Task
     {
         $action = get_class($action);
         if (!in_array($action, self::ACTIONS_NAMES, true)) {
-            throw new ActionNotExistException();
+            throw new ActionNotExistException("{$action} line ".__LINE__." ".__METHOD__);
         }
 
         switch ($action) {

@@ -2,13 +2,9 @@
 
 namespace Logic\FileSystem\Managers;
 
+use Logic\FileSystem\Data\IDTO;
+
 interface IWriter
 {
-    public function createFile(string $path);
-
-    public function writeInFile($file, string $content): void;
-
-    public function closeFile($file): void;
-
-    public function getContent($dto): string;
+    public function getWriteData(IDTO $DTO): string;
 }

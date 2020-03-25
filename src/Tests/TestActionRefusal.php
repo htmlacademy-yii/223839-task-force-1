@@ -1,9 +1,9 @@
 <?php
 
-namespace Src\Tests;
+namespace Tests;
 
 use Logic\Task;
-use Src\Logic\Actions\TaskActionRefusal;
+use Logic\Actions\TaskActionRefusal;
 
 class TestActionRefusal
 {

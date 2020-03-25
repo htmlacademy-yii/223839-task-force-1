@@ -1,11 +1,11 @@
 <?php
 
 
-namespace Src\Tests;
+namespace Tests;
 
 
 use Logic\Task;
-use Src\Logic\Actions\TaskActionComplete;
+use Logic\Actions\TaskActionComplete;
 
 class TestActionComplete
 {

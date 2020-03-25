@@ -1,6 +1,6 @@
 <?php
 
-namespace src\Logic\actions;
+namespace Logic\Actions;
 
 
 abstract class TaskAction

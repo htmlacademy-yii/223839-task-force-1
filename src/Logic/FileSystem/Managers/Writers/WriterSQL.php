@@ -2,52 +2,23 @@
 
 namespace Logic\FileSystem\Managers\Writers;
 
-use Logic\FileSystem\Data\CSV\CSVDTO;
+use Logic\FileSystem\Data\IDTO;
 use Logic\FileSystem\Managers\IWriter;
-use Src\Exceptions\FileSystem\FileExistsException;
-use Src\Exceptions\FileSystem\ThisIsNotDTOException;
-use Src\Exceptions\FileSystem\ThisIsNotFileException;
 
 class WriterSQL implements IWriter
 {
-    private CSVDTO $CSVDTO;
+    private IDTO $DTO;
+    private array $content = [];
 
-    public function createFile(string $path)
+    public function getWriteData(IDTO $DTO): string
     {
-        if (file_exists($path)) {
-            throw new FileExistsException();
-        }
-        $fhandler = fopen($path, 'w');
-        $this->closeFile($fhandler);
+        $this->DTO     = $DTO;
+        $this->content = $this->DTO->__get('content');
+
+        return $this->getFormationQuery();
     }
 
-    public function writeInFile($fileHandler, string $content): void
-    {
-        if ( ! is_resource($fileHandler)) {
-            throw new ThisIsNotFileException();
-        }
-
-        fwrite($fileHandler, $content);
-    }
-
-    public function closeFile($fileHandler): void
-    {
-        if ( ! is_resource($fileHandler)) {
-            throw new ThisIsNotFileException();
-        }
-        fclose($fileHandler);
-    }
-
-    public function getContent($dto): string
-    {
-        if ( ! ($dto instanceof CSVDTO)) {
-            throw new ThisIsNotDTOException('this is not CSVDTO');
-        }
-        $this->CSVDTO = $dto;
-        return $this->formationQuery();
-    }
-
-    private function formationQuery(): string
+    private function getFormationQuery(): string
     {
         $insert = "INSERT INTO %1s(%2s)\n";
         $insert = sprintf($insert, $this->getTableNameForSQL(), $this->getColumnNamesForSQL());
@@ -65,7 +36,7 @@ class WriterSQL implements IWriter
     private function formationValuesQuery(): string
     {
         $insert = '';
-        foreach ($this->CSVDTO->getContent() as $values) {
+        foreach ($this->content as $values) {
             if ( ! empty($values)) {
                 $insert .= "(";
                 foreach ($values as $value) {
@@ -95,12 +66,12 @@ class WriterSQL implements IWriter
 
     private function getTableNameForSQL(): string
     {
-        return '`'.$this->CSVDTO->getFileName().'`';
+        return '`'.$this->DTO->__get('fileName')[0].'`';
     }
 
     private function getColumnNamesForSQL(): string
     {
-        $namesGroup = $this->CSVDTO->getContent()[0];
+        $namesGroup = array_shift($this->content);
         $counter    = count($namesGroup);
 
         return $this->formationColumnsNames($counter, $namesGroup);
