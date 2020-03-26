@@ -1,60 +1,13 @@
 <?php
 
-use Logic\FileSystem\Converter;
-use Logic\FileSystem\Data\IDTO;
-use Logic\FileSystem\Managers\IReader;
-use Logic\FileSystem\Managers\IWriter;
-use Logic\FileSystem\Managers\IContentManager;
+use Logic\FileSystem\Converter\Converter;
+use Logic\FileSystem\Converter\ConverterDTO;
 
 require_once '../vendor/autoload.php';
 
-class ConvertRunner
-{
-    private IDTO $DTO;
-    private IReader $reader;
-    private IWriter $writer;
-    private Converter $converter;
-    private IContentManager $contentManager;
-    private string $data;
-
-    public function __construct(
-        IDTO $dto,
-        IReader $reader,
-        IWriter $writer,
-        Converter $converter,
-        IContentManager $contentManager
-    ) {
-        $this->DTO            = $dto;
-        $this->reader         = $reader;
-        $this->writer         = $writer;
-        $this->converter      = $converter;
-        $this->contentManager = $contentManager;
-    }
-
-    public function startConvert(): void
-    {
-        $this->data = $this->converter->converting($this->DTO, $this->writer);
-    }
-
-    public function getData(): string
-    {
-        return $this->data;
-    }
-
-    public function saveData(string $pathSave, string $data): void
-    {
-        $this->contentManager->saveContent($pathSave, $data);
-    }
-}
-
-
-////////////////////////////////////////////////////////////////
-////////////////////     data       ////////////////////////////
-////////////////////////////////////////////////////////////////
-
-$dir          = '../data/';
-$fileSavePath = __DIR__.'/database/queries/query.sql';
-$queue        = [
+$dir      = '..'.DIRECTORY_SEPARATOR.'data'.DIRECTORY_SEPARATOR;
+$savePath = __DIR__.'/database/queries/query.sql';
+$queue    = [
     'cities.csv',
     'categories.csv',
     'users.csv',
@@ -63,33 +16,37 @@ $queue        = [
     'responses.csv',
 ];
 
-$files = [];
-for ($index = 0; $index < count($queue); $index++) {
-    $files[] = $dir.DIRECTORY_SEPARATOR."{$queue[$index]}";
-}
-
-$DTO            = new \Logic\FileSystem\Data\DTO();
 $reader         = new \Logic\FileSystem\Managers\Readers\ReaderCSV();
 $writer         = new \Logic\FileSystem\Managers\Writers\WriterSQL();
 $fileManager    = new \Logic\FileSystem\Managers\FileManager\FileManager();
-$converter      = new \Logic\FileSystem\Converter();
 $contentManager = new \Logic\FileSystem\Managers\SaveContentManagers\ContentFilesManager($fileManager);
 
-////////////////////////////////////////////////////////////////
-////////////////////     logic       ///////////////////////////
-////////////////////////////////////////////////////////////////
+$converterDTO = new ConverterDTO($reader, $writer, $contentManager);
 
-$data = '';
-foreach ($files as $filePath) {
-    $fileName = $fileManager->getHandlerName($filePath);
-    $content  = $reader->readData($filePath);
+$converterDTO->queue    = $queue;
+$converterDTO->savePath = $savePath;
+$converterDTO->prefix   = $dir;
 
-    $DTO->__set('fileName', $fileName);
-    $DTO->__set('content', $content);
+function getHandlersQueue($DTO): array
+{
+    $handlers = [];
+    $queue    = $DTO->queue;
+    $prefix   = $DTO->prefix;
+    for ($index = 0; $index < count($queue); $index++) {
+        $handlers[] = $prefix."{$queue[$index]}";
+    }
 
-    $converterRunner = new ConvertRunner($DTO, $reader, $writer, $converter, $contentManager);
-    $converterRunner->startConvert($filePath);
-    $data .= $converterRunner->getData();
+    return $handlers;
 }
 
-$converterRunner->saveData($fileSavePath, $data);
+$converter = new Converter($converterDTO->reader, $converterDTO->writer);
+
+$data = '';
+foreach (getHandlersQueue($converterDTO) as $handler) {
+    $converter->startConvert($handler);
+
+    $data .= $converter->getData();
+
+    $converter->resetData();
+}
+$converterDTO->contentManager->saveContent($converterDTO->savePath, $data);

@@ -2,52 +2,71 @@
 
 namespace Logic\FileSystem\Managers\FileManager;
 
-use Logic\FileSystem\Managers\FileManager\Actions\ActionCheckFileExists;
-use Logic\FileSystem\Managers\FileManager\Actions\ActionDeleteFile;
-use Logic\FileSystem\Managers\FileManager\Actions\ActionOpenFile;
-use Logic\FileSystem\Managers\FileManager\Actions\ActionCloseFile;
-use Logic\FileSystem\Managers\FileManager\Actions\ActionCreateFile;
-use Logic\FileSystem\Managers\FileManager\Actions\ActionSaveFile;
+use Exceptions\FileSystem\FileDoesNotExistsException;
+use Exceptions\FileSystem\FileExistsException;
+use Exceptions\FileSystem\ThisIsNotFileException;
 
 class FileManager
 {
 
     public function openFile(string $path, string $mode = 'r')
     {
-        $action = new ActionOpenFile($path);
-        return $action->openFile($mode);
+        if (file_exists($path)) {
+            throw new FileDoesNotExistsException();
+        }
+
+        return fopen($path, $mode);
     }
 
     public function closeFile($fileHandler): void
     {
-        $action = new ActionCloseFile();
-        $action->closeFile($fileHandler);
+        if ( ! is_resource($fileHandler)) {
+            throw new ThisIsNotFileException();
+        }
+        fclose($fileHandler);
     }
 
     public function createFile(string $path): void
     {
 
-        $action = new ActionCreateFile($path);
-        $action->createFile();
+        if (file_exists($path)) {
+            throw new FileExistsException();
+        }
+        $fhandler = fopen($path, 'w');
+        $this->closeFile($fhandler);
     }
 
     public function saveFile($handler, string $data): void
     {
-        $action = new ActionSaveFile($data);
-        $action->saveFile($handler);
+        if ( ! is_resource($handler)) {
+            throw new ThisIsNotFileException();
+        }
+
+        fwrite($handler, $data);
     }
 
     public function deleteFile(string $pathDelete): void
     {
-        $action = new ActionDeleteFile($pathDelete);
-        $action->deleteFile();
+        if ( ! file_exists($pathDelete)) {
+            throw new FileDoesNotExistsException();
+        }
+        if ( ! is_file($pathDelete)) {
+            throw new ThisIsNotFileException();
+        }
+
+        unlink($pathDelete);
     }
 
     public function checkExistFile(string $filePath): bool
     {
-        $action = new ActionCheckFileExists($filePath);
+        if ( ! file_exists($filePath)) {
+            return false;
+        }
+        if ( ! is_file($filePath)) {
+            throw new ThisIsNotFileException();
+        }
 
-        return $action->checkFileExists();
+        return true;
     }
 
     public function getHandlerName(string $path): array

@@ -8,17 +8,17 @@ use Logic\FileSystem\Managers\IReader;
 
 class ReaderCSV implements IReader
 {
-    public function readData(string $path): array
+    public function readData(string $path): IDTO
     {
-        $data = [];
-        foreach ($this->getReaderGenerator($path) as $values) {
-            $data[] = $values;
+        $DTO = new DTO();
+        foreach ($this->generateData($path) as $value) {
+            $data[] = $value;
         }
-
-        return $data;
+        $DTO->setData($data);
+        return $DTO;
     }
 
-    private function getReaderGenerator(string $path): \Generator
+    private function generateData(string $path): \Generator
     {
         $handler = $this->initSplFileObject($path);
         while ($handler->valid()) {
@@ -29,7 +29,7 @@ class ReaderCSV implements IReader
     private function initSplFileObject(string $path): \SplFileObject
     {
         $handler = new \SplFileObject($path);
-        $handler->setFlags(\SplFileObject::SKIP_EMPTY);
+        $handler->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY);
 
         return $handler;
     }

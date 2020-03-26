@@ -10,7 +10,7 @@ namespace Logic\FileSystem\Managers;
  *
  * @package Logic\FileSystem\Managers
  */
-interface IContentManager
+interface IContentManager extends IManager
 {
     public function saveContent(string $content, string $savePath): void;
 

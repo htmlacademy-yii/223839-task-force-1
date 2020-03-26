@@ -2,19 +2,24 @@
 
 namespace Logic\FileSystem\Managers\Writers;
 
-use Logic\FileSystem\Data\IDTO;
 use Logic\FileSystem\Managers\IWriter;
 
 class WriterSQL implements IWriter
 {
-    private IDTO $DTO;
-    private array $content = [];
+    private array $data;
 
-    public function getWriteData(IDTO $DTO): string
+    public function writeData(array $data): void
     {
-        $this->DTO     = $DTO;
-        $this->content = $this->DTO->__get('content');
+        $this->data = $data;
+    }
 
+    public function resetData(): void
+    {
+        $this->data = [];
+    }
+
+    public function getData(): string
+    {
         return $this->getFormationQuery();
     }
 
@@ -35,8 +40,9 @@ class WriterSQL implements IWriter
 
     private function formationValuesQuery(): string
     {
+        echo '<pre>';
         $insert = '';
-        foreach ($this->content as $values) {
+        foreach ($this->data as $values) {
             if ( ! empty($values)) {
                 $insert .= "(";
                 foreach ($values as $value) {
@@ -51,9 +57,9 @@ class WriterSQL implements IWriter
         $insert = substr($insert, 0, -2);
         $insert .= ';';
 
+
         return $insert;
     }
-
 
     private function formationValue(?string $value): string
     {
@@ -66,12 +72,14 @@ class WriterSQL implements IWriter
 
     private function getTableNameForSQL(): string
     {
-        return '`'.$this->DTO->__get('fileName')[0].'`';
+        $tableName = array_shift($this->data);
+
+        return '`'.implode('', $tableName).'`';
     }
 
     private function getColumnNamesForSQL(): string
     {
-        $namesGroup = array_shift($this->content);
+        $namesGroup = array_shift($this->data);
         $counter    = count($namesGroup);
 
         return $this->formationColumnsNames($counter, $namesGroup);
@@ -89,3 +97,4 @@ class WriterSQL implements IWriter
         }
     }
 }
+
