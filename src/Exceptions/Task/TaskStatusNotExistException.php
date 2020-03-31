@@ -1,8 +1,6 @@
 <?php
 
-
-namespace Exceptions;
-
+namespace Exceptions\Task;
 
 class TaskStatusNotExistException extends BaseException
 {

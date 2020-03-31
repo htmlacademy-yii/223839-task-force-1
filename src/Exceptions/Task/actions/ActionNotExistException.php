@@ -1,8 +1,6 @@
 <?php
 
-
-namespace Exceptions;
-
+namespace Exceptions\Task\actions;
 
 class ActionNotExistException extends BaseException
 {

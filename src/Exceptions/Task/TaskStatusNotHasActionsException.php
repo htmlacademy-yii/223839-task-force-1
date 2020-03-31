@@ -1,7 +1,7 @@
 <?php
 
 
-namespace Exceptions;
+namespace Exceptions\Task;
 
 
 class TaskStatusNotHasActionsException extends BaseException
