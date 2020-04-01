@@ -4,9 +4,9 @@ namespace Convertor\Base;
 
 class DtoItem
 {
-    private $title = [];
-    private $columns = [];
-    private $data = [];
+    private array $title = [];
+    private array $columns = [];
+    private array $data = [];
 
     public function __construct($title, $columns, $data)
     {

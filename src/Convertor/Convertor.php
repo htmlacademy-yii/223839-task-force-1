@@ -7,8 +7,8 @@ use Convertor\Base\WriterInterface;
 
 class Convertor
 {
-    private $reader;
-    private $writer;
+    private ReaderInterface $reader;
+    private WriterInterface $writer;
 
     public function __construct(ReaderInterface $reader, WriterInterface $writer)
     {
@@ -16,15 +16,8 @@ class Convertor
         $this->writer = $writer;
     }
 
-    public function convert()
+    public function convert(): void
     {
-        $i = 0;
-        //было
-        // $data = $this->reader->readItem();
-        while($i <= 0) {
-            $data = $this->reader->readItem();
-            $this->writer->writeItem($data);
-            $i++;
-        }
+        $this->writer->writeItem($this->reader->readItem());
     }
 }

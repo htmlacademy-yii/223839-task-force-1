@@ -6,5 +6,5 @@ use Convertor\Base\DtoItem;
 
 interface ReaderInterface
 {
-    public function readItem(): \Generator;
+    public function readItem(): DtoItem;
 }
