@@ -14,26 +14,26 @@ class CsvReader implements ReaderInterface
         $this->pathFile = $filename;
     }
 
-    public function readItem(): DtoItem
+    public function readItem()
     {
         $file = new \SplFileObject($this->pathFile);
-        $file->setFlags(\SplFileObject::READ_CSV | \SplFileObject::SKIP_EMPTY);
+        $file->setFlags(\SplFileObject::READ_CSV | \SplFileObject::READ_AHEAD | \SplFileObject::DROP_NEW_LINE);
 
-        $generator = function ($file) {
-            while ($file->valid()) {
-                yield $file->fgetcsv();
+        $fileName      = $file->getFilename();
+        $fileExtension = '.'.$file->getExtension();
+
+        $fileName = [str_replace($fileExtension, '', $fileName)];
+
+        $i = 0;
+        while ( ! $file->eof()) {
+            if ($i === 0) {
+                $columns = $file->current();
             }
-        };
 
-        $data = [];
-        foreach ($generator($file) as $content) {
-            $data[] = $content;
+            $file->next();
+            yield new DtoItem($fileName, $columns, $file->current());
+            $i++;
         }
-
-        $tableName   = array_shift($data);
-        $columnsName = array_shift($data);
-
-        return new DtoItem($tableName, $columnsName, $data);
     }
 }
 

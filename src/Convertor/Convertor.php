@@ -18,6 +18,9 @@ class Convertor
 
     public function convert(): void
     {
-        $this->writer->writeItem($this->reader->readItem());
+        foreach ($this->reader->readItem() as $data) {
+            $this->writer->writeItem($data);
+        }
     }
 }
+
