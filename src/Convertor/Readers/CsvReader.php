@@ -26,7 +26,6 @@ class CsvReader implements ReaderInterface
 
 
         $i = 0;
-        echo '<pre>';
         while ( ! $file->eof()) {
             if ($i === 0) {
                 $columns = $file->current();

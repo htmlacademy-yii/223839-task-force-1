@@ -18,5 +18,4 @@ INSERT INTO `users` (`email`,`first_name`,`last_name`,`password`,`date_joined`,`
 ('bbartolettig@simplemachines.org','Barnabas','Bartoletti','3chTNtqhoo','2018-12-25','725 Eagle Crest Hill','1989-09-29','Nulla ac enim. In tempor, turpis nec euismod scelerisque, quam turpis adipiscing lorem, vitae mattis nibh ligula nec sem. Duis aliquam convallis nunc.',37349256497,'encompassing'), 
 ('nculliph@fc2.com','Nixie','Cullip','2UdKIR2f','2019-04-07','507 Graceland Junction','1989-03-19','Suspendisse potenti.',12403580562,'knowledge base'), 
 ('mpimblotti@xing.com','Matilde','Pimblott','nGZ8disdg','2019-07-18','92 Gina Park','1989-09-29','Phasellus sit amet erat.',40139478003,'dynamic'), 
-('askurrayj@un.org','Al','Skurray','bL9tAf','2018-11-25','8 Ridgeview Trail','1989-12-21','Cras pellentesque volutpat dui.',76657531985,'solution'), 
-(''), 
+('askurrayj@un.org','Al','Skurray','bL9tAf','2018-11-25','8 Ridgeview Trail','1989-12-21','Cras pellentesque volutpat dui.',76657531985,'solution');
