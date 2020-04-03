@@ -4,18 +4,18 @@ namespace Convertor\Base;
 
 class DtoItem
 {
-    private array $title = [];
+    private string $title;
     private array $columns = [];
     private array $data = [];
 
-    public function __construct($title, $columns, $data)
+    public function __construct(string $title, array $columns, array $data)
     {
-        $this->title = $title;
+        $this->title   = $title;
         $this->columns = $columns;
-        $this->data = $data;
+        $this->data    = $data;
     }
 
-    public function getTitle(): array
+    public function getTitle(): string
     {
         return $this->title;
     }

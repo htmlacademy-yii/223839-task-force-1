@@ -18,15 +18,8 @@ class Convertor
 
     public function convert(): void
     {
-        echo '<pre>';
-        $i = 0;
         foreach ($this->reader->readItem() as $data) {
-            $i++;
-            $this->writer->writeItem($data);
-            if($this->reader->endFile) {
-                $this->writer->saveFile();
-                echo 'finish ' . $i;
-            };
+                $this->writer->writeData($data);
         }
     }
 }

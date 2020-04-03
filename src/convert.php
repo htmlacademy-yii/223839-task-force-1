@@ -8,8 +8,7 @@ use Convertor\Writers\SqlWriter;
 
 $csvBasePath = '../data/csv/';
 $sqlBasePath = '../data/sql/';
-$files = ['users.csv', 'cities.csv'];
-//$files = ['users.csv'];
+$files = ['cities.csv', 'categories.csv', 'users.csv', 'tasks.csv', 'reviews.csv' ,'responses.csv', ];
 
 foreach ($files as $file)
 {

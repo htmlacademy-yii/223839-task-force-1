@@ -8,57 +8,59 @@ use Convertor\Base\WriterInterface;
 class SqlWriter implements WriterInterface
 {
     private string $path;
-    private string $content = '';
     private string $insertInto;
+    private string $insertValues = '';
 
-    private $title;
-    private $columns;
+    private DtoItem $data;
 
     public function setPath($path): void
     {
         $this->path = $path;
     }
 
-    public function writeItem(DtoItem $data, $endFile = false): void
+    public function writeData(DtoItem $data): void
     {
-        $this->title   = implode('', $data->getTitle());
-        $this->columns = implode('`,`', $data->getColumns());
+        $this->data = $data;
 
-        $formatToValueType = function ($values) {
-            $formatValues = [];
-            foreach ($values as $value) {
-                // если тип не numeric, ставит ковычки
-                $value          = is_numeric($value) ? $value : "'$value'";
-                $formatValues[] = $value;
-            }
+        if ($data) {
+            $insertIntoStr    = "INSERT INTO `%1s` (`%2s`) \n VALUES ";
+            $this->insertInto = sprintf($insertIntoStr, $this->getTitle(), $this->getColumns());
 
-            return $formatValues;
-        };
+            $values             = implode(',', $this->formatValues($data->getData()));
+            $this->insertValues .= "({$values}), \n";
+        }
 
-        $values = implode(',', $formatToValueType($data->getData()));
-
-        $insertInto = "INSERT INTO `{$this->title}` (`{$this->columns}`) \n VALUES ";
-
-        $insert = '';
-        $insert .= "({$values}), \n";
-
-
-
-        $this->insertInto = $insertInto;
-
-        // записывает полученную строку в переменную
-        $this->content    .= $insert;
+        $this->saveData();
     }
 
-    public function saveFile()
+    private function saveData(): void
     {
-        $insert = $this->insertInto.$this->content;
+        $insert = $this->insertInto . $this->insertValues;
+        $insert = substr($insert, 0, -3).';';
 
-        $file = fopen($this->path.$this->title.'.sql', 'w');
+        $file = fopen($this->path . $this->getTitle() . '.sql', 'w');
         fwrite($file, $insert);
         fclose($file);
+    }
 
-        $this->insertInto = '';
+    private function getTitle(): string
+    {
+        return $this->data->getTitle();
+    }
+
+    private function getColumns(): string
+    {
+        return implode('`,`', $this->data->getColumns());
+    }
+
+    private function formatValues($values): array
+    {
+        $formatValues = [];
+        foreach ($values as $value) {
+            $formatValues[] = is_numeric($value) ? $value : "'$value'";
+        }
+
+        return $formatValues;
     }
 }
 

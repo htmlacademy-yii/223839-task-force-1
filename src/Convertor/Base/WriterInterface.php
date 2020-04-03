@@ -6,5 +6,5 @@ use Convertor\Base\DtoItem;
 
 interface WriterInterface
 {
-    public function writeItem(DtoItem $item): void;
+    public function writeData(DtoItem $item): void;
 }
