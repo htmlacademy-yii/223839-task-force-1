@@ -6,7 +6,7 @@ for (var i = 0; i < openModalLinks.length; i++) {
   var modalLink = openModalLinks[i];
 
   modalLink.addEventListener("click", function (event) {
-    var modalId = event.currentTarget.getAttribute("data-for");
+    var modalId = event.currentTarget.getAttribute("Data-for");
 
     var modal = document.getElementById(modalId);
     modal.setAttribute("style", "display: block");

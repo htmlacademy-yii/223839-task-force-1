@@ -7,3 +7,5 @@
 *.sublime*
 Thumbs.db
 vendor
+data
+data/sql/*.sql
