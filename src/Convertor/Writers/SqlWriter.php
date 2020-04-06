@@ -22,21 +22,19 @@ class SqlWriter implements WriterInterface
     {
         $this->data = $data;
 
-        if ($data) {
-            $insertIntoStr    = "INSERT INTO `%1s` (`%2s`) \n VALUES ";
+        if (!is_null($data)) {
+            $insertIntoStr = "INSERT INTO `%1s` (`%2s`) \n VALUES ";
             $this->insertInto = sprintf($insertIntoStr, $this->getTitle(), $this->getColumns());
 
-            $values             = implode(',', $this->formatValues($data->getData()));
+            $values = implode(',', $this->formatValues($data->getData()));
             $this->insertValues .= "({$values}), \n";
         }
-
-        $this->saveData();
     }
 
-    private function saveData(): void
+    public function saveData(): void
     {
         $insert = $this->insertInto . $this->insertValues;
-        $insert = substr($insert, 0, -3).';';
+        $insert = substr($insert, 0, -3) . ';';
 
         $file = fopen($this->path . $this->getTitle() . '.sql', 'w');
         fwrite($file, $insert);

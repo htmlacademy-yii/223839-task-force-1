@@ -21,6 +21,7 @@ class Convertor
         foreach ($this->reader->readItem() as $data) {
                 $this->writer->writeData($data);
         }
+        $this->writer->saveData();
     }
 }
 
