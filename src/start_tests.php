@@ -10,7 +10,7 @@ use Exceptions\BaseException;
 
 class Tester
 {
-    private string $pathToTests = '.'.DIRECTORY_SEPARATOR.'Tests'.DIRECTORY_SEPARATOR;
+    private string $pathToTests = '.' . DIRECTORY_SEPARATOR . 'Tests' . DIRECTORY_SEPARATOR;
 
     private array $pathArray = [];
     private array $pathsTests = [];
@@ -19,8 +19,8 @@ class Tester
     {
         $this->registerload();
         foreach ($this->pathsTests as $pathToTest) {
-            $pathToTest = 'tests\\'.$pathToTest;
-            $test       = $pathToTest;
+            $pathToTest = 'tests\\' . $pathToTest;
+            $test = $pathToTest;
             $this->invokeTestMethod($test);
         }
     }
@@ -49,7 +49,7 @@ class Tester
 
     private function getPath(): void
     {
-        $tests = glob($this->pathToTests.DIRECTORY_SEPARATOR.'Test*.php');
+        $tests = glob($this->pathToTests . DIRECTORY_SEPARATOR . 'Test*.php');
         foreach ($tests as $test) {
             $path = $test;
             array_push($this->pathArray, $path);
@@ -59,11 +59,11 @@ class Tester
     private function getTestsNames(): void
     {
         foreach ($this->pathArray as $path) {
-            $file            = new SplFileObject($path);
+            $file = new SplFileObject($path);
             $fileDescription = $file->getExtension();
-            $fileName        = $file->getFilename();
-            $fileName        = str_replace(".{$fileDescription}", '', $fileName);
-            $path            = $fileName;
+            $fileName = $file->getFilename();
+            $fileName = str_replace(".{$fileDescription}", '', $fileName);
+            $path = $fileName;
             array_push($this->pathsTests, $path);
         }
     }
