@@ -1,7 +1,14 @@
 <?php
 namespace frontend\controllers;
 
+use frontend\models\BookmarkedUsers;
+use frontend\models\Categories;
+use frontend\models\Cities;
 use frontend\models\ResendVerificationEmailForm;
+use frontend\models\Responses;
+use frontend\models\Reviews;
+use frontend\models\Tasks;
+use frontend\models\Users;
 use frontend\models\VerifyEmailForm;
 use Yii;
 use yii\base\InvalidArgumentException;
@@ -74,7 +81,25 @@ class SiteController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('index');
+        $categories = new Categories();
+        $cities = new Cities();
+        $responses = new Responses();
+        $reviews = new Reviews();
+        $tasks = new Tasks();
+        $users = new Users();
+
+       $categories = Categories::find()->indexBy('id')->all();
+       $tasks = Tasks::find()->indexBy('id')->all();
+       $users = Users::find()->indexBy('id')->all();
+
+        return $this->render('index', compact(
+            'categories',
+            'cities',
+            'responses',
+            'reviews',
+            'tasks',
+            'users'
+        ));
     }
 
     /**
