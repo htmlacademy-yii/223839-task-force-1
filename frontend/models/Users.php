@@ -67,7 +67,13 @@ class Users extends \yii\db\ActiveRecord
             [['avatar'], 'string', 'max' => 255],
             [['email'], 'unique'],
             [['phone'], 'unique'],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::className(), 'targetAttribute' => ['city_id' => 'id']],
+            [
+                ['city_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Cities::class,
+                'targetAttribute' => ['city_id' => 'id']
+            ],
         ];
     }
 
@@ -98,132 +104,40 @@ class Users extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[BookmarkedUsers]].
+     * Gets query for [[TasksCustomer]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getBookmarkedUsers()
+    public function getTasksCustomer()
     {
-        return $this->hasMany(BookmarkedUsers::className(), ['user_id' => 'id']);
+        return $this->hasMany(Tasks::class, ['author_id' => 'id']);
     }
 
-    /**
-     * Gets query for [[BookmarkedUsers0]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getBookmarkedUsers0()
-    {
-        return $this->hasMany(BookmarkedUsers::className(), ['bookmarked_user_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[ChatMessages]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getChatMessages()
-    {
-        return $this->hasMany(ChatMessages::className(), ['author_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[ChatMessages0]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getChatMessages0()
-    {
-        return $this->hasMany(ChatMessages::className(), ['recipient_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[Notification]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getNotification()
-    {
-        return $this->hasOne(Notification::className(), ['user_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[Responses]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getResponses()
-    {
-        return $this->hasMany(Responses::className(), ['performer_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[Reviews]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
     public function getReviews()
     {
-        return $this->hasMany(Reviews::className(), ['customer_id' => 'id']);
+        return $this->hasMany(Reviews::class, ['performer_id' => 'id']);
     }
 
     /**
-     * Gets query for [[Reviews0]].
+     * Gets query for [[TasksPerformer]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getReviews0()
+    public function getTasksPerformer()
     {
-        return $this->hasMany(Reviews::className(), ['performer_id' => 'id']);
+        return $this->hasMany(Tasks::class, ['performer_id' => 'id']);
     }
 
-    /**
-     * Gets query for [[Tasks]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTasks()
+    public function getRating()
     {
-        return $this->hasMany(Tasks::className(), ['author_id' => 'id']);
+        return $this->getReviews()
+            ->select('AVG(rating) rating, performer_id')
+            ->groupBy('performer_id');
     }
 
-    /**
-     * Gets query for [[Tasks0]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTasks0()
+    public function getCategories()
     {
-        return $this->hasMany(Tasks::className(), ['performer_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[UserSpecializations]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUserSpecializations()
-    {
-        return $this->hasMany(UserSpecializations::className(), ['performer_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[City]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getCity()
-    {
-        return $this->hasOne(Cities::className(), ['id' => 'city_id']);
-    }
-
-    /**
-     * Gets query for [[UsersMedia]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUsersMedia()
-    {
-        return $this->hasMany(UsersMedia::className(), ['user_id' => 'id']);
+        return $this->hasMany(Categories::class, ['id' => 'category_id'])
+            ->viaTable('user_specializations', ['performer_id' => 'id']);
     }
 }

@@ -37,8 +37,8 @@ class Reviews extends \yii\db\ActiveRecord
             [['customer_id', 'performer_id', 'rating'], 'integer'],
             [['text'], 'string'],
             [['created_at'], 'safe'],
-            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['customer_id' => 'id']],
-            [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['performer_id' => 'id']],
+            [['customer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['customer_id' => 'id']],
+            [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['performer_id' => 'id']],
         ];
     }
 
@@ -64,7 +64,7 @@ class Reviews extends \yii\db\ActiveRecord
      */
     public function getCustomer()
     {
-        return $this->hasOne(Users::className(), ['id' => 'customer_id']);
+        return $this->hasOne(Users::class, ['id' => 'customer_id']);
     }
 
     /**
@@ -74,6 +74,6 @@ class Reviews extends \yii\db\ActiveRecord
      */
     public function getPerformer()
     {
-        return $this->hasOne(Users::className(), ['id' => 'performer_id']);
+        return $this->hasOne(Users::class, ['id' => 'performer_id']);
     }
 }

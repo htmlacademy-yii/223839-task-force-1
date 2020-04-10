@@ -46,6 +46,6 @@ class Chats extends \yii\db\ActiveRecord
      */
     public function getChatMessages()
     {
-        return $this->hasMany(ChatMessages::className(), ['chat_id' => 'id']);
+        return $this->hasMany(ChatMessages::class, ['chat_id' => 'id']);
     }
 }

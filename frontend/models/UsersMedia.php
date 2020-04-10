@@ -33,7 +33,7 @@ class UsersMedia extends \yii\db\ActiveRecord
             [['thumbnail_path', 'media_path', 'user_id'], 'required'],
             [['user_id'], 'integer'],
             [['thumbnail_path', 'media_path'], 'string', 'max' => 255],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -57,6 +57,6 @@ class UsersMedia extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(Users::className(), ['id' => 'user_id']);
+        return $this->hasOne(Users::class, ['id' => 'user_id']);
     }
 }

@@ -139,7 +139,7 @@ AppAsset::register($this);
     </header>
     <main class="page-main">
 
-        <div class="main-container">
+        <div class="main-container page-container">
             <?= $content ?>
         </div>
 

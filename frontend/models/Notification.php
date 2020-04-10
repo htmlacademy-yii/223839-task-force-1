@@ -36,7 +36,7 @@ class Notification extends \yii\db\ActiveRecord
             [['user_id', 'task_responce', 'task_refusal', 'task_start', 'task_complete', 'new_chat_message'], 'required'],
             [['user_id', 'task_responce', 'task_refusal', 'task_start', 'task_complete', 'new_chat_message'], 'integer'],
             [['user_id'], 'unique'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -63,6 +63,6 @@ class Notification extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(Users::className(), ['id' => 'user_id']);
+        return $this->hasOne(Users::class, ['id' => 'user_id']);
     }
 }
