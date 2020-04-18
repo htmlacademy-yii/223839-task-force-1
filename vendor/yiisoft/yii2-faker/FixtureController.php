@@ -34,7 +34,7 @@ use yii\helpers\VarDumper;
  * generate fixtures template files, according to the given format:
  *
  * ```php
- * // users.php file under template path (by default @tests/unit/templates/fixtures)
+ * // index.php file under template path (by default @tests/unit/templates/fixtures)
  * return [
  *     'name' => $faker->firstName,
  *     'phone' => $faker->phoneNumber,

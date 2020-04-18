@@ -1,8 +1,9 @@
 <?php
 /* @var $this yii\web\View
  * @var $users \frontend\models\Users
- * @var $userRole
+ * @var $performers \frontend\models\Users
  */
+$this->title = "TaskForce";
 ?>
 <section class="user__search">
     <div class="user__search-link">
@@ -19,40 +20,54 @@
             </li>
         </ul>
     </div>
-    <?php foreach ($users as $user) : ?>
+
+    <?php foreach ($performers as $performer) : ?>
+
+
         <div class="content-view__feedback-card user__search-wrapper">
             <div class="feedback-card__top">
                 <div class="user__search-icon">
                     <a href="#"><img src="../img/man-glasses.jpg" width="65" height="65"></a>
-                    <span><?= count($user["tasks${userRole}"]) ?> Заданий</span>
-                    <span><?= count($user["reviews"]) ?> отзывов</span>
+                    <span><?= $performer->getTasksPerformer()->count() ?> заданий</span>
+                    <span><?= $performer->getPerformerRating() ?> отзывов</span>
                 </div>
                 <div class="feedback-card__top--name user__search-card">
                     <p class="link-name">
                         <a href="#" class="link-regular">
-                            <?= $user['first_name'] ?> <?= $user['last_name'] ?>
+                            <?= $performer->first_name ?><?= $performer->last_name ?>
                         </a>
                     </p>
-                    <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
+
                     <?php
-                    if (empty($user['rating'])) {
-                        echo 0;
-                    } else {
-                        foreach ($user['rating'] as $item) {
-                            echo $item['rating'];
+                    $stars = function ($stars) {
+                        $i = 0;
+                        while ($i < 5) {
+                            if ($i < $stars) {
+                                echo '<span></span>';
+                                $i++;
+                            } else {
+                                echo '<span class="star-disabled"></span>';
+                                $i++;
+                            }
                         }
-                    }
+                    };
+
+                    $rating = Yii::$app->formatter->asDecimal($performer->performerRating, 2);
+
+                    $stars($rating);
                     ?>
+                    <b><?= $rating ?></b>
                     <p class="user__search-content">
-                        <?= $user['biography'] ?>
+                        <?= $performer->biography ?>
                     </p>
                 </div>
-                <span class="new-task__time">Был на сайте <?= Yii::$app->formatter->asRelativeTime($user['last_activity']) ?></span>
+                <span class="new-task__time">Был на сайте
+                    <?= Yii::$app->formatter->asRelativeTime($performer->last_activity) ?></span>
             </div>
             <div class="link-specialization user__search-link--bottom">
-                <?php foreach ($user['categories'] as $category) : ?>
-                    <a href="#" class="link-regular"><?= $category['name'] ?></a>
-                <?php endforeach; ?>
+                <?php foreach ($performer->getUserSpecializationsNames() as $category) : ?>
+                    <a href="#" class="link-regular"><?= $category->name ?></a>
+                <?php endforeach ?>
             </div>
         </div>
     <?php endforeach; ?>
@@ -91,4 +106,3 @@
         </form>
     </div>
 </section>
-}}

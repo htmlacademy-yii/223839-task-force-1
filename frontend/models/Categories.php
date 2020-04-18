@@ -51,7 +51,7 @@ class Categories extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Tasks]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|TasksQuery
      */
     public function getTasks()
     {
@@ -61,10 +61,11 @@ class Categories extends \yii\db\ActiveRecord
     /**
      * Gets query for [[UserSpecializations]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|UserSpecializationsQuery
      */
     public function getUserSpecializations()
     {
         return $this->hasMany(UserSpecializations::class, ['category_id' => 'id']);
     }
+
 }

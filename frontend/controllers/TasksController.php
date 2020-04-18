@@ -2,27 +2,38 @@
 
 namespace frontend\controllers;
 
+use frontend\models\Cities;
 use frontend\models\Tasks;
+use Logic\Task;
+use yii\db\Query;
 use yii\web\Controller;
 
 class TasksController extends Controller
 {
-    const STATUS_NEW = 1;
-    const STATUS_CANCELED = 2;
-    const STATUS_ACTIVE = 3;
-    const STATUS_COMPLETED = 4;
-    const STATUS_FAILED = 5;
-
     public function actionIndex()
     {
-        $this->view->title = "TaskForce";
-
-        $status = self::STATUS_NEW;
-
         $tasks = Tasks::find()
-            ->where("status = {$status}")
+            ->select([
+                'title',
+                'created_at',
+                'description',
+                'budget',
+                'address',
+                'city_id',
+                'category_id'
+            ])
+            ->andWhere('status = ' . Tasks::STATUS_NEW)
+            ->joinWith(
+                [
+                    'city',
+                    'category'
+                ], false)
+            ->addSelect([
+                'cities.name as city',
+                'categories.name as categoryName',
+                'categories.icon as categoryIcon'
+            ])
             ->orderBy('created_at DESC')
-            ->with(['city', 'category'])
             ->asArray()
             ->all();
 

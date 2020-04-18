@@ -2,30 +2,28 @@
 
 namespace frontend\controllers;
 
-use frontend\models\Categories;
+use common\models\User;
 use frontend\models\Users;
 use yii\web\Controller;
 
 class UsersController extends Controller
 {
-    const PERFORMER = 'Performer';
-    const CUSTOMER = 'Customer';
-
     public function actionIndex()
     {
-        $this->view->title = "TaskForce";
-
-        $userRole = self::PERFORMER;
-
-        $users = Users::find()
-            ->select(['id', 'first_name', 'last_name', 'biography', 'last_activity'])
-            ->where("role = :userRole", ['userRole' => $userRole])
-            ->orderBy('date_joined DESC')
-            ->with(["reviews", "tasks{$userRole}", "categories", "rating"])
-            ->asArray()
+        $performers = Users::find()
+            ->select([
+                'users.id',
+                'first_name',
+                'last_name',
+                'last_activity',
+                'biography',
+            ])
+            ->andWhere("role = '" . Users::PERFORMER . "'")
+            ->groupBy('users.id')
+            ->limit(6)
             ->all();
 
 
-        return $this->render('index', compact('users', 'userRole'));
+        return $this->render('index', compact('performers'));
     }
 }

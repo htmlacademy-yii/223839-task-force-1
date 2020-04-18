@@ -31,6 +31,12 @@ use Yii;
  */
 class Tasks extends \yii\db\ActiveRecord
 {
+    const STATUS_NEW = 1;
+    const STATUS_CANCELED = 2;
+    const STATUS_ACTIVE = 3;
+    const STATUS_COMPLETED = 4;
+    const STATUS_FAILED = 5;
+
     /**
      * {@inheritdoc}
      */
@@ -109,7 +115,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Responses]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|ResponsesQuery
      */
     public function getResponses()
     {
@@ -119,7 +125,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Category]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|CategoriesQuery
      */
     public function getCategory()
     {
@@ -129,7 +135,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Author]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|UsersQuery
      */
     public function getAuthor()
     {
@@ -139,7 +145,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Performer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|UsersQuery
      */
     public function getPerformer()
     {
@@ -149,7 +155,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[City]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|CitiesQuery
      */
     public function getCity()
     {

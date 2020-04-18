@@ -6,7 +6,7 @@ USE taskForce;
 -- таблица городов
 CREATE TABLE `cities` (
 	`id` INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
-	`name` VARCHAR(50) NOT NULL,
+	`city` VARCHAR(50) NOT NULL,
 	`lat` FLOAT NOT NULL,
 	`long` FLOAT NOT NULL,
 	UNIQUE KEY `lat`(`lat`),

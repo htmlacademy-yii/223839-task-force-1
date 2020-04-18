@@ -42,6 +42,9 @@ return [
             'rules' => [
             ],
         ],
+        'formatter' => [
+            'decimalSeparator' => '.',
+        ]
     ],
     'params' => $params,
 ];

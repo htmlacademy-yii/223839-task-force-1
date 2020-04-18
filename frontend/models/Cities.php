@@ -55,7 +55,7 @@ class Cities extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Tasks]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|TasksQuery
      */
     public function getTasks()
     {
@@ -65,7 +65,7 @@ class Cities extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Users]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|UsersQuery
      */
     public function getUsers()
     {
