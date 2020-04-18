@@ -1,6 +1,5 @@
 <?php
 /* @var $this yii\web\View
- * @var $users \frontend\models\Users
  * @var $performers \frontend\models\Users
  */
 $this->title = "TaskForce";

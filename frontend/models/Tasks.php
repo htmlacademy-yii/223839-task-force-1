@@ -37,6 +37,9 @@ class Tasks extends \yii\db\ActiveRecord
     const STATUS_COMPLETED = 4;
     const STATUS_FAILED = 5;
 
+    public $cityName;
+    public $categoryInfo;
+
     /**
      * {@inheritdoc}
      */
@@ -112,6 +115,16 @@ class Tasks extends \yii\db\ActiveRecord
         ];
     }
 
+    public function setCityName($name)
+    {
+        $this->cityName = $name;
+    }
+
+    public function setCategoryInfo($arr)
+    {
+        $this->categoryInfo = $arr;
+    }
+
     /**
      * Gets query for [[Responses]].
      *
@@ -131,6 +144,14 @@ class Tasks extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Categories::class, ['id' => 'category_id']);
     }
+
+    public function getCategoryInfo()
+    {
+        $this->setCategoryInfo($this->getCategory()->select('name, icon')->one());
+
+        return $this->categoryInfo;
+    }
+
 
     /**
      * Gets query for [[Author]].
@@ -160,5 +181,12 @@ class Tasks extends \yii\db\ActiveRecord
     public function getCity()
     {
         return $this->hasOne(Cities::class, ['id' => 'city_id']);
+    }
+
+    public function getCityName()
+    {
+        $this->setCityName($this->getCity()->select('name')->one());
+
+        return $this->cityName;
     }
 }

@@ -7,20 +7,20 @@ $this->title = "TaskForce";
 <section class="new-task">
     <div class="new-task__wrapper">
         <h1>Новые задания</h1>
+
         <?php foreach ($tasks as $task) : ?>
             <div class="new-task__card">
                 <div class="new-task__title">
-                    <a href="#" class="link-regular"><h2><?= $task['title'] ?></h2></a>
-                    <a class="new-task__type link-regular" href="#"><p><?= $task['categoryName'] ?></p></a>
+                    <a href="#" class="link-regular"><h2><?= $task->title ?></h2></a>
+                    <a class="new-task__type link-regular" href="#"><p><?= $task->getCategoryInfo()->name ?></p></a>
                 </div>
-                <div class="new-task__icon new-task__icon--<?= $task['categoryIcon'] ?>"></div>
-                <p class="new-task_description"><?= $task['description'] ?></p>
-                <b class="new-task__price new-task__price--<?= $task['categoryIcon'] ?>"><?= $task['budget'] ?> ₽</b>
-                <p class="new-task__place"><?= $task['city'] ?>, <?= $task['address'] ?></p>
-                <span class="new-task__time"><?= Yii::$app->formatter->asRelativeTime($task['created_at']) ?></span>
+                <div class="new-task__icon new-task__icon--<?= $task->getCategoryInfo()->icon ?>"></div>
+                <p class="new-task_description"><?= $task->description ?></p>
+                <b class="new-task__price new-task__price--<?= $task->getCategoryInfo()->icon ?>"><?= $task->budget ?> ₽</b>
+                <p class="new-task__place"><?= $task->getCityName()->name ?>, <?= $task->address ?></p>
+                <span class="new-task__time"><?= Yii::$app->formatter->asRelativeTime($task->created_at) ?></span>
             </div>
         <?php endforeach; ?>
-
 
     </div>
     <div class="new-task__pagination">
