@@ -13,7 +13,7 @@ class TasksController extends Controller
             ->andWhere([
                 'status' => Tasks::STATUS_NEW
             ])
-            ->joinWith([
+            ->with([
                 'city',
                 'category'
             ])

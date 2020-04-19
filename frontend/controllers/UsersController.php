@@ -13,7 +13,7 @@ class UsersController extends Controller
             ->andWhere([
                 'role' => Users::PERFORMER
             ])
-            ->joinWith([
+            ->with([
                 'reviewsPerformer',
                 'tasksPerformer',
                 'userSpecializations'
