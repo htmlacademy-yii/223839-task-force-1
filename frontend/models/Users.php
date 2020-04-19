@@ -227,8 +227,13 @@ class Users extends \yii\db\ActiveRecord
 
     public function getUserSpecializations()
     {
+        return $this->hasMany(UserSpecializations::class, ['performer_id' => 'id']);
+    }
+
+    public function getCategories()
+    {
         return $this->hasMany(Categories::class, ['id' => 'category_id'])
-            ->viaTable('user_specializations', ['performer_id' => 'id']);
+            ->via('userSpecializations');
     }
 
     /**

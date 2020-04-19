@@ -16,7 +16,8 @@ class UsersController extends Controller
             ->with([
                 'reviewsPerformer',
                 'tasksPerformer',
-                'userSpecializations'
+                'userSpecializations',
+                'categories'
             ])
             ->all();
 
