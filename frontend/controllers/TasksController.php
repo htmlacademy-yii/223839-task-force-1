@@ -3,7 +3,6 @@
 namespace frontend\controllers;
 
 use frontend\models\Tasks;
-use yii\db\Query;
 use yii\web\Controller;
 
 class TasksController extends Controller
@@ -11,22 +10,16 @@ class TasksController extends Controller
     public function actionIndex()
     {
         $tasks = Tasks::find()
-            ->select([
-                'title',
-                'created_at',
-                'description',
-                'budget',
-                'address',
-                'city_id',
-                'category_id'
+            ->andWhere([
+                'status' => Tasks::STATUS_NEW
             ])
-            ->andWhere('status = ' . Tasks::STATUS_NEW)
-//            ->joinWith(
-//                [
-//                    'cityName',
-//                    'category'
-//                ], true)
-            ->orderBy('created_at DESC')
+            ->joinWith([
+                'city',
+                'category'
+            ])
+            ->orderBy([
+                'created_at' => SORT_DESC
+            ])
             ->all();
 
         return $this->render('index', compact('tasks'));

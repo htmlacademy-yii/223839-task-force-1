@@ -19,16 +19,13 @@ $this->title = "TaskForce";
             </li>
         </ul>
     </div>
-
     <?php foreach ($performers as $performer) : ?>
-
-
         <div class="content-view__feedback-card user__search-wrapper">
             <div class="feedback-card__top">
                 <div class="user__search-icon">
                     <a href="#"><img src="../img/man-glasses.jpg" width="65" height="65"></a>
-                    <span><?= $performer->getTasksPerformer()->count() ?> заданий</span>
-                    <span><?= $performer->getPerformerRating() ?> отзывов</span>
+                    <span><?= count($performer->tasksPerformer) ?> заданий</span>
+                    <span><?= count($performer->reviewsPerformer) ?> отзывов</span>
                 </div>
                 <div class="feedback-card__top--name user__search-card">
                     <p class="link-name">
@@ -38,22 +35,19 @@ $this->title = "TaskForce";
                     </p>
 
                     <?php
-                    $stars = function ($stars) {
-                        $i = 0;
-                        while ($i < 5) {
-                            if ($i < $stars) {
+                    $outStars = function ($rating) {
+                        for ($i = 0; $i < 5; $i++) {
+                            if ($i < floor($rating)) {
                                 echo '<span></span>';
-                                $i++;
                             } else {
                                 echo '<span class="star-disabled"></span>';
-                                $i++;
                             }
                         }
                     };
 
                     $rating = Yii::$app->formatter->asDecimal($performer->performerRating, 2);
 
-                    $stars($rating);
+                    $outStars($rating);
                     ?>
                     <b><?= $rating ?></b>
                     <p class="user__search-content">
@@ -64,7 +58,7 @@ $this->title = "TaskForce";
                     <?= Yii::$app->formatter->asRelativeTime($performer->last_activity) ?></span>
             </div>
             <div class="link-specialization user__search-link--bottom">
-                <?php foreach ($performer->getUserSpecializationsNames() as $category) : ?>
+                <?php foreach ($performer->userSpecializations as $category) : ?>
                     <a href="#" class="link-regular"><?= $category->name ?></a>
                 <?php endforeach ?>
             </div>

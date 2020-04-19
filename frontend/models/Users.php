@@ -53,10 +53,6 @@ class Users extends \yii\db\ActiveRecord
     const CUSTOMER = 'customer';
     const PERFORMER = 'performer';
 
-    private int $performerRating;
-    private int $_performerReviewsCount;
-    private int $_performerTasksCount;
-
     /**
      * {@inheritdoc}
      */
@@ -117,21 +113,6 @@ class Users extends \yii\db\ActiveRecord
             'telegram' => 'Telegram',
             'biography' => 'Biography',
         ];
-    }
-
-    public function setPerformerRating(float $rating): void
-    {
-        $this->performerRating = (float)$rating;
-    }
-
-    public function setPerformerReviewsCount(int $count): void
-    {
-        $this->performerReviewsCount = (int)$count;
-    }
-
-    public function setPerformerTasksCount(int $count): void
-    {
-        $this->performerTasksCount = (int)$count;
     }
 
     /**
@@ -211,28 +192,18 @@ class Users extends \yii\db\ActiveRecord
      */
     public function getPerformerRating()
     {
-        $rating = $this->getPerformerRatingAggregation()
-            ->average('rating');
-
-        if ($rating === null) {
-            $rating = 0;
+        if (($reviewsCount = count($this->reviewsPerformer)) === 0) {
+            return 0;
         }
 
-        $this->setPerformerRating($rating);
+        $rating = 0;
+        foreach ($this->reviewsPerformer as $review) {
+            $rating += $review->rating;
+        }
 
-        return $this->performerRating;
+        return $rating / $reviewsCount;
     }
 
-    public function getPerformerRatingAggregation()
-    {
-        return $this->getReviewsPerformer()
-            ->select('rating');
-    }
-
-    public function getPerformerReviewsCount()
-    {
-        return $this->getReviewsPerformer()->count();
-    }
 
     /**
      * Gets query for [[TasksCustomer]].
@@ -254,22 +225,10 @@ class Users extends \yii\db\ActiveRecord
         return $this->hasMany(Tasks::class, ['performer_id' => 'id']);
     }
 
-    public function getPerformerTasksCount()
-    {
-        return $this->getTasksPerformer()->count();
-    }
-
     public function getUserSpecializations()
     {
         return $this->hasMany(Categories::class, ['id' => 'category_id'])
             ->viaTable('user_specializations', ['performer_id' => 'id']);
-    }
-
-    public function getUserSpecializationsNames()
-    {
-        return $this->getUserSpecializations()
-            ->select('name')
-            ->all();
     }
 
     /**
