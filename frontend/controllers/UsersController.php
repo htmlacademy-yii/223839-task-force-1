@@ -10,9 +10,7 @@ class UsersController extends Controller
     public function actionIndex()
     {
         $performers = Users::find()
-            ->andWhere([
-                'role' => Users::PERFORMER
-            ])
+            ->andWhere(['role' => Users::PERFORMER])
             ->with([
                 'reviewsPerformer',
                 'tasksPerformer',

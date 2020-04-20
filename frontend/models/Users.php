@@ -50,8 +50,8 @@ use Yii;
  */
 class Users extends \yii\db\ActiveRecord
 {
-    const CUSTOMER = 'customer';
-    const PERFORMER = 'performer';
+    const ROLE_CUSTOMER = 'customer';
+    const ROLE_PERFORMER = 'performer';
 
     /**
      * {@inheritdoc}
@@ -201,7 +201,7 @@ class Users extends \yii\db\ActiveRecord
             $rating += $review->rating;
         }
 
-        return $rating / $reviewsCount;
+        return Yii::$app->formatter->asDecimal($rating / $reviewsCount, 2);
     }
 
 

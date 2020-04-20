@@ -33,7 +33,6 @@ $this->title = "TaskForce";
                             <?= $performer->first_name ?><?= $performer->last_name ?>
                         </a>
                     </p>
-
                     <?php
                     $outStars = function ($rating) {
                         for ($i = 0; $i < 5; $i++) {
@@ -45,7 +44,7 @@ $this->title = "TaskForce";
                         }
                     };
 
-                    $rating = Yii::$app->formatter->asDecimal($performer->performerRating, 2);
+                    $rating = $performer->performerRating;
 
                     $outStars($rating);
                     ?>
