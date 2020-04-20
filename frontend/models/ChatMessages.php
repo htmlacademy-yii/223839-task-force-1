@@ -37,9 +37,9 @@ class ChatMessages extends \yii\db\ActiveRecord
             [['chat_id', 'author_id', 'recipient_id', 'created_at', 'text'], 'required'],
             [['chat_id', 'author_id', 'recipient_id', 'created_at'], 'integer'],
             [['text'], 'string', 'max' => 5000],
-            [['chat_id'], 'exist', 'skipOnError' => true, 'targetClass' => Chats::className(), 'targetAttribute' => ['chat_id' => 'id']],
-            [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['author_id' => 'id']],
-            [['recipient_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['recipient_id' => 'id']],
+            [['chat_id'], 'exist', 'skipOnError' => true, 'targetClass' => Chats::class, 'targetAttribute' => ['chat_id' => 'id']],
+            [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['author_id' => 'id']],
+            [['recipient_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['recipient_id' => 'id']],
         ];
     }
 
@@ -65,7 +65,7 @@ class ChatMessages extends \yii\db\ActiveRecord
      */
     public function getChat()
     {
-        return $this->hasOne(Chats::className(), ['id' => 'chat_id']);
+        return $this->hasOne(Chats::class, ['id' => 'chat_id']);
     }
 
     /**
@@ -75,7 +75,7 @@ class ChatMessages extends \yii\db\ActiveRecord
      */
     public function getAuthor()
     {
-        return $this->hasOne(Users::className(), ['id' => 'author_id']);
+        return $this->hasOne(Users::class, ['id' => 'author_id']);
     }
 
     /**
@@ -85,6 +85,6 @@ class ChatMessages extends \yii\db\ActiveRecord
      */
     public function getRecipient()
     {
-        return $this->hasOne(Users::className(), ['id' => 'recipient_id']);
+        return $this->hasOne(Users::class, ['id' => 'recipient_id']);
     }
 }

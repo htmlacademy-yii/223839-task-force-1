@@ -31,6 +31,12 @@ use Yii;
  */
 class Tasks extends \yii\db\ActiveRecord
 {
+    const STATUS_NEW = 1;
+    const STATUS_CANCELED = 2;
+    const STATUS_ACTIVE = 3;
+    const STATUS_COMPLETED = 4;
+    const STATUS_FAILED = 5;
+
     /**
      * {@inheritdoc}
      */
@@ -51,10 +57,34 @@ class Tasks extends \yii\db\ActiveRecord
             [['description'], 'string'],
             [['title'], 'string', 'max' => 255],
             [['address'], 'string', 'max' => 500],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::className(), 'targetAttribute' => ['category_id' => 'id']],
-            [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['author_id' => 'id']],
-            [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['performer_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::className(), 'targetAttribute' => ['city_id' => 'id']],
+            [
+                ['category_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Categories::class,
+                'targetAttribute' => ['category_id' => 'id']
+            ],
+            [
+                ['author_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Users::class,
+                'targetAttribute' => ['author_id' => 'id']
+            ],
+            [
+                ['performer_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Users::class,
+                'targetAttribute' => ['performer_id' => 'id']
+            ],
+            [
+                ['city_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Cities::class,
+                'targetAttribute' => ['city_id' => 'id']
+            ],
         ];
     }
 
@@ -85,50 +115,50 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Responses]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|ResponsesQuery
      */
     public function getResponses()
     {
-        return $this->hasMany(Responses::className(), ['task_id' => 'id']);
+        return $this->hasMany(Responses::class, ['task_id' => 'id']);
     }
 
     /**
      * Gets query for [[Category]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|CategoriesQuery
      */
     public function getCategory()
     {
-        return $this->hasOne(Categories::className(), ['id' => 'category_id']);
+        return $this->hasOne(Categories::class, ['id' => 'category_id']);
     }
 
     /**
      * Gets query for [[Author]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|UsersQuery
      */
     public function getAuthor()
     {
-        return $this->hasOne(Users::className(), ['id' => 'author_id']);
+        return $this->hasOne(Users::class, ['id' => 'author_id']);
     }
 
     /**
      * Gets query for [[Performer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|UsersQuery
      */
     public function getPerformer()
     {
-        return $this->hasOne(Users::className(), ['id' => 'performer_id']);
+        return $this->hasOne(Users::class, ['id' => 'performer_id']);
     }
 
     /**
      * Gets query for [[City]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|CitiesQuery
      */
     public function getCity()
     {
-        return $this->hasOne(Cities::className(), ['id' => 'city_id']);
+        return $this->hasOne(Cities::class, ['id' => 'city_id']);
     }
 }

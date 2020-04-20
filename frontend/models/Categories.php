@@ -51,20 +51,21 @@ class Categories extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Tasks]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|TasksQuery
      */
     public function getTasks()
     {
-        return $this->hasMany(Tasks::className(), ['category_id' => 'id']);
+        return $this->hasMany(Tasks::class, ['category_id' => 'id']);
     }
 
     /**
      * Gets query for [[UserSpecializations]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|UserSpecializationsQuery
      */
     public function getUserSpecializations()
     {
-        return $this->hasMany(UserSpecializations::className(), ['category_id' => 'id']);
+        return $this->hasMany(UserSpecializations::class, ['category_id' => 'id']);
     }
+
 }

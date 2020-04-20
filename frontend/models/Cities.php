@@ -8,7 +8,7 @@ use Yii;
  * This is the model class for table "cities".
  *
  * @property int $id
- * @property string $city
+ * @property string $name
  * @property float $lat
  * @property float $long
  *
@@ -31,9 +31,9 @@ class Cities extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['city', 'lat', 'long'], 'required'],
+            [['name', 'lat', 'long'], 'required'],
             [['lat', 'long'], 'number'],
-            [['city'], 'string', 'max' => 50],
+            [['name'], 'string', 'max' => 50],
             [['lat'], 'unique'],
             [['long'], 'unique'],
         ];
@@ -46,7 +46,7 @@ class Cities extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'city' => 'City',
+            'name' => 'Name',
             'lat' => 'Lat',
             'long' => 'Long',
         ];
@@ -55,20 +55,20 @@ class Cities extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Tasks]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|TasksQuery
      */
     public function getTasks()
     {
-        return $this->hasMany(Tasks::className(), ['city_id' => 'id']);
+        return $this->hasMany(Tasks::class, ['city_id' => 'id']);
     }
 
     /**
      * Gets query for [[Users]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return \yii\db\ActiveQuery|UsersQuery
      */
     public function getUsers()
     {
-        return $this->hasMany(Users::className(), ['city_id' => 'id']);
+        return $this->hasMany(Users::class, ['city_id' => 'id']);
     }
 }

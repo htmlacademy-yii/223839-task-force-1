@@ -74,10 +74,10 @@ AppAsset::register($this);
             <div class="header__nav">
                 <ul class="header-nav__list site-list">
                     <li class="site-list__item">
-                        <a href="#">Задания</a>
+                        <a href="<?= \yii\helpers\Url::to(['tasks/index']) ?>">Задания</a>
                     </li>
                     <li class="site-list__item">
-                        <a href="#">Исполнители</a>
+                        <a href="<?= \yii\helpers\Url::to(['users/index']) ?>">Исполнители</a>
                     </li>
                     <li class="site-list__item">
                         <a href="#">Создать задание</a>
@@ -139,7 +139,7 @@ AppAsset::register($this);
     </header>
     <main class="page-main">
 
-        <div class="main-container">
+        <div class="main-container page-container">
             <?= $content ?>
         </div>
 
