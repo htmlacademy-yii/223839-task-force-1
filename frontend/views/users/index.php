@@ -34,18 +34,15 @@ $this->title = "TaskForce";
                         </a>
                     </p>
                     <?php
-                    $outStars = function ($rating) {
-                        for ($i = 0; $i < 5; $i++) {
-                            if ($i < floor($rating)) {
-                                echo '<span></span>';
-                            } else {
-                                echo '<span class="star-disabled"></span>';
-                            }
+                    $rating = $performer->performerRating;
+                    for ($i = 0; $i < 5; $i++) {
+                        if ($i < floor($rating)) {
+                            echo '<span></span>';
+                        } else {
+                            echo '<span class="star-disabled"></span>';
                         }
-                        echo "<b>{$rating}<b>";
-                    };
-
-                    $outStars($performer->performerRating);
+                    }
+                    echo "<b>{$rating}<b>";
                     ?>
                     <p class="user__search-content">
                         <?= $performer->biography ?>
