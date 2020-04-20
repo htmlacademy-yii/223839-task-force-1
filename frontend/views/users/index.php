@@ -42,13 +42,11 @@ $this->title = "TaskForce";
                                 echo '<span class="star-disabled"></span>';
                             }
                         }
+                        echo "<b>{$rating}<b>";
                     };
 
-                    $rating = $performer->performerRating;
-
-                    $outStars($rating);
+                    $outStars($performer->performerRating);
                     ?>
-                    <b><?= $rating ?></b>
                     <p class="user__search-content">
                         <?= $performer->biography ?>
                     </p>
