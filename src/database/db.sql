@@ -40,6 +40,7 @@ CREATE TABLE `users`(
 	`skype` VARCHAR(50) NULL,
 	`telegram` VARCHAR(50) NULL,
 	`biography` TEXT NULL,
+	 visit_counter INT UNSIGNED NOT NULL DEFAULT 0,
 	UNIQUE KEY `email`(`email`),
 	UNIQUE KEY `phone`(`phone`),
 	FOREIGN KEY (`city_id`) REFERENCES `cities`(`id`)
@@ -64,6 +65,7 @@ CREATE TABLE `tasks` (
 	`performer_id` INT UNSIGNED NULL,
 	`author_id` INT UNSIGNED NOT NULL,
 	`status` TINYINT NOT NULL,
+	`remoteWork` TINYINT NOT NULL DEFAULT 0, # 0 not 1 yes
 	FOREIGN KEY (`category_id`) REFERENCES `categories`(`id`)
 	ON DELETE CASCADE
 	ON UPDATE CASCADE,
