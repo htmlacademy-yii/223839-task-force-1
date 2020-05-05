@@ -9,7 +9,7 @@ use yii\helpers\ArrayHelper;
 
 class TasksFilterForms extends Model
 {
-    const CREATED_TODAY = 1; // DAY
+    const CREATED_TODAY = 24; // HOUR
     const CREATED_WEEK = 7; // DAY
     const CREATED_MONTH = 1; // MONTH
     const ALL_TIME = 0;
@@ -143,7 +143,10 @@ class TasksFilterForms extends Model
         switch ($this->getPeriod()) {
             case self::ALL_TIME:
                 return;
-            case self::CREATED_TODAY or self::CREATED_WEEK:
+            case self::CREATED_TODAY:
+                $date = 'HOUR';
+                break;
+            case self::CREATED_WEEK:
                 $date = 'DAY';
                 break;
             case self::CREATED_MONTH:
