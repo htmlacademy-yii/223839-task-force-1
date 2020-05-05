@@ -42,7 +42,6 @@ return [
             'rules' => [
                 'GET users/search' => 'users/index',
                 'GET tasks/search' => 'tasks/index',
-                'users/<sort>' => 'users/index'
             ],
         ],
         'formatter' => [

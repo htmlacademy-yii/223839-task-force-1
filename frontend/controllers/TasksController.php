@@ -26,7 +26,7 @@ class TasksController extends Controller
             ->with(['city', 'category', 'responses'])
             ->orderBy(['created_at' => SORT_DESC]);
 
-        $categories = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
+        $categories = ArrayHelper::map(Categories::find()->select(['id', 'name'])->all(), 'id', 'name');
         $filterForm = new TasksFilterForms();
 
         if (\Yii::$app->request->getIsGet()) {

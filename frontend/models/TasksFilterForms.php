@@ -12,6 +12,7 @@ class TasksFilterForms extends Model
     const CREATED_TODAY = 1;
     const CREATED_WEEK = 7;
     const CREATED_MONTH = 30;
+    const ALL_TIME = 0;
 
     const WITHOUT_RESPONSES = 'withoutResponses';
     const REMOTE_WORK = 'remoteWork';
@@ -46,7 +47,8 @@ class TasksFilterForms extends Model
         return [
             self::CREATED_TODAY => 'За день',
             self::CREATED_WEEK => 'За неделю',
-            self::CREATED_MONTH => 'За месяц'
+            self::CREATED_MONTH => 'За месяц',
+            self::ALL_TIME => 'За все время'
         ];
     }
 
@@ -76,7 +78,6 @@ class TasksFilterForms extends Model
     private function setExtraFieldsFilter(): void
     {
         if (!empty($this->getExtraFields())) {
-            // TODO
             foreach (self::getExtraFieldsdList() as $key => $value) {
                 switch ($key) {
                     case $this->isWithoutResponses($key) :
@@ -139,11 +140,24 @@ class TasksFilterForms extends Model
 
     private function setPeriodFilter(): void
     {
-        $this->query->andFilterWhere([
-            '>',
-            'created_at',
-            new Expression("CURRENT_TIMESTAMP - INTERVAL {$this->getPeriod()} DAY")
-        ]);
+        switch ($this->getPeriod()) {
+            case self::ALL_TIME:
+                return;
+            case self::CREATED_TODAY or self::CREATED_WEEK:
+                $date = 'DAY';
+                break;
+            case self::CREATED_MONTH:
+                $date = 'MONTH';
+                break;
+        }
+
+        $this->query->andFilterWhere(
+            [
+                '>',
+                'created_at',
+                new Expression("CURRENT_TIMESTAMP - INTERVAL {$this->getPeriod()} {$date}")
+            ]
+        );
     }
 
     private function setSearchFilter(): void

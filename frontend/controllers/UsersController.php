@@ -10,16 +10,18 @@ use yii\web\Controller;
 
 class UsersController extends Controller
 {
-    public function actionIndex(string $sort = UsersFiltersForm::USER_SORT_LAST_ACTIVITY): string
+    public function actionIndex(): string
     {
         $performers = Users::find()
             ->andWhere(['role' => Users::ROLE_PERFORMER])
-            ->with([
-                'reviewsPerformer',
-                'tasksPerformer',
-                'userSpecializations',
-                'categories'
-            ]);
+            ->with(
+                [
+                    'reviewsPerformer',
+                    'tasksPerformer',
+                    'userSpecializations',
+                    'categories'
+                ]
+            );
 
         $categories = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
 
@@ -27,13 +29,16 @@ class UsersController extends Controller
 
         if (\Yii::$app->request->getIsGet()) {
             $requestData = \Yii::$app->request->get();
+            if (!empty($requestData['sort'])) {
+                $performers = $filterForm->setSort($requestData['sort'], $performers);
+            }
             if ($filterForm->load($requestData) && $filterForm->validate()) {
                 $filterForm->setData($requestData);
                 $filterForm->setFilters($performers);
             }
         }
 
-        $performers = $filterForm->setSort($sort, $performers);
+        $performers = $performers->all();
 
         return $this->render('index', compact('performers', 'categories', 'filterForm'));
     }

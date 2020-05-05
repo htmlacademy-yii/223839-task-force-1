@@ -16,13 +16,13 @@ $this->title = "TaskForce";
         <p>Сортировать по:</p>
         <ul class="user__search-list">
             <li class="user__search-item user__search-item--current">
-                <a href="/users/sort_rating" class="link-regular">Рейтингу</a>
+                <a href="/users/?sort=rating" class="link-regular">Рейтингу</a>
             </li>
             <li class="user__search-item">
-                <a href="/users/sort_orders" class="link-regular">Числу заказов</a>
+                <a href="/users/?sort=orders" class="link-regular">Числу заказов</a>
             </li>
             <li class="user__search-item">
-                <a href="/users/sort_popular" class="link-regular">Популярности</a>
+                <a href="/users/?sort=popular" class="link-regular">Популярности</a>
             </li>
         </ul>
     </div>
