@@ -9,9 +9,9 @@ use yii\helpers\ArrayHelper;
 
 class TasksFilterForms extends Model
 {
-    const CREATED_TODAY = 1;
-    const CREATED_WEEK = 7;
-    const CREATED_MONTH = 30;
+    const CREATED_TODAY = 1; // DAY
+    const CREATED_WEEK = 7; // DAY
+    const CREATED_MONTH = 1; // MONTH
     const ALL_TIME = 0;
 
     const WITHOUT_RESPONSES = 'withoutResponses';
