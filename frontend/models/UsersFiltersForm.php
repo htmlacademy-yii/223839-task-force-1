@@ -41,7 +41,7 @@ class UsersFiltersForm extends Model
     public function rules(): array
     {
         return [
-            [['categories', 'extraFields', 'sortOn', 'search'], 'safe']
+            [['categories', 'extraFields', 'search'], 'safe']
         ];
     }
 
@@ -73,8 +73,18 @@ class UsersFiltersForm extends Model
 
         $dataProvider = new ActiveDataProvider([
             'query' => $this->query,
-            'pagination' => ['pageSize' => 5]
+            'pagination' => ['pageSize' => 5],
+            'sort' => [
+                'attributes' => [
+                    'last_activity',
+                    'rating' => SORT_DESC,
+                    'tasks_counter',
+                    'visit_counter'
+                ]
+            ]
         ]);
+
+//        VarDumper::dump($dataProvider, 10, true);
 
         if (!$this->load($data) && $this->validate()) {
             return $dataProvider;
@@ -93,26 +103,20 @@ class UsersFiltersForm extends Model
                 $this->query->orderBy(['last_activity' => SORT_DESC]);
                 break;
             case self::USER_SORT_RATING:
-                $this->query = Users::find()
-                    ->select([
-                        'users.*',
-                        'AVG(reviews.rating) AS rating'
-                    ])
-                    ->andFilterWhere(['role' => 'performer'])
+                $this->query
+                    ->select(['users.*'])
+                    ->addSelect(['AVG(reviews.rating) AS rating'])
                     ->joinWith('reviewsPerformer', false)
                     ->groupBy('users.id')
                     ->orderBy(['rating' => SORT_DESC]);
                 break;
             case self::USER_SORT_COUNT_ORDERS:
                 $this->query = Users::find()
-                    ->select([
-                        'users.*',
-                        'count(tasks.performer_id) AS tasksCounter'
-                    ])
-                    ->andFilterWhere(['role' => 'performer'])
+                    ->select(['users.*'])
+                    ->addSelect(['COUNT(tasks.performer_id) AS tasks_counter'])
                     ->joinWith('tasksPerformer', false)
                     ->groupBy('users.id')
-                    ->orderBy(['tasksCounter' => SORT_DESC]);
+                    ->orderBy(['tasks_counter' => SORT_DESC]);
                 break;
             case self::USER_SORT_POPULAR:
                 $this->query->orderBy(['visit_counter' => SORT_DESC]);
@@ -131,18 +135,14 @@ class UsersFiltersForm extends Model
 
     private function setCategoriesFilter(): void
     {
-        $categories = ArrayHelper::getValue($this->data, 'categories');
         $categories = UserSpecializations::find()
             ->select(['performer_id'])
-            ->andFilterWhere(['IN', 'category_id', $categories])
+            ->andFilterWhere(['category_id' => ArrayHelper::getValue($this->data, 'categories')])
             ->all();
 
-        $performersIDs = [];
-        foreach ($categories as $category) {
-            $performersIDs[] = $category->performer_id;
-        }
+        $performersIDs = ArrayHelper::getColumn($categories, 'performer_id');
 
-        $this->query->andFilterWhere(['IN', 'id', $performersIDs]);
+        $this->query->andFilterWhere(['id' => $performersIDs]);
     }
 
     /**
@@ -183,13 +183,10 @@ class UsersFiltersForm extends Model
         $tasks = Tasks::find()
             ->select('performer_id')
             ->distinct()
-            ->where(['=', 'status', Tasks::STATUS_ACTIVE])
+            ->where(['status' => Tasks::STATUS_ACTIVE])
             ->all();
 
-        $performersWithoutTasks = [];
-        foreach ($tasks as $task) {
-            $performersWithoutTasks[] = ArrayHelper::getValue($task, 'performer_id');
-        }
+        $performersWithoutTasks = ArrayHelper::getColumn($tasks, 'performer_id');
 
         $this->query->andFilterWhere(['NOT IN', 'id', $performersWithoutTasks]);
     }
@@ -208,30 +205,25 @@ class UsersFiltersForm extends Model
         $reviews = Reviews::find()
             ->select(['performer_id'])
             ->distinct()
-            ->all();;
+            ->all();
 
-        $perfromerWithReviews = [];
-        foreach ($reviews as $value) {
-            $perfromerWithReviews[] = $value->performer_id;
-        }
+        $perfomerWithReviews = ArrayHelper::getColumn($reviews, 'performer_id');
 
-        $this->query->andFilterWhere(['IN', 'id', $perfromerWithReviews]);
+        $this->query->andFilterWhere(['id' => $perfomerWithReviews]);
     }
 
     private function setFavoritesExtraFieldsFilter(): void
     {
-        $usersId = [1]; // TODO исправить когда появится возможность добавлять в избранное
+        $usersID = [1]; // TODO исправить когда появится возможность добавлять в избранное
+
         $bookmarkedPerformers = BookmarkedUsers::find()
             ->select(['bookmarked_user_id'])
-            ->where(['IN', 'user_id', $usersId])
+            ->where(['user_id' => $usersID])
             ->all();
 
-        $bookmarkedPerformersId = [];
-        foreach ($bookmarkedPerformers as $bookmarkedPerformer) {
-            $bookmarkedPerformersId[] = $bookmarkedPerformer->bookmarked_user_id;
-        }
+        $bookmarkedPerformersIDs = ArrayHelper::getColumn($bookmarkedPerformers, 'bookmarked_user_id');
 
-        $this->query->andFilterWhere(['IN', 'id', $bookmarkedPerformersId]);
+        $this->query->andFilterWhere(['id' => $bookmarkedPerformersIDs]);
     }
 
     private function getSearch(): string
