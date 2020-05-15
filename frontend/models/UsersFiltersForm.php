@@ -57,6 +57,7 @@ class UsersFiltersForm extends Model
     public function search(array $data): ActiveDataProvider
     {
         $this->query = Users::find()
+            ->select(['users.*'])
             ->andWhere(['role' => Users::ROLE_PERFORMER])
             ->with([
                 'reviewsPerformer',
@@ -83,8 +84,6 @@ class UsersFiltersForm extends Model
             ]
         ]);
 
-//        VarDumper::dump($dataProvider, 10, true);
-
         if (!$this->load($data) && $this->validate()) {
             return $dataProvider;
         }
@@ -103,15 +102,13 @@ class UsersFiltersForm extends Model
                 break;
             case self::USER_SORT_RATING:
                 $this->query
-                    ->select(['users.*'])
                     ->addSelect(['AVG(reviews.rating) AS rating'])
                     ->joinWith('reviewsPerformer', false)
                     ->groupBy('users.id')
                     ->orderBy(['rating' => SORT_DESC]);
                 break;
             case self::USER_SORT_COUNT_ORDERS:
-                $this->query = Users::find()
-                    ->select(['users.*'])
+                $this->query
                     ->addSelect(['COUNT(tasks.performer_id) AS tasks_counter'])
                     ->joinWith('tasksPerformer', false)
                     ->groupBy('users.id')
