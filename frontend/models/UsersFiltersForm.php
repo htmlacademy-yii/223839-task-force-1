@@ -7,7 +7,6 @@ use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
-use yii\helpers\VarDumper;
 
 class UsersFiltersForm extends Model
 {

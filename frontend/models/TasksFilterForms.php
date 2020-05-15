@@ -7,7 +7,6 @@ use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 use yii\data\ActiveDataProvider;
-use yii\web\Request;
 
 class TasksFilterForms extends Model
 {
