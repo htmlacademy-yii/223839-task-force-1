@@ -10,36 +10,17 @@ use yii\web\Controller;
 
 class UsersController extends Controller
 {
-    public function actionIndex(): string
+    public function actionIndex()
     {
-        $performers = Users::find()
-            ->andWhere(['role' => Users::ROLE_PERFORMER])
-            ->with(
-                [
-                    'reviewsPerformer',
-                    'tasksPerformer',
-                    'userSpecializations',
-                    'categories'
-                ]
-            );
-
         $categories = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
 
-        $filterForm = new UsersFiltersForm();
+        $searchModel = new UsersFiltersForm();
 
-        if (\Yii::$app->request->getIsGet()) {
-            $requestData = \Yii::$app->request->get();
-            if (!empty($requestData['sort'])) {
-                $performers = $filterForm->setSort($requestData['sort'], $performers);
-            }
-            if ($filterForm->load($requestData) && $filterForm->validate()) {
-                $filterForm->setData($requestData);
-                $filterForm->setFilters($performers);
-            }
-        }
+        $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
 
-        $performers = $performers->all();
+        $pagination = $dataProvider->getPagination();
+        $performers = $dataProvider->getModels();
 
-        return $this->render('index', compact('performers', 'categories', 'filterForm'));
+        return $this->render('index', compact('performers', 'categories', 'searchModel', 'pagination'));
     }
 }

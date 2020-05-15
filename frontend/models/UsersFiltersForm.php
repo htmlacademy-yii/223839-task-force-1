@@ -3,9 +3,11 @@
 namespace frontend\models;
 
 use yii\base\Model;
+use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
 
 class UsersFiltersForm extends Model
 {
@@ -53,53 +55,79 @@ class UsersFiltersForm extends Model
         ];
     }
 
-    public function setSort(string $sort, ActiveQuery $query): ActiveQuery
+    public function search(array $data): ActiveDataProvider
+    {
+        $this->query = Users::find()
+            ->andWhere(['role' => Users::ROLE_PERFORMER])
+            ->with([
+                'reviewsPerformer',
+                'tasksPerformer',
+                'userSpecializations',
+                'categories'
+            ]);
+
+        $sort = \Yii::$app->request->get('sort');
+        if (isset($sort)) {
+            $this->setSort($sort);
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $this->query,
+            'pagination' => [
+                'pageSize' => 5,
+            ]
+        ]);
+
+        if (!$this->load($data) && $this->validate()) {
+            return $dataProvider;
+        }
+
+        $this->data = ArrayHelper::getValue($data, $this->formName());
+        $this->setFilters();
+
+        return $dataProvider;
+    }
+
+    public function setSort(string $sort): void
     {
         switch ($sort) {
             case self::USER_SORT_LAST_ACTIVITY:
-                return $query->orderBy(['last_activity' => SORT_DESC]);
+                $this->query->orderBy(['last_activity' => SORT_DESC]);
+                break;
             case self::USER_SORT_RATING:
-                $query = Users::find()
-                    ->select(
-                        [
-                            'users.*',
-                            'AVG(reviews.rating) AS rating'
-                        ]
-                    )
-                    ->andFilterWhere(['=', 'role', 'performer'])
+                $this->query = Users::find()
+                    ->select([
+                        'users.*',
+                        'AVG(reviews.rating) AS rating'
+                    ])
+                    ->andFilterWhere(['role' => 'performer'])
                     ->joinWith('reviewsPerformer', false)
                     ->groupBy('users.id')
                     ->orderBy(['rating' => SORT_DESC]);
-                return $query;
+                break;
             case self::USER_SORT_COUNT_ORDERS:
-                $query = Users::find()
-                    ->select(
-                        [
-                            'users.*',
-                            'count(tasks.performer_id) as tasksCounter'
-                        ]
-                    )
-                    ->andFilterWhere(['=', 'role', 'performer'])
+                $this->query = Users::find()
+                    ->select([
+                        'users.*',
+                        'count(tasks.performer_id) AS tasksCounter'
+                    ])
+                    ->andFilterWhere(['role' => 'performer'])
                     ->joinWith('tasksPerformer', false)
                     ->groupBy('users.id')
                     ->orderBy(['tasksCounter' => SORT_DESC]);
-                return $query;
+                break;
             case self::USER_SORT_POPULAR:
-                return $query->orderBy(['visit_counter' => SORT_DESC]);
+                $this->query->orderBy(['visit_counter' => SORT_DESC]);
+                break;
         }
     }
 
-    public function setData(array $data): void
+    public function setFilters(): void
     {
-        $this->data = ArrayHelper::getValue($data, $this->formName());
-    }
-
-    public function setFilters(ActiveQuery $query): void
-    {
-        $this->query = $query;
-
         $this->setCategoriesFilter();
+
         $this->setExtraFieldsFilters();
+
         $this->setSearchFilter();
     }
 
@@ -111,12 +139,12 @@ class UsersFiltersForm extends Model
             ->andFilterWhere(['IN', 'category_id', $categories])
             ->all();
 
-        $performersId = [];
+        $performersIDs = [];
         foreach ($categories as $category) {
-            $performersId[] = $category->performer_id;
+            $performersIDs[] = $category->performer_id;
         }
 
-        $this->query->andFilterWhere(['IN', 'id', $performersId]);
+        $this->query->andFilterWhere(['IN', 'id', $performersIDs]);
     }
 
     /**
@@ -133,60 +161,79 @@ class UsersFiltersForm extends Model
     private function setExtraFieldsFilters(): void
     {
         if (!empty($this->getExtraFields())) {
-            foreach (self::getExtraFieldsList() as $key => $value) {
-                if (ArrayHelper::keyExists($key, $this->getExtraFields()) && $key === self::FREE_NOW) {
-                    $tasks = Tasks::find()
-                        ->select('performer_id')
-                        ->distinct()
-                        ->where(['=', 'status', Tasks::STATUS_ACTIVE])
-                        ->all();
-
-                    $performersWithoutTasks = [];
-                    foreach ($tasks as $task) {
-                        $performersWithoutTasks[] = ArrayHelper::getValue($task, 'performer_id');
-                    }
-
-                    $this->query->andFilterWhere(['NOT IN', 'id', $performersWithoutTasks]);
-                }
-                if (ArrayHelper::keyExists($key, $this->getExtraFields()) && $key === self::ONLINE_NOW) {
-                    $this->query->andFilterWhere(
-                        [
-                            '>',
-                            'last_activity',
-                            new Expression('CURRENT_TIMESTAMP - INTERVAL 1800 SECOND')
-                        ]
-                    );
-                }
-                if (ArrayHelper::keyExists($key, $this->getExtraFields()) && $key === self::HAS_RESPONSES) {
-                    $reviews = Reviews::find()
-                        ->select(['performer_id'])
-                        ->distinct()
-                        ->all();;
-
-                    $perfromerWithReviews = [];
-                    foreach ($reviews as $review => $value) {
-                        $perfromerWithReviews[] = $value->performer_id;
-                    }
-
-                    $this->query->andFilterWhere(['IN', 'id', $perfromerWithReviews]);
-                }
-                if (ArrayHelper::keyExists($key, $this->getExtraFields()) && $key === self::FAVORITES) {
-                    $usersId = [1];
-                    // TODO исправить когда появится возможность добавлять в избранное
-                    $bookmarkedPerformers = BookmarkedUsers::find()
-                        ->select(['bookmarked_user_id'])
-                        ->where(['IN', 'user_id', $usersId])
-                        ->all();
-
-                    $bookmarkedPerformersId = [];
-                    foreach ($bookmarkedPerformers as $bookmarkedPerformer) {
-                        $bookmarkedPerformersId[] = $bookmarkedPerformer->bookmarked_user_id;
-                    }
-
-                    $this->query->andFilterWhere(['IN', 'id', $bookmarkedPerformersId]);
+            foreach ($this->getExtraFields() as $value) {
+                switch ($value) {
+                    case self::FREE_NOW:
+                        $this->setFreeNowExtraFieldsFilter();
+                        break;
+                    case self::ONLINE_NOW:
+                        $this->setOnlineNowExtraFieldsFilter();
+                        break;
+                    case self::HAS_RESPONSES:
+                        $this->setHasResponsesExtraFieldsFilter();
+                        break;
+                    case self::FAVORITES:
+                        $this->setFavoritesExtraFieldsFilter();
+                        break;
                 }
             }
         }
+    }
+
+    private function setFreeNowExtraFieldsFilter(): void
+    {
+        $tasks = Tasks::find()
+            ->select('performer_id')
+            ->distinct()
+            ->where(['=', 'status', Tasks::STATUS_ACTIVE])
+            ->all();
+
+        $performersWithoutTasks = [];
+        foreach ($tasks as $task) {
+            $performersWithoutTasks[] = ArrayHelper::getValue($task, 'performer_id');
+        }
+
+        $this->query->andFilterWhere(['NOT IN', 'id', $performersWithoutTasks]);
+    }
+
+    private function setOnlineNowExtraFieldsFilter(): void
+    {
+        $this->query->andFilterWhere([
+            '>',
+            'last_activity',
+            new Expression('CURRENT_TIMESTAMP - INTERVAL 1800 SECOND')
+        ]);
+    }
+
+    private function setHasResponsesExtraFieldsFilter(): void
+    {
+        $reviews = Reviews::find()
+            ->select(['performer_id'])
+            ->distinct()
+            ->all();;
+
+        $perfromerWithReviews = [];
+        foreach ($reviews as $value) {
+            $perfromerWithReviews[] = $value->performer_id;
+        }
+
+        $this->query->andFilterWhere(['IN', 'id', $perfromerWithReviews]);
+    }
+
+    private function setFavoritesExtraFieldsFilter(): void
+    {
+        $usersId = [1]; // TODO исправить когда появится возможность добавлять в избранное
+        $bookmarkedPerformers = BookmarkedUsers::find()
+            ->select(['bookmarked_user_id'])
+            ->where(['IN', 'user_id', $usersId])
+            ->all();
+
+        $bookmarkedPerformersId = [];
+        foreach ($bookmarkedPerformers as $bookmarkedPerformer) {
+            $bookmarkedPerformersId[] = $bookmarkedPerformer->bookmarked_user_id;
+        }
+
+        $this->query->andFilterWhere(['IN', 'id', $bookmarkedPerformersId]);
     }
 
     private function getSearch(): string
@@ -198,10 +245,6 @@ class UsersFiltersForm extends Model
     {
         $extraFields = ArrayHelper::getValue($this->data, 'extraFields');
 
-        if (empty($extraFields)) {
-            return [];
-        }
-
-        return array_flip($extraFields);
+        return empty($extraFields) ? [] : $extraFields;
     }
 }

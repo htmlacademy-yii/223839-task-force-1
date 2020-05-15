@@ -1,8 +1,9 @@
 <?php
 /* @var $this yii\web\View
  * @var $performers \frontend\models\Users
- * @var $filterForm \frontend\models\UsersFiltersForm
+ * @var $searchModel \frontend\models\UsersFiltersForm
  * @var $categories \frontend\models\Categories
+ * @var $pagination \yii\data\Pagination
  */
 
 use \yii\helpers\Html;
@@ -28,7 +29,8 @@ $this->title = "TaskForce";
     </div>
 
 
-    <?php foreach ($performers as $performer) : ?>
+    <?php
+    foreach ($performers as $performer) : ?>
         <div class="content-view__feedback-card user__search-wrapper">
             <div class="feedback-card__top">
                 <div class="user__search-icon">
@@ -61,30 +63,50 @@ $this->title = "TaskForce";
                     <?= Yii::$app->formatter->asRelativeTime($performer->last_activity) ?></span>
             </div>
             <div class="link-specialization user__search-link--bottom">
-                <?php foreach ($performer->categories as $category) : ?>
+                <?php
+                foreach ($performer->categories as $category) : ?>
                     <a href="#" class="link-regular"><?= $category->name ?></a>
-                <?php endforeach ?>
+                <?php
+                endforeach ?>
             </div>
         </div>
-    <?php endforeach; ?>
+    <?php
+    endforeach; ?>
+
+    <div class="new-task__pagination">
+        <?=
+        \yii\widgets\LinkPager::widget([
+            'pagination' => $pagination,
+            'options' => [
+                'class' => 'new-task__pagination-list'
+            ],
+            'prevPageLabel' => '',
+            'nextPageLabel' => '',
+            'pageCssClass' => 'pagination__item',
+            'prevPageCssClass' => 'pagination__item',
+            'nextPageCssClass' => 'pagination__item'
+        ])
+        ?>
+    </div>
 </section>
 <section class="search-task">
     <div class="search-task__wrapper">
-        <?php $form = ActiveForm::begin([
+        <?php
+        $form = ActiveForm::begin([
             'method' => 'get',
             'action' => ['users/search'],
             'options' => [
                 'class' => 'search-task__form',
             ]
         ]);
-        $loadCategories = $filterForm->categories;
-        $loadExtraFields = $filterForm->extraFields;
+        $loadCategories = $searchModel->categories;
+        $loadExtraFields = $searchModel->extraFields;
         ?>
 
         <?= Html::beginTag('fieldset', ['class' => 'search-task__categories']) ?>
         <?= Html::tag('legend', 'Категории') ?>
 
-        <?= $form->field($filterForm, 'categories')
+        <?= $form->field($searchModel, 'categories')
             ->label(false)
             ->checkboxList($categories, [
                 'item' => function (
@@ -110,9 +132,9 @@ $this->title = "TaskForce";
         <?= Html::tag('legend', 'Дополнительно') ?>
 
 
-        <?= $form->field($filterForm, 'extraFields')
+        <?= $form->field($searchModel, 'extraFields')
             ->label(false)
-            ->checkboxList($filterForm::getExtraFieldsList(), [
+            ->checkboxList($searchModel::getExtraFieldsList(), [
                 'item' => function (
                     int $index,
                     string $label,
@@ -131,11 +153,12 @@ $this->title = "TaskForce";
 
         <?= Html::endTag('fieldset') ?>
         <?= $form
-            ->field($filterForm, 'search', ['options' => ['tag' => false]])
+            ->field($searchModel, 'search', ['options' => ['tag' => false]])
             ->input('search', ['class' => 'input-middle input'])
             ->label('Поиск по имени', ['class' => 'search-task__name']) ?>
         <?= Html::submitButton('Искать', ['class' => 'button']) ?>
-        <?php $form::end() ?>
+        <?php
+        $form::end() ?>
 
     </div>
 </section>

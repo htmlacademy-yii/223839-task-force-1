@@ -6,6 +6,8 @@ use yii\base\Model;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
+use yii\data\ActiveDataProvider;
+use yii\web\Request;
 
 class TasksFilterForms extends Model
 {
@@ -42,6 +44,32 @@ class TasksFilterForms extends Model
         ];
     }
 
+
+    public function search(array $data): ActiveDataProvider
+    {
+        $this->query = Tasks::find()
+            ->andWhere(['status' => Tasks::STATUS_NEW])
+            ->with(['city', 'category', 'responses'])
+            ->orderBy(['created_at' => SORT_DESC]);
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $this->query,
+            'pagination' => [
+                'pageSize' => 5,
+            ]
+        ]);
+
+        if (!$this->load($data) && $this->validate()) {
+            return $dataProvider;
+        }
+
+        $this->data = ArrayHelper::getValue($data, $this->formName());
+        $this->setFilters();
+
+        return $dataProvider;
+    }
+
+
     public static function getPeriodList(): array
     {
         return [
@@ -60,83 +88,53 @@ class TasksFilterForms extends Model
         ];
     }
 
-    public function setData(array $data): void
+    public function setFilters(): void
     {
-        $this->data = ArrayHelper::getValue($data, $this->formName());
-    }
-
-    public function setFilters(ActiveQuery $tasks): void
-    {
-        $this->query = $tasks;
-
         $this->setExtraFieldsFilter();
+
         $this->setCategoriesFilter();
+
         $this->setPeriodFilter();
+
         $this->setSearchFilter();
     }
 
     private function setExtraFieldsFilter(): void
     {
         if (!empty($this->getExtraFields())) {
-            foreach (self::getExtraFieldsdList() as $key => $value) {
-                switch ($key) {
-                    case $this->isWithoutResponses($key) :
-                        $this->setWithoutResponsesFilter();
+            foreach ($this->getExtraFields() as $value) {
+                switch ($value) {
+                    case self::WITHOUT_RESPONSES:
+                        $this->setWithoutResponsesExtraFieldsFilter();
                         break;
-                    case $this->isRemoteWork($key):
-                        $this->setRemoteWorkFilter();
+                    case self::REMOTE_WORK:
+                        $this->setRemoteWorkExtraFieldsFilter();
                         break;
                 }
             }
         }
     }
 
-    private function setWithoutResponsesFilter(): void
+    private function setWithoutResponsesExtraFieldsFilter(): void
     {
         $responses = Responses::find()
             ->select('task_id')
             ->distinct()
             ->andWhere(['IS NOT', 'performer_id', null])
-            ->all();
+            ->column();
 
-        $tasksWithResponses = [];
-        foreach ($responses as $response) {
-            $tasksWithResponses[] = ArrayHelper::getValue($response, 'task_id');
-        }
-
-        $this->query->andFilterWhere(['NOT IN', 'id', $tasksWithResponses]);
+        $this->query->andFilterWhere(['NOT IN', 'id', $responses]);
     }
 
-    private function setRemoteWorkFilter(): void
+    private function setRemoteWorkExtraFieldsFilter(): void
     {
-        $this->query->andWhere(['=', 'remoteWork', 1]);
+        $this->query->andWhere(['remoteWork' => 1]);
     }
-
-
-    private function isWithoutResponses($key): bool
-    {
-        if (ArrayHelper::keyExists($key, $this->getExtraFields()) && $key === self::WITHOUT_RESPONSES) {
-            return true;
-        }
-        return false;
-    }
-
-    private function isRemoteWork($key): bool
-    {
-        if (ArrayHelper::keyExists($key, $this->getExtraFields()) && $key === self::REMOTE_WORK) {
-            return true;
-        }
-        return false;
-    }
-
-////////////////////////// EXTRA FIELDS FILTERS //////////////
-/////////////////////////////////////////////////////////////
 
     private function setCategoriesFilter(): void
     {
         $this->query->andFilterWhere(['category_id' => $this->categories]);
     }
-
 
     private function setPeriodFilter(): void
     {
@@ -154,13 +152,11 @@ class TasksFilterForms extends Model
                 break;
         }
 
-        $this->query->andFilterWhere(
-            [
-                '>',
-                'created_at',
-                new Expression("CURRENT_TIMESTAMP - INTERVAL {$this->getPeriod()} {$date}")
-            ]
-        );
+        $this->query->andFilterWhere([
+            '>',
+            'created_at',
+            new Expression("CURRENT_TIMESTAMP - INTERVAL {$this->getPeriod()} {$date}")
+        ]);
     }
 
     private function setSearchFilter(): void
@@ -174,11 +170,7 @@ class TasksFilterForms extends Model
     {
         $extraFields = ArrayHelper::getValue($this->data, 'extraFields');
 
-        if (empty($extraFields)) {
-            return [];
-        }
-
-        return array_flip($extraFields);
+        return empty($extraFields) ? [] : $extraFields;
     }
 
     private function getSearch(): string

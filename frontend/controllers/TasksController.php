@@ -5,7 +5,9 @@ namespace frontend\controllers;
 use frontend\models\Categories;
 use frontend\models\Tasks;
 use frontend\models\TasksFilterForms;
+use yii\data\ActiveDataProvider;
 use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
 
 
@@ -17,27 +19,22 @@ class TasksController extends Controller
      *
      * TODO а также из города пользователя, либо из города, выбранного пользователем в текущей сессии.
      *
-     * @return string
      */
-    public function actionIndex(): string
+    public function actionIndex()
     {
-        $tasks = Tasks::find()
-            ->andWhere(['status' => Tasks::STATUS_NEW])
-            ->with(['city', 'category', 'responses'])
-            ->orderBy(['created_at' => SORT_DESC]);
+        $categories = Categories::find()
+            ->select(['id', 'name'])
+            ->asArray()
+            ->all();
 
-        $categories = ArrayHelper::map(Categories::find()->select(['id', 'name'])->all(), 'id', 'name');
-        $filterForm = new TasksFilterForms();
+        $searchModel = new TasksFilterForms();
 
-        if (\Yii::$app->request->getIsGet()) {
-            $requestData = \Yii::$app->request->get();
-            if ($filterForm->load($requestData) && $filterForm->validate()) {
-                $filterForm->setData($requestData);
-                $filterForm->setFilters($tasks);
-            }
-        }
-        $tasks = $tasks->all();
-        return $this->render('index', compact('tasks', 'categories', 'filterForm'));
+        $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
+
+        $pagination = $dataProvider->getPagination();
+        $tasks = $dataProvider->getModels();
+
+        return $this->render('index', compact('tasks', 'categories', 'searchModel', 'pagination'));
     }
 }
 

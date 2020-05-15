@@ -2,7 +2,8 @@
 /* @var $this yii\web\View
  * @var $tasks \frontend\models\Tasks
  * @var $categories \frontend\models\Categories
- * @var $filterForm \frontend\models\TasksFilterForms
+ * @var $searchModel \frontend\models\TasksFilterForms
+ * @var $pagination \yii\data\Pagination
  */
 
 use yii\helpers\Html;
@@ -11,10 +12,12 @@ use yii\widgets\ActiveForm;
 
 $this->title = "TaskForce";
 ?>
+
 <section class="new-task">
     <div class="new-task__wrapper">
         <h1>Новые задания</h1>
-        <?php foreach ($tasks as $task) : ?>
+        <?php
+        foreach ($tasks as $task) : ?>
             <div class="new-task__card">
                 <div class="new-task__title">
                     <a href="#" class="link-regular"><h2><?= Html::encode($task->title) ?></h2></a>
@@ -28,36 +31,49 @@ $this->title = "TaskForce";
                 <p class="new-task__place"><?= $task->city->city ?>, <?= Html::encode($task->address) ?></p>
                 <span class="new-task__time"><?= Yii::$app->formatter->asRelativeTime($task->created_at) ?></span>
             </div>
-        <?php endforeach; ?>
+        <?php
+        endforeach; ?>
     </div>
+
     <div class="new-task__pagination">
-        <ul class="new-task__pagination-list">
-            <li class="pagination__item"><a href="#"></a></li>
-            <li class="pagination__item pagination__item--current">
-                <a>1</a></li>
-            <li class="pagination__item"><a href="#">2</a></li>
-            <li class="pagination__item"><a href="#">3</a></li>
-            <li class="pagination__item"><a href="#"></a></li>
-        </ul>
+        <?=
+        \yii\widgets\LinkPager::widget([
+            'pagination' => $pagination,
+            'options' => [
+                'class' => 'new-task__pagination-list'
+            ],
+            'prevPageLabel' => '',
+            'nextPageLabel' => '',
+            'pageCssClass' => 'pagination__item',
+            'prevPageCssClass' => 'pagination__item',
+            'nextPageCssClass' => 'pagination__item'
+        ])
+        ?>
     </div>
 </section>
 
 <section class="search-task">
     <div class="search-task__wrapper">
-        <?php $form = ActiveForm::begin([
+        <?php
+        $form = ActiveForm::begin([
             'method' => 'get',
             'action' => ['tasks/search'],
             'options' => [
                 'class' => 'search-task__form'
             ]
         ]);
-        $loadCategories = $filterForm->categories;
-        $loadExtraFields = $filterForm->extraFields;
+        $categories = array_reduce($categories, function ($acc, $category) {
+            $acc[$category['id']] = $category['name'];
+            return $acc;
+        });
+
+        $loadCategories = $searchModel->categories;
+        $loadExtraFields = $searchModel->extraFields;
         ?>
         <?= Html::beginTag('fieldset', ['class' => 'search-task__categories']) ?>
         <?= Html::tag('legend', 'Категории') ?>
         <?= $form
-            ->field($filterForm, 'categories')
+            ->field($searchModel, 'categories')
             ->label(false)
             ->checkboxList($categories,
                 [
@@ -67,13 +83,12 @@ $this->title = "TaskForce";
                         string $name,
                         bool $checked,
                         string $value
-                    ) use ($loadCategories) : string {
+                    ) use ($categories) : string {
                         $checked = ($checked === true) ? 'checked' : '';
                         $id = "category-{$index}";
-
                         return "<input type='checkbox' id='{$id}' name='{$name}'
-                    class='visually-hidden checkbox__input' value='{$value}' {$checked}>
-                    <label for='{$id}'>{$label}</label>";
+                                    class='visually-hidden checkbox__input' value='{$value}' {$checked}>
+                                    <label for='{$id}'>{$label}</label>";
                     }
                 ])
         ?>
@@ -81,9 +96,9 @@ $this->title = "TaskForce";
         <?= Html::beginTag('fieldset', ['class' => 'search-task__categories']) ?>
         <?= Html::tag('legend', 'Дополнительно') ?>
         <?= $form
-            ->field($filterForm, 'extraFields')
+            ->field($searchModel, 'extraFields')
             ->label(false)
-            ->checkboxList($filterForm::getExtraFieldsdList(), [
+            ->checkboxList($searchModel::getExtraFieldsdList(), [
                 'item' => function (
                     int $index,
                     string $label,
@@ -101,14 +116,15 @@ $this->title = "TaskForce";
         ?>
         <?= Html::endTag('fieldset') ?>
         <?= $form
-            ->field($filterForm, 'period', ['options' => ['tag' => false]])
+            ->field($searchModel, 'period', ['options' => ['tag' => false]])
             ->label('Период', ['class' => 'search-task__name'])
-            ->listBox($filterForm::getPeriodList(), ['size' => 1, 'class' => 'multiple-select input']) ?>
+            ->listBox($searchModel::getPeriodList(), ['size' => 1, 'class' => 'multiple-select input']) ?>
         <?= $form
-            ->field($filterForm, 'search', ['options' => ['tag' => false]])
+            ->field($searchModel, 'search', ['options' => ['tag' => false]])
             ->input('search', ['class' => 'input-middle input'])
             ->label('Поиск по названию', ['class' => 'search-task__name']) ?>
         <?= Html::submitButton('Искать', ['class' => 'button']) ?>
-        <?php $form::end() ?>
+        <?php
+        $form::end() ?>
     </div>
 </section>
