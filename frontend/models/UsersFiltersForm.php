@@ -73,9 +73,7 @@ class UsersFiltersForm extends Model
 
         $dataProvider = new ActiveDataProvider([
             'query' => $this->query,
-            'pagination' => [
-                'pageSize' => 5,
-            ]
+            'pagination' => ['pageSize' => 5]
         ]);
 
         if (!$this->load($data) && $this->validate()) {
