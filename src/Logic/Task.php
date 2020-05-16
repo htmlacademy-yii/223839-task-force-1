@@ -56,7 +56,7 @@ class Task
      * @throws TaskStatusNotExistException Статус не существует
      * @throws TaskStatusNotHasActionsException Статус существует, но для него нет доступных действий
      */
-    public function getActionForStatus(int $status): array
+    public function getActionForStatus(int $status): ?array
     {
         if (!array_key_exists($status, Task::getAllStatuses())) {
             throw new TaskStatusNotExistException();

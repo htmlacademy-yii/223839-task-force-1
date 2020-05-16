@@ -1,5 +1,4 @@
 <?php
-
 /* @var $this \yii\web\View */
 
 /* @var $content string */
@@ -74,10 +73,10 @@ AppAsset::register($this);
             <div class="header__nav">
                 <ul class="header-nav__list site-list">
                     <li class="site-list__item">
-                        <a href="<?= \yii\helpers\Url::to(['tasks/index']) ?>">Задания</a>
+                        <a href="<?= \yii\helpers\Url::to(['tasks/']) ?>">Задания</a>
                     </li>
                     <li class="site-list__item">
-                        <a href="<?= \yii\helpers\Url::to(['users/index']) ?>">Исполнители</a>
+                        <a href="<?= \yii\helpers\Url::to(['users/']) ?>">Исполнители</a>
                     </li>
                     <li class="site-list__item">
                         <a href="#">Создать задание</a>
@@ -137,6 +136,7 @@ AppAsset::register($this);
             </div>
         </div>
     </header>
+
     <main class="page-main">
 
         <div class="main-container page-container">
@@ -144,6 +144,7 @@ AppAsset::register($this);
         </div>
 
     </main>
+
     <footer class="page-footer">
         <div class="main-container page-footer__container">
             <div class="page-footer__info">

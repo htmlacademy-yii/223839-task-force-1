@@ -2,19 +2,39 @@
 
 namespace frontend\controllers;
 
+use frontend\models\Categories;
 use frontend\models\Tasks;
+use frontend\models\TasksFilterForms;
+use yii\data\ActiveDataProvider;
+use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
 use yii\web\Controller;
+
 
 class TasksController extends Controller
 {
+    /**
+     * * Список заданий включает только задания в статусе «Новое».
+     * Показываются только задания без привязыки к адресу,
+     *
+     * TODO а также из города пользователя, либо из города, выбранного пользователем в текущей сессии.
+     *
+     */
     public function actionIndex()
     {
-        $tasks = Tasks::find()
-            ->andWhere(['status' => Tasks::STATUS_NEW])
-            ->with(['city', 'category'])
-            ->orderBy(['created_at' => SORT_DESC])
+        $categories = Categories::find()
+            ->select(['id', 'name'])
+            ->asArray()
             ->all();
 
-        return $this->render('index', compact('tasks'));
+        $searchModel = new TasksFilterForms();
+
+        $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
+
+        $pagination = $dataProvider->getPagination();
+        $tasks = $dataProvider->getModels();
+
+        return $this->render('index', compact('tasks', 'categories', 'searchModel', 'pagination'));
     }
 }
+

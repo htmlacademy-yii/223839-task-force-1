@@ -40,6 +40,8 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'GET users/search' => 'users/index',
+                'GET tasks/search' => 'tasks/index',
             ],
         ],
         'formatter' => [
