@@ -238,7 +238,6 @@ class Users extends \yii\db\ActiveRecord
           ->via('usersSpecializations');
     }
 
-
     /*
      *  Gets average rating for performer
      */
@@ -257,7 +256,6 @@ class Users extends \yii\db\ActiveRecord
 
             return "<b>{$rating}<b>";
         }
-
 
         if (($reviewsCount = count($this->reviewsPerformer)) === 0) {
             return 0;
@@ -373,7 +371,4 @@ class Users extends \yii\db\ActiveRecord
 
         return $counter;
     }
-
-
-// TODO телефоный номер с помощью str split после 0 вставить пробел, после 2 и т.д
 }

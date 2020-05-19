@@ -25,13 +25,9 @@ class UsersController extends Controller
         return $this->render('index', compact('performers', 'categories', 'searchModel', 'pagination'));
     }
 
-
-    public function actionView($id)
+    public function actionView(int $id)
     {
-        $user = Users::find()
-          ->andWhere(['id' => $id])
-          ->with(['city', 'tasksPerformer'])
-          ->one();
+        $user = Users::findOne(['id' => $id]);
 
         if(!$user) {
             throw new NotFoundHttpException();

@@ -21,9 +21,9 @@ class TasksController extends Controller
     public function actionIndex()
     {
         $categories = Categories::find()
-            ->select(['id', 'name'])
-            ->asArray()
-            ->all();
+          ->select(['id', 'name'])
+          ->asArray()
+          ->all();
 
         $searchModel = new TasksFilterForms();
 
@@ -35,11 +35,11 @@ class TasksController extends Controller
         return $this->render('index', compact('tasks', 'categories', 'searchModel', 'pagination'));
     }
 
-    public function actionView($id)
+    public function actionView(int $id)
     {
-        $task = Tasks::find()->andWhere(['id' => $id])->one();
+        $task = Tasks::findOne(['id' => $id]);
 
-        if(!$task) {
+        if (!$task) {
             throw new NotFoundHttpException();
         }
 

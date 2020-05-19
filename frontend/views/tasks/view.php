@@ -10,7 +10,6 @@ use yii\helpers\HtmlPurifier;
 $this->title = $task->title;
 ?>
 
-
 <section class="content-view">
     <div class="content-view__card">
         <div class="content-view__card-wrapper">
@@ -85,7 +84,7 @@ $this->title = $task->title;
                                   ['class' => 'link-regular']
                                 ) ?>
                             </p>
-                            <?= $response->performer->getPerformerRating(['withStars' => true])?>
+                            <?= $response->performer->getPerformerRating(['withStars' => true]) ?>
                         </div>
                         <?= Html::tag(
                           'span',
@@ -111,10 +110,7 @@ $this->title = $task->title;
     </div>
     <pre>
 </section>
-
-
 <section class="connect-desk">
-
     <div class="connect-desk__profile-mini">
         <div class="profile-mini__wrapper">
             <h3>Заказчик</h3>

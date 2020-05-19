@@ -13,7 +13,6 @@ use yii\widgets\ActiveForm;
 $this->title = "TaskForce";
 ?>
 
-
 <section class="new-task">
     <div class="new-task__wrapper">
 

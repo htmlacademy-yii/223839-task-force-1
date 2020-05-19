@@ -137,13 +137,11 @@ $this->beginBody() ?>
         </div>
     </header>
 
-    <?= Html::beginTag('main', ['class' => 'page-main']) ?>
-
-    <div class="main-container page-container">
-        <?= $content ?>
-    </div>
-
-    <?= Html::endTag('main') ?>
+    <main class="page-main">
+        <div class="main-container page-container">
+            <?= $content ?>
+        </div>
+    </main>
 
     <footer class="page-footer">
         <div class="main-container page-footer__container">
