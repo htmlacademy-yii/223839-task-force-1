@@ -62,7 +62,7 @@ class UsersFiltersForm extends Model
             ->with([
                 'reviewsPerformer',
                 'tasksPerformer',
-                'userSpecializations',
+                'usersSpecializations',
                 'categories'
             ]);
 
@@ -131,7 +131,7 @@ class UsersFiltersForm extends Model
 
     private function setCategoriesFilter(): void
     {
-        $categories = UserSpecializations::find()
+        $categories = UsersSpecializations::find()
             ->select(['performer_id'])
             ->andFilterWhere(['category_id' => ArrayHelper::getValue($this->data, 'categories')])
             ->all();
@@ -212,7 +212,7 @@ class UsersFiltersForm extends Model
     {
         $usersID = [1]; // TODO исправить когда появится возможность добавлять в избранное
 
-        $bookmarkedPerformers = BookmarkedUsers::find()
+        $bookmarkedPerformers = Bookmarked_users::find()
             ->select(['bookmarked_user_id'])
             ->where(['user_id' => $usersID])
             ->all();

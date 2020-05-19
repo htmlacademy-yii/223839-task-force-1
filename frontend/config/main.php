@@ -1,4 +1,5 @@
 <?php
+
 $params = array_merge(
     require __DIR__ . '/../../common/config/params.php',
     require __DIR__ . '/../../common/config/params-local.php',
@@ -40,8 +41,13 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'GET users/search' => 'users/index',
-                'GET tasks/search' => 'tasks/index',
+                // users
+                ['pattern' => 'users/search', 'route' => 'users/index'],
+                ['pattern' => 'users/<id:\d+>', 'route' => 'users/view'],
+
+                // tasks
+                ['pattern' => 'tasks/search', 'route' => 'tasks/index'],
+                ['pattern' => 'tasks/<id:\d+>', 'route' => 'tasks/view'],
             ],
         ],
         'formatter' => [

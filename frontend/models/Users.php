@@ -2,7 +2,7 @@
 
 namespace frontend\models;
 
-use phpDocumentor\Reflection\Types\Integer;
+use frontend\modules\WordsTerminations;
 use Yii;
 
 /**
@@ -10,48 +10,48 @@ use Yii;
  *
  * @property int $id
  * @property string $first_name
- * @property string|null $last_name
- * @property int|null $city_id
+ * @property string $last_name
  * @property string|null $address
- * @property string $email
- * @property string $phone
+ * @property string|null $biography
+ * @property int|null $city_id
  * @property string $password
- * @property string|null $birthday
+ * @property string $birthday
  * @property string $role
  * @property int $is_public
  * @property string $avatar
  * @property string $date_joined
  * @property string $last_activity
+ * @property int $phone
+ * @property string $email
  * @property string|null $skype
  * @property string|null $telegram
- * @property string|null $biography
+ * @property int $visit_counter
  *
- * @property BookmarkedUsers[] $bookmarkedUsersCustomer
- * @property BookmarkedUsers[] $bookmarkedUsersPerformer
- *
- * @property ChatMessages[] $chatMessagesCustomer
- * @property ChatMessages[] $chatMessagesPerformer
- *
- * @property Notification $notification
- *
+ * @property BookmarkedUsers[] $bookmarkedUsers
+ * @property BookmarkedUsers[] $bookmarkedUser
+ * @property ChatMessages[] $chatMessagesAuthor
+ * @property ChatMessages[] $chatMessagesRecipient
  * @property Responses[] $responses
- *
  * @property Reviews[] $reviewsCustomer
  * @property Reviews[] $reviewsPerformer
- *
  * @property Tasks[] $tasksCustomer
  * @property Tasks[] $tasksPerformer
- *
- * @property UserSpecializations[] $userSpecializations
- *
  * @property Cities $city
- *
  * @property UsersMedia[] $usersMedia
+ * @property UsersSpecializations[] $usersSpecializations
  */
 class Users extends \yii\db\ActiveRecord
 {
     const ROLE_CUSTOMER = 'customer';
     const ROLE_PERFORMER = 'performer';
+
+    const COUNTER_OPTIONS = [
+      'withWord' => false
+    ];
+    const RATING_OPTIONS = [
+      'withStars' => false
+    ];
+
 
     /**
      * {@inheritdoc}
@@ -67,25 +67,21 @@ class Users extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['first_name', 'email', 'phone', 'password', 'role'], 'required'],
-            [['city_id', 'is_public'], 'integer'],
-            [['birthday', 'date_joined', 'last_activity'], 'safe'],
-            [['role', 'biography'], 'string'],
-            [['first_name'], 'string', 'max' => 30],
-            [['last_name', 'email', 'skype', 'telegram'], 'string', 'max' => 50],
-            [['address'], 'string', 'max' => 500],
-            [['phone'], 'string', 'max' => 11],
-            [['password'], 'string', 'max' => 32],
-            [['avatar'], 'string', 'max' => 255],
-            [['email'], 'unique'],
-            [['phone'], 'unique'],
-            [
-                ['city_id'],
-                'exist',
-                'skipOnError' => true,
-                'targetClass' => Cities::class,
-                'targetAttribute' => ['city_id' => 'id']
-            ],
+          [['first_name', 'last_name', 'password', 'birthday', 'role', 'phone', 'email'], 'required'],
+          [['biography', 'role', 'avatar'], 'string'],
+          [['city_id', 'is_public', 'phone', 'visit_counter'], 'integer'],
+          [['birthday', 'date_joined', 'last_activity'], 'safe'],
+          [['first_name'], 'string', 'max' => 30],
+          [['last_name', 'email', 'skype', 'telegram'], 'string', 'max' => 50],
+          [['address'], 'string', 'max' => 255],
+          [['password'], 'string', 'max' => 32],
+          [
+            ['city_id'],
+            'exist',
+            'skipOnError' => true,
+            'targetClass' => Cities::class,
+            'targetAttribute' => ['city_id' => 'id']
+          ],
         ];
     }
 
@@ -95,30 +91,31 @@ class Users extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'first_name' => 'First Name',
-            'last_name' => 'Last Name',
-            'city_id' => 'City ID',
-            'address' => 'Address',
-            'email' => 'Email',
-            'phone' => 'Phone',
-            'password' => 'Password',
-            'birthday' => 'Birthday',
-            'role' => 'Role',
-            'is_public' => 'Is Public',
-            'avatar' => 'Avatar',
-            'date_joined' => 'Date Joined',
-            'last_activity' => 'Last Activity',
-            'skype' => 'Skype',
-            'telegram' => 'Telegram',
-            'biography' => 'Biography',
+          'id' => 'ID',
+          'first_name' => 'First Name',
+          'last_name' => 'Last Name',
+          'address' => 'Address',
+          'biography' => 'Biography',
+          'city_id' => 'City ID',
+          'password' => 'Password',
+          'birthday' => 'Birthday',
+          'role' => 'Role',
+          'is_public' => 'Is Public',
+          'avatar' => 'Avatar',
+          'date_joined' => 'Date Joined',
+          'last_activity' => 'Last Activity',
+          'phone' => 'Phone',
+          'email' => 'Email',
+          'skype' => 'Skype',
+          'telegram' => 'Telegram',
+          'visit_counter' => 'Visit Counter',
         ];
     }
 
     /**
      * Gets query for [[BookmarkedUsers]].
      *
-     * @return \yii\db\ActiveQuery|BookmarkedUsersQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getBookmarkedUsers()
     {
@@ -126,72 +123,142 @@ class Users extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[BookmarkedUsers0]].
+     * Gets query for [[BookmarkedUser]].
      *
-     * @return \yii\db\ActiveQuery|BookmarkedUsersQuery
+     * @return \yii\db\ActiveQuery
      */
-    public function getBookmarkedUsers0()
+    public function getBookmarkedUser()
     {
         return $this->hasMany(BookmarkedUsers::class, ['bookmarked_user_id' => 'id']);
     }
 
     /**
-     * Gets query for [[ChatMessages]].
+     * Gets query for [[ChatMessagesAuthor]].
      *
-     * @return \yii\db\ActiveQuery|ChatMessagesQuery
+     * @return \yii\db\ActiveQuery
      */
-    public function getChatMessages()
+    public function getChatMessagesAuthor()
     {
         return $this->hasMany(ChatMessages::class, ['author_id' => 'id']);
     }
 
     /**
-     * Gets query for [[ChatMessages0]].
+     * Gets query for [[ChatMessagesRecipient]].
      *
-     * @return \yii\db\ActiveQuery|ChatMessagesQuery
+     * @return \yii\db\ActiveQuery
      */
-    public function getChatMessages0()
+    public function getChatMessagesRecipient()
     {
         return $this->hasMany(ChatMessages::class, ['recipient_id' => 'id']);
     }
 
     /**
-     * Gets query for [[Notification]].
-     *
-     * @return \yii\db\ActiveQuery|NotificationQuery
-     */
-    public function getNotification()
-    {
-        return $this->hasOne(Notification::class, ['user_id' => 'id']);
-    }
-
-    /**
      * Gets query for [[Responses]].
      *
-     * @return \yii\db\ActiveQuery|ResponsesQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getResponses()
     {
         return $this->hasMany(Responses::class, ['performer_id' => 'id']);
     }
 
-
+    /**
+     * Gets query for [[ReviewsCustomer]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getReviewsCustomer()
     {
         return $this->hasMany(Reviews::class, ['customer_id' => 'id']);
     }
 
-
+    /**
+     * Gets query for [[ReviewsPerformer]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
     public function getReviewsPerformer()
     {
         return $this->hasMany(Reviews::class, ['performer_id' => 'id']);
     }
 
+    /**
+     * Gets query for [[TasksCustomer]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTasksCustomer()
+    {
+        return $this->hasMany(Tasks::class, ['author_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[TasksPerformer]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTasksPerformer()
+    {
+        return $this->hasMany(Tasks::class, ['performer_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[City]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getCity()
+    {
+        return $this->hasOne(Cities::class, ['id' => 'city_id']);
+    }
+
+    /**
+     * Gets query for [[UsersMedia]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUsersMedia()
+    {
+        return $this->hasMany(UsersMedia::class, ['user_id' => 'id']);
+    }
+
+    /**
+     * Gets query for [[UsersSpecializations]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUsersSpecializations()
+    {
+        return $this->hasMany(UsersSpecializations::class, ['performer_id' => 'id']);
+    }
+
+    public function getCategories()
+    {
+        return $this->hasMany(Categories::class, ['id' => 'category_id'])
+          ->via('usersSpecializations');
+    }
+
+
     /*
      *  Gets average rating for performer
      */
-    public function getPerformerRating()
+    public function getPerformerRating(array $options = self::RATING_OPTIONS)
     {
+        if ($options['withStars']) {
+            $rating = $this->getPerformerRating();
+
+            for ($i = 0; $i < 5; $i++) {
+                if ($i < floor($rating)) {
+                    echo ' <span></span > ';
+                } else {
+                    echo '<span class="star-disabled" ></span > ';
+                }
+            }
+
+            return "<b>{$rating}<b>";
+        }
+
+
         if (($reviewsCount = count($this->reviewsPerformer)) === 0) {
             return 0;
         }
@@ -204,55 +271,109 @@ class Users extends \yii\db\ActiveRecord
         return Yii::$app->formatter->asDecimal($rating / $reviewsCount, 2);
     }
 
-
-    /**
-     * Gets query for [[TasksCustomer]].
-     *
-     * @return \yii\db\ActiveQuery|TasksQuery
-     */
-    public function getTasksCustomer()
+    public function getAge(array $options = self::COUNTER_OPTIONS): string
     {
-        return $this->hasMany(Tasks::class, ['author_id' => 'id']);
+        $age = date('Y', time()) - date_create($this->birthday)->format('Y');
+
+        if ($options['withWord']) {
+            $terminations =
+              [
+                0 => 'лет',
+                1 => 'год',
+                2 => 'года',
+                5 => 'лет'
+              ];
+            $age .= ' ' . WordsTerminations::getWordTermination($age, $terminations);;
+        }
+
+        return $age;
     }
 
-    /**
-     * Gets query for [[TasksPerformer]].
-     *
-     * @return \yii\db\ActiveQuery|TasksQuery
-     */
-    public function getTasksPerformer()
+    public function getCountTasks(array $options = self::COUNTER_OPTIONS)
     {
-        return $this->hasMany(Tasks::class, ['performer_id' => 'id']);
+        $counter = count($this->getTasksPerformer()->asArray()->all());
+
+        if ($options['withWord']) {
+            $terminations = [
+              0 => 'ов',
+              1 => '',
+              2 => 'а',
+              5 => 'ов'
+            ];
+
+            $counter .= ' заказ' . WordsTerminations::getWordTermination($counter, $terminations);
+        }
+
+        return $counter;
     }
 
-    public function getUserSpecializations()
+    public function getCountReviews(array $options = self::COUNTER_OPTIONS)
     {
-        return $this->hasMany(UserSpecializations::class, ['performer_id' => 'id']);
+        $counter = count($this->getReviewsPerformer()->asArray()->all());
+
+        if ($options['withWord']) {
+            $terminations = [
+              0 => 'ов',
+              1 => '',
+              2 => 'а',
+              5 => 'ов'
+            ];
+
+            $counter .= ' отзыв' . WordsTerminations::getWordTermination($counter, $terminations);
+        }
+
+        return $counter;
     }
 
-    public function getCategories()
+    public function getCountYearsOnSite(array $options = self::COUNTER_OPTIONS): string
     {
-        return $this->hasMany(Categories::class, ['id' => 'category_id'])
-            ->via('userSpecializations');
+        $counter = date('Y', time()) - Yii::$app->formatter->asDate($this->date_joined, 'Y');
+
+        if ($counter < 1) {
+            $counter = date('m', time()) - date_create($this->date_joined)->format('m');
+
+            // days
+            if ($counter < 1) {
+                $counter = date('d', time()) - date_create($this->date_joined)->format('d');
+                if ($options['withWord']) {
+                    $terminations = [
+                      0 => 'дней',
+                      1 => 'день',
+                      2 => 'дня',
+                      5 => 'дней'
+                    ];
+                    return $counter . ' ' . WordsTerminations::getWordTermination($counter, $terminations);
+                }
+            }
+
+            // month
+            if ($options['withWord']) {
+                $terminations = [
+                  0 => 'ев',
+                  1 => '',
+                  2 => 'а',
+                  5 => 'ев'
+                ];
+
+                return $counter . ' месяц' . WordsTerminations::getWordTermination($counter, $terminations);
+            }
+        } else {
+            //years
+            if ($options['withWord']) {
+                $terminations = [
+                  0 => 'лет',
+                  1 => 'год',
+                  2 => 'года',
+                  5 => 'лет'
+                ];
+
+                return $counter . ' ' . WordsTerminations::getWordTermination($counter, $terminations);
+            }
+        }
+
+        return $counter;
     }
 
-    /**
-     * Gets query for [[City]].
-     *
-     * @return \yii\db\ActiveQuery|CitiesQuery
-     */
-    public function getCity()
-    {
-        return $this->hasOne(Cities::class, ['id' => 'city_id']);
-    }
 
-    /**
-     * Gets query for [[UsersMedia]].
-     *
-     * @return \yii\db\ActiveQuery|UsersMediaQuery
-     */
-    public function getUsersMedia()
-    {
-        return $this->hasMany(UsersMedia::class, ['user_id' => 'id']);
-    }
+// TODO телефоный номер с помощью str split после 0 вставить пробел, после 2 и т.д
 }
