@@ -48,10 +48,6 @@ class Users extends \yii\db\ActiveRecord
     const COUNTER_OPTIONS = [
       'withWord' => false
     ];
-    const RATING_OPTIONS = [
-      'withStars' => false
-    ];
-
 
     /**
      * {@inheritdoc}
@@ -241,22 +237,8 @@ class Users extends \yii\db\ActiveRecord
     /*
      *  Gets average rating for performer
      */
-    public function getPerformerRating(array $options = self::RATING_OPTIONS)
+    public function getPerformerRating()
     {
-        if ($options['withStars']) {
-            $rating = $this->getPerformerRating();
-
-            for ($i = 0; $i < 5; $i++) {
-                if ($i < floor($rating)) {
-                    echo ' <span></span > ';
-                } else {
-                    echo '<span class="star-disabled" ></span > ';
-                }
-            }
-
-            return "<b>{$rating}<b>";
-        }
-
         if (($reviewsCount = count($this->reviewsPerformer)) === 0) {
             return 0;
         }

@@ -84,7 +84,19 @@ $this->title = $task->title;
                                   ['class' => 'link-regular']
                                 ) ?>
                             </p>
-                            <?= $response->performer->getPerformerRating(['withStars' => true]) ?>
+                            <?php
+                            $rating = $response->performer->getPerformerRating();
+
+                            for ($i = 0; $i < 5; $i++) {
+                                if ($i < floor($rating)) {
+                                    echo ' <span></span > ';
+                                } else {
+                                    echo '<span class="star-disabled" ></span > ';
+                                }
+                            }
+                            echo "<b>{$rating}<b>";
+                            ?>
+
                         </div>
                         <?= Html::tag(
                           'span',

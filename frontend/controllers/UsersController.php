@@ -27,7 +27,7 @@ class UsersController extends Controller
 
     public function actionView(int $id)
     {
-        $user = Users::findOne(['id' => $id]);
+        $user = Users::findOne($id);
 
         if(!$user) {
             throw new NotFoundHttpException();

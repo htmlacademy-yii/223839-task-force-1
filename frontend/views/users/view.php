@@ -18,7 +18,18 @@ $this->title = Html::encode($user->first_name) . ' ' . Html::encode($user->last_
                 <p>Россия, <?= $user->city->name ?>, <?= $user->getAge(['withWord' => true]) ?></p>
 
                 <div class="profile-mini__name five-stars__rate">
-                    <?= $user->getPerformerRating(['withStars' => true]) ?>
+                    <?php
+                    $rating = $user->getPerformerRating();
+
+                    for ($i = 0; $i < 5; $i++) {
+                        if ($i < floor($rating)) {
+                            echo ' <span></span > ';
+                        } else {
+                            echo '<span class="star-disabled" ></span > ';
+                        }
+                    }
+                    echo "<b>{$rating}<b>";
+                    ?>
                 </div>
                 <b class="done-task">Получил <?= $user->getCountTasks(['withWord' => true]) ?></b>
                 <b class="done-review">Получил <?= $user->getCountReviews(['withWord' => true]) ?></b>

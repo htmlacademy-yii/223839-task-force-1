@@ -46,7 +46,18 @@ $this->title = "TaskForce";
                           ['class' => 'link-regular']
                         ) ?>
                     </p>
-                    <?= $performer->getPerformerRating(['withStars' => true]) ?>
+                    <?php
+                    $rating = $performer->getPerformerRating();
+
+                    for ($i = 0; $i < 5; $i++) {
+                        if ($i < floor($rating)) {
+                            echo ' <span></span > ';
+                        } else {
+                            echo '<span class="star-disabled" ></span > ';
+                        }
+                    }
+                    echo "<b>{$rating}<b>";
+                    ?>
                     <p class="user__search-content">
                         <?= HtmlPurifier::process($performer->biography) ?>
                     </p>
