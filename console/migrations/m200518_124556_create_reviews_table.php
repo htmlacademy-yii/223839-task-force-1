@@ -64,22 +64,21 @@ class m200518_124556_create_reviews_table extends Migration
           'id'
         );
 
+        $insert = [];
         for ($i = 1; $i <= 100; $i++) {
             $faker = \Faker\Factory::create('ru-RU');
 
-            $this->batchInsert('reviews',
-              ['customer_id', 'performer_id', 'task_id', 'text', 'rating', 'created_at'],
-              [
-                [
-                  $faker->numberBetween(1, 50),
-                  $faker->numberBetween(51, 100),
-                  $faker->numberBetween(1, 100),
-                  $faker->text(500),
-                  $faker->numberBetween(0, 5),
-                  $faker->dateTimeBetween('-2 month')->format('Y-m-d')
-                ]
-              ]);
+            $insert[] = [
+              $faker->numberBetween(1, 50),
+              $faker->numberBetween(51, 100),
+              $faker->numberBetween(1, 100),
+              $faker->text(500),
+              $faker->numberBetween(0, 5),
+              $faker->dateTimeBetween('-2 month')->format('Y-m-d')
+            ];
         }
+        $this->batchInsert('reviews',
+          ['customer_id', 'performer_id', 'task_id', 'text', 'rating', 'created_at'], $insert);
     }
 
     /**

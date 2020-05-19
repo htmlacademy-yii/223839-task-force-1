@@ -88,41 +88,40 @@ class m200518_123606_create_tasks_table extends Migration
         );
 
 
+        $insert = [];
         for ($i = 0; $i <= 100; $i++) {
             $faker = Faker\Factory::create('ru_RU');
-
-            $this->batchInsert('tasks',
-              [
-                'title',
-                'address',
-                'budget',
-                'created_at',
-                'city_id',
-                'lan',
-                'long',
-                'description',
-                'category_id',
-                'performer_id',
-                'author_id',
-                'status'
-              ],
-              [
-                [
-                    $faker->text(40),
-                    $faker->streetAddress,
-                    $faker->numberBetween(1099, 100000),
-                    $faker->dateTimeBetween('-2 month')->format('Y-m-d'),
-                    $faker->numberBetween(1, 100),
-                    $faker->latitude,
-                    $faker->longitude,
-                    $faker->text(100),
-                    $faker->numberBetween(1,8),
-                    $faker->numberBetween(1,100),
-                    $faker->numberBetween(1,100),
-                    $faker->numberBetween(1,5)
-                ]
-              ]);
+            $insert[] = [
+              $faker->text(40),
+              $faker->streetAddress,
+              $faker->numberBetween(1099, 100000),
+              $faker->dateTimeBetween('-2 month')->format('Y-m-d'),
+              $faker->numberBetween(1, 100),
+              $faker->latitude,
+              $faker->longitude,
+              $faker->text(100),
+              $faker->numberBetween(1, 8),
+              $faker->numberBetween(1, 100),
+              $faker->numberBetween(1, 100),
+              $faker->numberBetween(1, 5)
+            ];
         }
+
+        $this->batchInsert('tasks',
+          [
+            'title',
+            'address',
+            'budget',
+            'created_at',
+            'city_id',
+            'lan',
+            'long',
+            'description',
+            'category_id',
+            'performer_id',
+            'author_id',
+            'status'
+          ], $insert);
     }
 
     /**

@@ -51,21 +51,21 @@ class m200518_124545_create_responses_table extends Migration
           'CASCADE'
         );
 
+        $insert = [];
         for ($i = 1; $i <= 100; $i++) {
             $faker = \Faker\Factory::create('ru-RU');
 
-            $this->batchInsert('responses',
-              ['task_id', 'performer_id', 'response_date', 'text', 'offer_price'],
-              [
-                [
-                  $faker->numberBetween(1, 100),
-                  $faker->numberBetween(1, 100),
-                  $faker->dateTimeBetween('-1 week')->format('Y-m-d'),
-                  $faker->text(300),
-                  $faker->numberBetween(1000, 13099)
-                ]
-              ]);
+            $insert[] = [
+              $faker->numberBetween(1, 100),
+              $faker->numberBetween(1, 100),
+              $faker->dateTimeBetween('-1 week')->format('Y-m-d'),
+              $faker->text(300),
+              $faker->numberBetween(1000, 13099)
+            ];
         }
+
+        $this->batchInsert('responses',
+          ['task_id', 'performer_id', 'response_date', 'text', 'offer_price'], $insert);
     }
 
     /**
