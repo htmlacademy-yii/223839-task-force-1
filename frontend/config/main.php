@@ -43,11 +43,11 @@ return [
             'rules' => [
                 // users
                 ['pattern' => 'users/search', 'route' => 'users/index'],
-                ['pattern' => 'users/<id:\d+>', 'route' => 'users/view'],
+                ['pattern' => 'users/view/<id:\d+>', 'route' => 'users/view'],
 
                 // tasks
                 ['pattern' => 'tasks/search', 'route' => 'tasks/index'],
-                ['pattern' => 'tasks/<id:\d+>', 'route' => 'tasks/view'],
+                ['pattern' => 'tasks/view/<id:\d+>', 'route' => 'tasks/view'],
             ],
         ],
         'formatter' => [
