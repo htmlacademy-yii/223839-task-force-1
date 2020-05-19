@@ -34,6 +34,7 @@ class Cities extends \yii\db\ActiveRecord
             [['name', 'lat', 'long'], 'required'],
             [['lat', 'long'], 'number'],
             [['name'], 'string', 'max' => 50],
+            [['name'], 'unique'],
             [['lat'], 'unique'],
             [['long'], 'unique'],
         ];
@@ -55,20 +56,20 @@ class Cities extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Tasks]].
      *
-     * @return \yii\db\ActiveQuery|TasksQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getTasks()
     {
-        return $this->hasMany(Tasks::class, ['city_id' => 'id']);
+        return $this->hasMany(Tasks::className(), ['city_id' => 'id']);
     }
 
     /**
      * Gets query for [[Users]].
      *
-     * @return \yii\db\ActiveQuery|UsersQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getUsers()
     {
-        return $this->hasMany(Users::class, ['city_id' => 'id']);
+        return $this->hasMany(Users::className(), ['city_id' => 'id']);
     }
 }

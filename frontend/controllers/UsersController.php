@@ -7,6 +7,7 @@ use frontend\models\Users;
 use frontend\models\UsersFiltersForm;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 class UsersController extends Controller
 {
@@ -22,5 +23,16 @@ class UsersController extends Controller
         $performers = $dataProvider->getModels();
 
         return $this->render('index', compact('performers', 'categories', 'searchModel', 'pagination'));
+    }
+
+    public function actionView(int $id)
+    {
+        $user = Users::findOne($id);
+
+        if(!$user) {
+            throw new NotFoundHttpException();
+        }
+
+        return $this->render('view', compact('user'));
     }
 }

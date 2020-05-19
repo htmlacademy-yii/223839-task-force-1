@@ -12,7 +12,7 @@ use Yii;
  * @property string $icon
  *
  * @property Tasks[] $tasks
- * @property UserSpecializations[] $userSpecializations
+ * @property UsersSpecializations[] $usersSpecializations
  */
 class Categories extends \yii\db\ActiveRecord
 {
@@ -31,8 +31,9 @@ class Categories extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'icon'], 'required'],
-            [['name', 'icon'], 'string', 'max' => 100],
+            [['name', 'icon'], 'string', 'max' => 30],
             [['name'], 'unique'],
+            [['icon'], 'unique'],
         ];
     }
 
@@ -51,21 +52,20 @@ class Categories extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Tasks]].
      *
-     * @return \yii\db\ActiveQuery|TasksQuery
+     * @return \yii\db\ActiveQuery
      */
     public function getTasks()
     {
-        return $this->hasMany(Tasks::class, ['category_id' => 'id']);
+        return $this->hasMany(Tasks::className(), ['category_id' => 'id']);
     }
 
     /**
-     * Gets query for [[UserSpecializations]].
+     * Gets query for [[UsersSpecializations]].
      *
-     * @return \yii\db\ActiveQuery|UserSpecializationsQuery
+     * @return \yii\db\ActiveQuery
      */
-    public function getUserSpecializations()
+    public function getUsersSpecializations()
     {
-        return $this->hasMany(UserSpecializations::class, ['category_id' => 'id']);
+        return $this->hasMany(UsersSpecializations::className(), ['category_id' => 'id']);
     }
-
 }

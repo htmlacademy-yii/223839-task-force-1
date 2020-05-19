@@ -1,52 +1,58 @@
 <?php
+
 $params = array_merge(
-    require __DIR__ . '/../../common/config/params.php',
-    require __DIR__ . '/../../common/config/params-local.php',
-    require __DIR__ . '/params.php',
-    require __DIR__ . '/params-local.php'
+  require __DIR__ . '/../../common/config/params.php',
+  require __DIR__ . '/../../common/config/params-local.php',
+  require __DIR__ . '/params.php',
+  require __DIR__ . '/params-local.php'
 );
 
 return [
-    'id' => 'app-frontend',
-    'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
-    'controllerNamespace' => 'frontend\controllers',
-    'components' => [
-        'request' => [
-            'csrfParam' => '_csrf-frontend',
-        ],
-        'user' => [
-            'identityClass' => 'common\models\User',
-            'enableAutoLogin' => true,
-            'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
-        ],
-        'session' => [
-            // this is the name of the session cookie used for login on the frontend
-            'name' => 'advanced-frontend',
-        ],
-        'log' => [
-            'traceLevel' => YII_DEBUG ? 3 : 0,
-            'targets' => [
-                [
-                    'class' => 'yii\log\FileTarget',
-                    'levels' => ['error', 'warning'],
-                ],
-            ],
-        ],
-        'errorHandler' => [
-            'errorAction' => 'site/error',
-        ],
-        'urlManager' => [
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
-            'rules' => [
-                'GET users/search' => 'users/index',
-                'GET tasks/search' => 'tasks/index',
-            ],
-        ],
-        'formatter' => [
-            'decimalSeparator' => '.',
-        ]
+  'id' => 'app-frontend',
+  'basePath' => dirname(__DIR__),
+  'bootstrap' => ['log'],
+  'controllerNamespace' => 'frontend\controllers',
+  'components' => [
+    'request' => [
+      'csrfParam' => '_csrf-frontend',
     ],
-    'params' => $params,
+    'user' => [
+      'identityClass' => 'common\models\User',
+      'enableAutoLogin' => true,
+      'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
+    ],
+    'session' => [
+        // this is the name of the session cookie used for login on the frontend
+        'name' => 'advanced-frontend',
+    ],
+    'log' => [
+      'traceLevel' => YII_DEBUG ? 3 : 0,
+      'targets' => [
+        [
+          'class' => 'yii\log\FileTarget',
+          'levels' => ['error', 'warning'],
+        ],
+      ],
+    ],
+    'errorHandler' => [
+      'errorAction' => 'site/error',
+    ],
+    'urlManager' => [
+      'enablePrettyUrl' => true,
+      'showScriptName' => false,
+      'rules' => [
+          // users
+          'users/search' => 'users/index',
+          'users/<id:\d+>' => 'users/view',
+
+          // tasks
+          'tasks/search' => 'tasks/index',
+          'tasks/<id:\d+>' => 'tasks/view'
+      ],
+    ],
+    'formatter' => [
+      'decimalSeparator' => '.',
+    ]
+  ],
+  'params' => $params,
 ];
