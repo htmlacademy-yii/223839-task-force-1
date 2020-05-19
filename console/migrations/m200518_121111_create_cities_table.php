@@ -18,6 +18,18 @@ class m200518_121111_create_cities_table extends Migration
             'lat' => $this->float()->unique()->notNull(),
             'long' => $this->float()->unique()->notNull()
         ]);
+
+
+        for ($i = 1; $i <= 100; $i++) {
+            $faker = Faker\Factory::create();
+
+            $model = new \frontend\models\Cities();
+
+            $model->name = $faker->unique(true)->city;
+            $model->lat = $faker->unique(true)->latitude;
+            $model->long = $faker->unique(true)->longitude;
+            $model->save();
+        }
     }
 
     /**

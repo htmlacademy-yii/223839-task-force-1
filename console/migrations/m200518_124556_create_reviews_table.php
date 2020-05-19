@@ -30,10 +30,10 @@ class m200518_124556_create_reviews_table extends Migration
 
         $this->addForeignKey(
           'reviews_customer_id',
-          'users',
-          'id',
           'reviews',
-          'customer_id'
+          'customer_id',
+          'users',
+          'id'
         );
 
         $this->createIndex(
@@ -44,10 +44,10 @@ class m200518_124556_create_reviews_table extends Migration
 
         $this->addForeignKey(
           'reviews_performer_id',
-          'users',
-          'id',
           'reviews',
-          'performer_id'
+          'performer_id',
+          'users',
+          'id'
         );
 
         $this->createIndex(
@@ -58,10 +58,10 @@ class m200518_124556_create_reviews_table extends Migration
 
         $this->addForeignKey(
           'reviews_task_id',
-          'tasks',
-          'id',
           'reviews',
-          'task_id'
+          'task_id',
+          'tasks',
+          'id'
         );
     }
 

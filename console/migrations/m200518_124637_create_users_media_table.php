@@ -27,10 +27,10 @@ class m200518_124637_create_users_media_table extends Migration
 
         $this->addForeignKey(
           'users_media_user_id',
-          'users',
-          'id',
           'users_media',
           'user_id',
+          'users',
+          'id',
           'CASCADE'
         );
     }

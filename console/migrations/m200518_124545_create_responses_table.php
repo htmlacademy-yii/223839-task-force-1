@@ -29,10 +29,10 @@ class m200518_124545_create_responses_table extends Migration
 
         $this->addForeignKey(
           'responses_performer_id',
-          'users',
-          'id',
           'responses',
           'performer_id',
+          'users',
+          'id',
           'CASCADE'
         );
 
@@ -44,10 +44,10 @@ class m200518_124545_create_responses_table extends Migration
 
         $this->addForeignKey(
           'responses_task_id',
-          'tasks',
-          'id',
           'responses',
           'task_id',
+          'tasks',
+          'id',
           'CASCADE'
         );
     }

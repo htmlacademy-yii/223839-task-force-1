@@ -32,60 +32,95 @@ class m200518_123606_create_tasks_table extends Migration
         ]);
 
         $this->createIndex(
+          'task_author_id',
+          'tasks',
+          'author_id'
+        );
+
+        $this->addForeignKey(
+          'task_author_id',
+          'tasks',
           'author_id',
-          'tasks',
-          'author_id'
-        );
-
-        $this->addForeignKey(
-          'tasks_author_id',
           'users',
-          'id',
-          'tasks',
-          'author_id'
+          'id'
         );
 
         $this->createIndex(
+          'task_performer_id',
+          'tasks',
+          'performer_id'
+        );
+
+        $this->addForeignKey(
+          'task_performer_id',
+          'tasks',
           'performer_id',
-          'tasks',
-          'performer_id'
-        );
-
-        $this->addForeignKey(
-          'tasks_performer_id',
           'users',
-          'id',
-          'tasks',
-          'performer_id'
+          'id'
         );
 
         $this->createIndex(
-          'category_id',
+          'task_category_id',
           'tasks',
           'category_id'
         );
 
         $this->addForeignKey(
           'task_category_id',
-          'categories',
-          'id',
           'tasks',
-          'category_id'
+          'category_id',
+          'categories',
+          'id'
         );
 
         $this->createIndex(
-          'city_id',
+          'task_city_id',
           'tasks',
           'city_id'
+        );
+//
+        $this->addForeignKey(
+          'task_city_id',
+          'tasks',
+          'city_id',
+          'cities',
+          'id'
         );
 
-        $this->addForeignKey(
-          'tasks_city_id',
-          'cities',
-          'id',
-          'tasks',
-          'city_id'
-        );
+
+        for ($i = 0; $i <= 5000; $i++) {
+            $faker = Faker\Factory::create('ru_RU');
+
+            $this->batchInsert('tasks',
+              [
+                'title',
+                'address',
+                'budget',
+                'city_id',
+                'lan',
+                'long',
+                'description',
+                'category_id',
+                'performer_id',
+                'author_id',
+                'status'
+              ],
+              [
+                [
+                    $faker->title,
+                    $faker->streetAddress,
+                    $faker->numberBetween(1099, 100000),
+                    $faker->numberBetween(1, 100),
+                    $faker->latitude,
+                    $faker->longitude,
+                    $faker->text(10),
+                    $faker->numberBetween(1,7),
+                    $faker->numberBetween(1,1000),
+                    $faker->numberBetween(1,1000),
+                    $faker->numberBetween(1,5)
+                ]
+              ]);
+        }
     }
 
     /**

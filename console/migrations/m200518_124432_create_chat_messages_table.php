@@ -29,10 +29,10 @@ class m200518_124432_create_chat_messages_table extends Migration
 
         $this->addForeignKey(
           'chats_author_id',
-          'users',
-          'id',
           'chat_messages',
-          'author_id'
+          'author_id',
+          'users',
+          'id'
         );
 
         $this->createIndex(
@@ -43,10 +43,10 @@ class m200518_124432_create_chat_messages_table extends Migration
 
         $this->addForeignKey(
           'chats_recipient_id',
-          'users',
-          'id',
           'chat_messages',
-          'recipient_id'
+          'recipient_id',
+          'users',
+          'id'
         );
 
         $this->createIndex(

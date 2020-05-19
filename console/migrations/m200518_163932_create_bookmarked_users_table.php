@@ -26,10 +26,10 @@ class m200518_163932_create_bookmarked_users_table extends Migration
 
         $this->addForeignKey(
           'bk_user_id',
-          'users',
-          'id',
           'bookmarked_users',
           'user_id',
+          'users',
+          'id',
           'CASCADE'
         );
 
@@ -41,10 +41,10 @@ class m200518_163932_create_bookmarked_users_table extends Migration
 
         $this->addForeignKey(
           'bookmarked_user_id',
-          'users',
-          'id',
           'bookmarked_users',
           'bookmarked_user_id',
+          'users',
+          'id',
           'CASCADE'
         );
     }

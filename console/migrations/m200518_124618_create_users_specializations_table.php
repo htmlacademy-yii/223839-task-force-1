@@ -26,10 +26,10 @@ class m200518_124618_create_users_specializations_table extends Migration
 
         $this->addForeignKey(
           'users_sp_performer_id',
-          'users',
-          'id',
           'users_specializations',
-          'performer_id'
+          'performer_id',
+          'users',
+          'id'
         );
 
         $this->createIndex(
@@ -40,10 +40,10 @@ class m200518_124618_create_users_specializations_table extends Migration
 
         $this->addForeignKey(
           'users_sp_category_id',
-          'categories',
-          'id',
           'users_specializations',
-          'category_id'
+          'category_id',
+          'categories',
+          'id'
         );
     }
 
