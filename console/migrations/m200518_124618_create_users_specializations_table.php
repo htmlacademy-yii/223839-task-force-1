@@ -45,6 +45,19 @@ class m200518_124618_create_users_specializations_table extends Migration
           'categories',
           'id'
         );
+
+        for ($i = 1; $i <= 1000; $i++) {
+            $faker = \Faker\Factory::create('ru-RU');
+
+            $this->batchInsert('users_specializations',
+            ['performer_id', 'category_id'],
+            [
+              [
+                $faker->numberBetween(1,100),
+                $faker->numberBetween(1,8)
+              ]
+            ]);
+        }
     }
 
     /**

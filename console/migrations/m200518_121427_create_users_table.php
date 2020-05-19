@@ -26,13 +26,13 @@ class m200518_121427_create_users_table extends Migration
           'avatar' => $this->text()->defaultValue('placeholderUser.jpg')->notNull(),
           'date_joined' => $this->timestamp()->notNull(),
           'last_activity' => $this->timestamp()->notNull(),
+          'phone' => $this->bigInteger(12)->unsigned()->notNull(),
           //          'phone' => $this->integer(11)->unsigned()->unique()->notNull(),
-          'phone' => $this->integer(11)->unsigned()->notNull(),
-//          'email' => $this->char(50)->unique()->notNull(),
+          //          'skype' => $this->char(50)->unique()->null(),
+          //          'telegram' => $this->char(50)->unique()->null(),
+          //          'email' => $this->char(50)->unique()->notNull(),
           'email' => $this->char(50)->notNull(),
-//          'skype' => $this->char(50)->unique()->null(),
           'skype' => $this->char(50)->null(),
-//          'telegram' => $this->char(50)->unique()->null(),
           'telegram' => $this->char(50)->null(),
           'visit_counter' => $this->integer()->unsigned()->defaultValue(0)->notNull()
         ]);
@@ -51,7 +51,7 @@ class m200518_121427_create_users_table extends Migration
           'id'
         );
 
-        for ($i = 1; $i <= 1000; $i++) {
+        for ($i = 1; $i <= 100; $i++) {
             $faker = Faker\Factory::create('ru_RU');
 
             $this->batchInsert('users',
@@ -63,6 +63,7 @@ class m200518_121427_create_users_table extends Migration
                 'city_id',
                 'password',
                 'birthday',
+                'last_activity',
                 'role',
                 'phone',
                 'email',
@@ -75,12 +76,13 @@ class m200518_121427_create_users_table extends Migration
                   $faker->firstName,
                   $faker->lastName,
                   $faker->streetAddress,
-                  $faker->text(1000),
+                  $faker->text(500),
                   $faker->numberBetween(1, 100),
                   $faker->password(8, 30),
                   $faker->date('Y-m-d'),
+                  $faker->dateTimeBetween('-2 month')->format('Y-m-d'),
                   $i % 2 ? 'CUSTOMER' : 'PERFORMER',
-                  $faker->phoneNumber,
+                  $faker->unique()->numberBetween(70000000000, 79999999999),
                   $faker->unique(true)->email,
                   $faker->unique(true)->userName,
                   $faker->unique(true)->userName,

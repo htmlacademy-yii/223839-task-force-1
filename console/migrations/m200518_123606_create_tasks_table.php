@@ -14,7 +14,7 @@ class m200518_123606_create_tasks_table extends Migration
     {
         $this->createTable('{{%tasks}}', [
           'id' => $this->primaryKey()->unsigned(),
-          'title' => $this->char(30)->notNull(),
+          'title' => $this->char(50)->notNull(),
           'address' => $this->char(100)->null(),
           'created_at' => $this->timestamp()->notNull(),
           'update_at' => $this->timestamp()->notNull(),
@@ -88,7 +88,7 @@ class m200518_123606_create_tasks_table extends Migration
         );
 
 
-        for ($i = 0; $i <= 5000; $i++) {
+        for ($i = 0; $i <= 100; $i++) {
             $faker = Faker\Factory::create('ru_RU');
 
             $this->batchInsert('tasks',
@@ -96,6 +96,7 @@ class m200518_123606_create_tasks_table extends Migration
                 'title',
                 'address',
                 'budget',
+                'created_at',
                 'city_id',
                 'lan',
                 'long',
@@ -107,16 +108,17 @@ class m200518_123606_create_tasks_table extends Migration
               ],
               [
                 [
-                    $faker->title,
+                    $faker->text(40),
                     $faker->streetAddress,
                     $faker->numberBetween(1099, 100000),
+                    $faker->dateTimeBetween('-2 month')->format('Y-m-d'),
                     $faker->numberBetween(1, 100),
                     $faker->latitude,
                     $faker->longitude,
-                    $faker->text(10),
-                    $faker->numberBetween(1,7),
-                    $faker->numberBetween(1,1000),
-                    $faker->numberBetween(1,1000),
+                    $faker->text(100),
+                    $faker->numberBetween(1,8),
+                    $faker->numberBetween(1,100),
+                    $faker->numberBetween(1,100),
                     $faker->numberBetween(1,5)
                 ]
               ]);
