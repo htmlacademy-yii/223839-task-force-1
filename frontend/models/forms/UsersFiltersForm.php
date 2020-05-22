@@ -1,7 +1,12 @@
 <?php
 
-namespace frontend\models;
+namespace frontend\models\forms;
 
+use frontend\models\Bookmarked_users;
+use frontend\models\Reviews;
+use frontend\models\Tasks;
+use frontend\models\Users;
+use frontend\models\UsersSpecializations;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
@@ -30,41 +35,41 @@ class UsersFiltersForm extends Model
     public function attributeLabels(): array
     {
         return [
-            'categories' => 'Категории',
-            'extraFields' => 'Дополнительно',
-            'sortOn' => 'Сортировать по',
-            'search' => 'Поиск по имени'
+          'categories' => 'Категории',
+          'extraFields' => 'Дополнительно',
+          'sortOn' => 'Сортировать по',
+          'search' => 'Поиск по имени'
         ];
     }
 
     public function rules(): array
     {
         return [
-            [['categories', 'extraFields', 'search'], 'safe']
+          [['categories', 'extraFields', 'search'], 'safe']
         ];
     }
 
     public static function getExtraFieldsList(): array
     {
         return [
-            self::FREE_NOW => 'Сейчас свободен',
-            self::ONLINE_NOW => 'Сейчас онлайн',
-            self::HAS_RESPONSES => 'Есть отзывы',
-            self::FAVORITES => 'В избранном'
+          self::FREE_NOW => 'Сейчас свободен',
+          self::ONLINE_NOW => 'Сейчас онлайн',
+          self::HAS_RESPONSES => 'Есть отзывы',
+          self::FAVORITES => 'В избранном'
         ];
     }
 
     public function search(array $data): ActiveDataProvider
     {
         $this->query = Users::find()
-            ->select(['users.*'])
-            ->andWhere(['role' => Users::ROLE_PERFORMER])
-            ->with([
-                'reviewsPerformer',
-                'tasksPerformer',
-                'usersSpecializations',
-                'categories'
-            ]);
+          ->select(['users.*'])
+          ->andWhere(['role' => Users::ROLE_PERFORMER])
+          ->with([
+            'reviewsPerformer',
+            'tasksPerformer',
+            'usersSpecializations',
+            'categories'
+          ]);
 
         $sort = \Yii::$app->request->get('sort');
         if (isset($sort)) {
@@ -72,17 +77,18 @@ class UsersFiltersForm extends Model
         }
 
         $dataProvider = new ActiveDataProvider([
-            'query' => $this->query,
-            'pagination' => ['pageSize' => 5],
-            'sort' => [
-                'attributes' => [
-                    'last_activity',
-                    'rating' => SORT_DESC,
-                    'tasks_counter',
-                    'visit_counter'
-                ]
+          'query' => $this->query,
+          'pagination' => ['pageSize' => 5],
+          'sort' => [
+            'attributes' => [
+              'last_activity',
+              'rating' => SORT_DESC,
+              'tasks_counter',
+              'visit_counter'
             ]
+          ]
         ]);
+
 
         if (!$this->load($data) && $this->validate()) {
             return $dataProvider;
@@ -102,17 +108,17 @@ class UsersFiltersForm extends Model
                 break;
             case self::USER_SORT_RATING:
                 $this->query
-                    ->addSelect(['AVG(reviews.rating) AS rating'])
-                    ->joinWith('reviewsPerformer', false)
-                    ->groupBy('users.id')
-                    ->orderBy(['rating' => SORT_DESC]);
+                  ->addSelect(['AVG(reviews.rating) AS rating'])
+                  ->joinWith('reviewsPerformer', false)
+                  ->groupBy('users.id')
+                  ->orderBy(['rating' => SORT_DESC]);
                 break;
             case self::USER_SORT_COUNT_ORDERS:
                 $this->query
-                    ->addSelect(['COUNT(tasks.performer_id) AS tasks_counter'])
-                    ->joinWith('tasksPerformer', false)
-                    ->groupBy('users.id')
-                    ->orderBy(['tasks_counter' => SORT_DESC]);
+                  ->addSelect(['COUNT(tasks.performer_id) AS tasks_counter'])
+                  ->joinWith('tasksPerformer', false)
+                  ->groupBy('users.id')
+                  ->orderBy(['tasks_counter' => SORT_DESC]);
                 break;
             case self::USER_SORT_POPULAR:
                 $this->query->orderBy(['visit_counter' => SORT_DESC]);
@@ -122,9 +128,9 @@ class UsersFiltersForm extends Model
 
     public function setFilters(): void
     {
-        $this->setCategoriesFilter();
-
         $this->setExtraFieldsFilters();
+
+        $this->setCategoriesFilter();
 
         $this->setSearchFilter();
     }
@@ -132,9 +138,10 @@ class UsersFiltersForm extends Model
     private function setCategoriesFilter(): void
     {
         $categories = UsersSpecializations::find()
-            ->select(['performer_id'])
-            ->andFilterWhere(['category_id' => ArrayHelper::getValue($this->data, 'categories')])
-            ->all();
+          ->select(['performer_id'])
+          ->andFilterWhere(['category_id' => ArrayHelper::getValue($this->data, 'categories')])
+          ->all();
+
 
         $performersIDs = ArrayHelper::getColumn($categories, 'performer_id');
 
@@ -177,10 +184,10 @@ class UsersFiltersForm extends Model
     private function setFreeNowExtraFieldsFilter(): void
     {
         $tasks = Tasks::find()
-            ->select('performer_id')
-            ->distinct()
-            ->where(['status' => Tasks::STATUS_ACTIVE])
-            ->all();
+          ->select('performer_id')
+          ->distinct()
+          ->where(['status' => Tasks::STATUS_ACTIVE])
+          ->all();
 
         $performersWithoutTasks = ArrayHelper::getColumn($tasks, 'performer_id');
 
@@ -190,18 +197,18 @@ class UsersFiltersForm extends Model
     private function setOnlineNowExtraFieldsFilter(): void
     {
         $this->query->andFilterWhere([
-            '>',
-            'last_activity',
-            new Expression('CURRENT_TIMESTAMP - INTERVAL 1800 SECOND')
+          '>',
+          'last_activity',
+          new Expression('CURRENT_TIMESTAMP - INTERVAL 1800 SECOND')
         ]);
     }
 
     private function setHasResponsesExtraFieldsFilter(): void
     {
         $reviews = Reviews::find()
-            ->select(['performer_id'])
-            ->distinct()
-            ->all();
+          ->select(['performer_id'])
+          ->distinct()
+          ->all();
 
         $perfomerWithReviews = ArrayHelper::getColumn($reviews, 'performer_id');
 
@@ -213,9 +220,9 @@ class UsersFiltersForm extends Model
         $usersID = [1]; // TODO исправить когда появится возможность добавлять в избранное
 
         $bookmarkedPerformers = Bookmarked_users::find()
-            ->select(['bookmarked_user_id'])
-            ->where(['user_id' => $usersID])
-            ->all();
+          ->select(['bookmarked_user_id'])
+          ->where(['user_id' => $usersID])
+          ->all();
 
         $bookmarkedPerformersIDs = ArrayHelper::getColumn($bookmarkedPerformers, 'bookmarked_user_id');
 

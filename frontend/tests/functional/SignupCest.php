@@ -6,18 +6,18 @@ use frontend\tests\FunctionalTester;
 
 class SignupCest
 {
-    protected $formId = '#form-signup';
+    protected $formId = '#form-registration';
 
 
     public function _before(FunctionalTester $I)
     {
-        $I->amOnRoute('site/signup');
+        $I->amOnRoute('site/registration');
     }
 
     public function signupWithEmptyFields(FunctionalTester $I)
     {
         $I->see('Signup', 'h1');
-        $I->see('Please fill out the following fields to signup:');
+        $I->see('Please fill out the following fields to registration:');
         $I->submitForm($this->formId, []);
         $I->seeValidationError('Username cannot be blank.');
         $I->seeValidationError('Email cannot be blank.');

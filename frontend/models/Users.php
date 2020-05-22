@@ -42,8 +42,8 @@ use Yii;
  */
 class Users extends \yii\db\ActiveRecord
 {
-    const ROLE_CUSTOMER = 'customer';
-    const ROLE_PERFORMER = 'performer';
+    const ROLE_CUSTOMER = 'CUSTOMER';
+    const ROLE_PERFORMER = 'PERFORMER';
 
     const COUNTER_OPTIONS = [
       'withWord' => false
@@ -63,14 +63,14 @@ class Users extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-          [['first_name', 'last_name', 'password', 'birthday', 'role', 'phone', 'email'], 'required'],
+          [['first_name', 'last_name', 'city_id', 'password', 'role', 'email'], 'required'],
           [['biography', 'role', 'avatar'], 'string'],
           [['city_id', 'is_public', 'phone', 'visit_counter'], 'integer'],
           [['birthday', 'date_joined', 'last_activity'], 'safe'],
           [['first_name'], 'string', 'max' => 30],
-          [['last_name', 'email', 'skype', 'telegram'], 'string', 'max' => 50],
-          [['address'], 'string', 'max' => 255],
-          [['password'], 'string', 'max' => 32],
+          [['last_name'], 'string', 'max' => 40],
+          [['address', 'password'], 'string', 'max' => 255],
+          [['email', 'skype', 'telegram'], 'string', 'max' => 50],
           [
             ['city_id'],
             'exist',
@@ -251,8 +251,10 @@ class Users extends \yii\db\ActiveRecord
         return Yii::$app->formatter->asDecimal($rating / $reviewsCount, 2);
     }
 
-    public function getAge(array $options = self::COUNTER_OPTIONS): string
+    public function getAge(array $options = []): string
     {
+        $options = array_merge(self::COUNTER_OPTIONS, $options);
+
         $age = date('Y', time()) - date_create($this->birthday)->format('Y');
 
         if ($options['withWord']) {
@@ -269,8 +271,10 @@ class Users extends \yii\db\ActiveRecord
         return $age;
     }
 
-    public function getCountTasks(array $options = self::COUNTER_OPTIONS)
+    public function getCountTasks(array $options = [])
     {
+        $options = array_merge(self::COUNTER_OPTIONS, $options);
+
         $counter = count($this->getTasksPerformer()->asArray()->all());
 
         if ($options['withWord']) {
@@ -287,8 +291,10 @@ class Users extends \yii\db\ActiveRecord
         return $counter;
     }
 
-    public function getCountReviews(array $options = self::COUNTER_OPTIONS)
+    public function getCountReviews(array $options = [])
     {
+        $options = array_merge(self::COUNTER_OPTIONS, $options);
+
         $counter = count($this->getReviewsPerformer()->asArray()->all());
 
         if ($options['withWord']) {
@@ -305,8 +311,10 @@ class Users extends \yii\db\ActiveRecord
         return $counter;
     }
 
-    public function getCountYearsOnSite(array $options = self::COUNTER_OPTIONS): string
+    public function getCountYearsOnSite(array $options = []): string
     {
+        $options = array_merge(self::COUNTER_OPTIONS, $options);
+
         $counter = date('Y', time()) - Yii::$app->formatter->asDate($this->date_joined, 'Y');
 
         if ($counter < 1) {
@@ -352,5 +360,15 @@ class Users extends \yii\db\ActiveRecord
         }
 
         return $counter;
+    }
+
+    public function setPassword(string $password): void
+    {
+        $this->password = \Yii::$app->getSecurity()->generatePasswordHash($password);
+    }
+
+    public function updateLstActivity(): void
+    {
+        $this->last_activity = date('Y-m-d H:i:s', time());
     }
 }

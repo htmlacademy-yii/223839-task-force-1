@@ -3,8 +3,9 @@
 namespace frontend\controllers;
 
 use frontend\models\Categories;
+use frontend\models\forms\UsersFiltersForm;
 use frontend\models\Users;
-use frontend\models\UsersFiltersForm;
+
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;

@@ -2,7 +2,7 @@
 /* @var $this yii\web\View
  * @var $tasks \frontend\models\Tasks
  * @var $categories \frontend\models\Categories
- * @var $searchModel \frontend\models\TasksFilterForms
+ * @var $searchModel \frontend\models\forms\TasksFilterForms
  * @var $pagination \yii\data\Pagination
  */
 

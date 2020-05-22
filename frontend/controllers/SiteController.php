@@ -28,10 +28,10 @@ class SiteController extends Controller
         return [
             'access' => [
                 'class' => AccessControl::className(),
-                'only' => ['logout', 'signup'],
+                'only' => ['logout', 'registration'],
                 'rules' => [
                     [
-                        'actions' => ['signup'],
+                        'actions' => ['registration'],
                         'allow' => true,
                         'roles' => ['?'],
                     ],
@@ -158,7 +158,7 @@ class SiteController extends Controller
             return $this->goHome();
         }
 
-        return $this->render('signup', [
+        return $this->render('registration', [
             'model' => $model,
         ]);
     }

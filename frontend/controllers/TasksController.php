@@ -3,8 +3,8 @@
 namespace frontend\controllers;
 
 use frontend\models\Categories;
+use frontend\models\forms\TasksFilterForms;
 use frontend\models\Tasks;
-use frontend\models\TasksFilterForms;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 

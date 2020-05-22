@@ -12,14 +12,17 @@ class AppAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'css/normalize.css',
-        'css/style.css',
+      'css/normalize.css',
+      'css/style.css',
     ];
     public $js = [
-        'js/main.js',
-        'js/dropzone.js'
+      'js/vue.js',
+      'js/main.js',
+      'js/dropzone.js',
+      'js/messenger.js'
     ];
     public $depends = [
-//        'yii\web\YiiAsset',
+      'yii\web\YiiAsset',
+      'yii\bootstrap\BootstrapAsset',
     ];
 }
