@@ -255,7 +255,7 @@ class Users extends \yii\db\ActiveRecord
     {
         $options = array_merge(self::COUNTER_OPTIONS, $options);
 
-        $age = date('Y', time()) - date_create($this->birthday)->format('Y');
+        $age = date('Y', time()) - Yii::$app->formatter->asDate($this->birthday, 'Y');
 
         if ($options['withWord']) {
             $terminations =
@@ -275,7 +275,7 @@ class Users extends \yii\db\ActiveRecord
     {
         $options = array_merge(self::COUNTER_OPTIONS, $options);
 
-        $counter = count($this->getTasksPerformer()->asArray()->all());
+        $counter = $this->getTasksPerformer()->count();
 
         if ($options['withWord']) {
             $terminations = [
@@ -318,11 +318,11 @@ class Users extends \yii\db\ActiveRecord
         $counter = date('Y', time()) - Yii::$app->formatter->asDate($this->date_joined, 'Y');
 
         if ($counter < 1) {
-            $counter = date('m', time()) - date_create($this->date_joined)->format('m');
+            $counter = date('m', time()) - Yii::$app->formatter->asDate($this->date_joined, 'm');
 
             // days
             if ($counter < 1) {
-                $counter = date('d', time()) - date_create($this->date_joined)->format('d');
+                $counter = date('d', time()) - Yii::$app->formatter->asDate($this->date_joined, 'd');
                 if ($options['withWord']) {
                     $terminations = [
                       0 => 'дней',

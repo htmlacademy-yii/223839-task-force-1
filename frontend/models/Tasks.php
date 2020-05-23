@@ -40,10 +40,6 @@ class Tasks extends \yii\db\ActiveRecord
     const STATUS_COMPLETED = 4;
     const STATUS_FAILED = 5;
 
-    const COUNTER_OPTIONS = [
-      'withWord' => false
-    ];
-
     /**
      * {@inheritdoc}
      */
@@ -155,21 +151,5 @@ class Tasks extends \yii\db\ActiveRecord
     public function getPerformer()
     {
         return $this->hasOne(Users::class, ['id' => 'performer_id']);
-    }
-
-    public function getTasksCounter(int $counter, array $options = self::COUNTER_OPTIONS) : string
-    {
-        if ($options['withWord']) {
-            $terminations = [
-              0 => 'ий',
-              1 => 'ие',
-              2 => 'ия',
-              5 => 'ий'
-            ];
-
-            $counter .= ' задан' . WordsTerminations::getWordTermination($counter, $terminations);
-        }
-
-        return $counter;
     }
 }

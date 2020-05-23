@@ -26,13 +26,7 @@ $this->title = 'Registration';
         ]) ?>
 
         <?= $form
-          ->field($model, 'email', [
-            'options' =>
-              [
-                'tag' => 'div',
-                'class' => ''
-              ]
-          ])
+          ->field($model, 'email')
           ->textarea([
             'class' => 'input textarea',
             'rows' => 1,
@@ -45,7 +39,7 @@ $this->title = 'Registration';
         ?>
 
         <?= $form
-          ->field($model, 'username')
+          ->field($model, 'user_name')
           ->textarea([
             'class' => 'input textarea',
             'rows' => 1,
@@ -57,7 +51,7 @@ $this->title = 'Registration';
 
 
         <?= $form
-          ->field($model, 'cityID')
+          ->field($model, 'city_id')
           ->dropDownList($cities, [
             'class' => 'multiple-select input town-select registration-town',
             'size' => 1

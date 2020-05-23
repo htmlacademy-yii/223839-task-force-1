@@ -71,9 +71,11 @@ class UsersFiltersForm extends Model
             'categories'
           ]);
 
-        $sort = \Yii::$app->request->get('sort');
-        if (isset($sort)) {
-            $this->setSort($sort);
+        if (isset($data['sort'])) {
+            $this->setSort($data['sort']);
+        } else {
+            ArrayHelper::setValue($data, 'sort', self::USER_SORT_LAST_ACTIVITY);
+            $this->setSort($data['sort']);
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -88,7 +90,6 @@ class UsersFiltersForm extends Model
             ]
           ]
         ]);
-
 
         if (!$this->load($data) && $this->validate()) {
             return $dataProvider;
@@ -130,7 +131,9 @@ class UsersFiltersForm extends Model
     {
         $this->setExtraFieldsFilters();
 
-        $this->setCategoriesFilter();
+        if (!empty(ArrayHelper::getValue($this->data, 'categories'))) {
+            $this->setCategoriesFilter();
+        }
 
         $this->setSearchFilter();
     }
@@ -140,12 +143,9 @@ class UsersFiltersForm extends Model
         $categories = UsersSpecializations::find()
           ->select(['performer_id'])
           ->andFilterWhere(['category_id' => ArrayHelper::getValue($this->data, 'categories')])
-          ->all();
+          ->column();
 
-
-        $performersIDs = ArrayHelper::getColumn($categories, 'performer_id');
-
-        $this->query->andFilterWhere(['id' => $performersIDs]);
+        $this->query->andFilterWhere(['id' => $categories]);
     }
 
     /**
@@ -187,11 +187,9 @@ class UsersFiltersForm extends Model
           ->select('performer_id')
           ->distinct()
           ->where(['status' => Tasks::STATUS_ACTIVE])
-          ->all();
+          ->column();
 
-        $performersWithoutTasks = ArrayHelper::getColumn($tasks, 'performer_id');
-
-        $this->query->andFilterWhere(['NOT IN', 'id', $performersWithoutTasks]);
+        $this->query->andFilterWhere(['NOT IN', 'id', $tasks]);
     }
 
     private function setOnlineNowExtraFieldsFilter(): void
@@ -208,11 +206,9 @@ class UsersFiltersForm extends Model
         $reviews = Reviews::find()
           ->select(['performer_id'])
           ->distinct()
-          ->all();
+          ->column();
 
-        $perfomerWithReviews = ArrayHelper::getColumn($reviews, 'performer_id');
-
-        $this->query->andFilterWhere(['id' => $perfomerWithReviews]);
+        $this->query->andFilterWhere(['id' => $reviews]);
     }
 
     private function setFavoritesExtraFieldsFilter(): void
@@ -222,11 +218,9 @@ class UsersFiltersForm extends Model
         $bookmarkedPerformers = Bookmarked_users::find()
           ->select(['bookmarked_user_id'])
           ->where(['user_id' => $usersID])
-          ->all();
+          ->column();
 
-        $bookmarkedPerformersIDs = ArrayHelper::getColumn($bookmarkedPerformers, 'bookmarked_user_id');
-
-        $this->query->andFilterWhere(['id' => $bookmarkedPerformersIDs]);
+        $this->query->andFilterWhere(['id' => $bookmarkedPerformers]);
     }
 
     private function getSearch(): string

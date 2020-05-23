@@ -84,18 +84,6 @@ $this->title = $task->title;
                                   ['class' => 'link-regular']
                                 ) ?>
                             </p>
-                            <?php
-                            $rating = $response->performer->getPerformerRating();
-
-                            for ($i = 0; $i < 5; $i++) {
-                                if ($i < floor($rating)) {
-                                    echo ' <span></span > ';
-                                } else {
-                                    echo '<span class="star-disabled" ></span > ';
-                                }
-                            }
-                            echo "<b>{$rating}<b>";
-                            ?>
 
                         </div>
                         <?= Html::tag(
@@ -120,7 +108,6 @@ $this->title = $task->title;
             ?>
         </div>
     </div>
-    <pre>
 </section>
 <section class="connect-desk">
     <div class="connect-desk__profile-mini">
@@ -135,7 +122,7 @@ $this->title = $task->title;
                 </div>
             </div>
             <p class="info-customer">
-                <span><?= $task->getTasksCounter(count($task->author->tasksCustomer), ['withWord' => true]) ?></span>
+                <span><?= $task->author->getCountTasks(['withWord' => true]) ?></span>
                 <span class="last-">
                     <?= $task->author->getCountYearsOnSite(['withWord' => true]) ?> на сайте
                 </span>
