@@ -17,6 +17,7 @@ class RegistrationController extends Controller
             $model->load(\Yii::$app->request->post());
 
             if ($model->validate() && $model->register()) {
+                \Yii::$app->session->setFlash('success', 'You have successfully registered');
                 return $this->goHome();
             }
         }
