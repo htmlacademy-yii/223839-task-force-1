@@ -198,6 +198,28 @@ class Users extends \yii\db\ActiveRecord
         return $this->hasMany(Tasks::class, ['performer_id' => 'id']);
     }
 
+    public function getPerformersHasTasksNow(): array
+    {
+        return Tasks::find()
+          ->distinct()
+          ->select('performer_id')
+          ->where(['status' => Tasks::STATUS_ACTIVE])
+          ->column();
+    }
+
+    public function getPerformersHasReviews(): array
+    {
+        return Reviews::find()->distinct()->select(['performer_id'])->column();
+    }
+
+    public function getBookmarkedUsersForUser(int $id): array
+    {
+        return Bookmarked_users::find()
+          ->select(['bookmarked_user_id'])
+          ->where(['user_id' => $id])
+          ->column();
+    }
+
     /**
      * Gets query for [[City]].
      *
