@@ -5,10 +5,10 @@ namespace frontend\models\forms;
 use frontend\models\Responses;
 use frontend\models\Tasks;
 use yii\base\Model;
+use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
-use yii\data\ActiveDataProvider;
 
 class TasksFilterForms extends Model
 {
@@ -31,32 +31,28 @@ class TasksFilterForms extends Model
     public function attributeLabels(): array
     {
         return [
-            'categories' => 'Категории',
-            'extraFields' => 'Дополнительно',
-            'period' => 'Период',
-            'search' => 'Поиск по названию'
+          'categories' => 'Категории',
+          'extraFields' => 'Дополнительно',
+          'period' => 'Период',
+          'search' => 'Поиск по названию'
         ];
     }
 
     public function rules(): array
     {
         return [
-            [['categories', 'extraFields', 'period', 'search'], 'safe'],
+          [['categories', 'extraFields', 'period', 'search'], 'safe'],
         ];
     }
-
 
     public function search(array $data): ActiveDataProvider
     {
         $this->query = Tasks::find()
-            ->andWhere(['status' => Tasks::STATUS_NEW])
-            ->with(['city', 'category', 'responses'])
-            ->orderBy(['created_at' => SORT_DESC]);
+          ->andWhere(['status' => Tasks::STATUS_NEW])
+          ->with(['city', 'category', 'responses'])
+          ->orderBy(['created_at' => SORT_DESC]);
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $this->query,
-            'pagination' => ['pageSize' => 5]
-        ]);
+        $dataProvider = new ActiveDataProvider(['query' => $this->query, 'pagination' => ['pageSize' => 5]]);
 
         if (!$this->load($data) && $this->validate()) {
             return $dataProvider;
@@ -72,18 +68,18 @@ class TasksFilterForms extends Model
     public static function getPeriodList(): array
     {
         return [
-            self::CREATED_TODAY => 'За день',
-            self::CREATED_WEEK => 'За неделю',
-            self::CREATED_MONTH => 'За месяц',
-            self::ALL_TIME => 'За все время'
+          self::CREATED_TODAY => 'За день',
+          self::CREATED_WEEK => 'За неделю',
+          self::CREATED_MONTH => 'За месяц',
+          self::ALL_TIME => 'За все время'
         ];
     }
 
     public static function getExtraFieldsdList(): array
     {
         return [
-            self::WITHOUT_RESPONSES => 'Нет откликов',
-            self::REMOTE_WORK => 'Удаленная работа'
+          self::WITHOUT_RESPONSES => 'Нет откликов',
+          self::REMOTE_WORK => 'Удаленная работа'
         ];
     }
 
@@ -100,15 +96,17 @@ class TasksFilterForms extends Model
 
     private function setExtraFieldsFilter(): void
     {
-        if (!empty($this->getExtraFields())) {
-            foreach ($this->getExtraFields() as $value) {
-                switch ($value) {
-                    case self::WITHOUT_RESPONSES:
-                        $this->setWithoutResponsesExtraFieldsFilter();
-                        break;
-                    case self::REMOTE_WORK:
-                        $this->setRemoteWorkExtraFieldsFilter();
-                        break;
+        $extraFields = $this->getExtraFields();
+
+        if (!empty($extraFields)) {
+            $extraFieldsFilters = [
+              self::WITHOUT_RESPONSES => [$this, 'setWithoutResponsesExtraFieldsFilter'],
+              self::REMOTE_WORK => [$this, 'setRemoteWorkExtraFieldsFilter'],
+            ];
+
+            foreach ($extraFields as $extraField) {
+                if (ArrayHelper::keyExists($extraField, $extraFieldsFilters)) {
+                    call_user_func($extraFieldsFilters[$extraField]);
                 }
             }
         }
@@ -116,13 +114,13 @@ class TasksFilterForms extends Model
 
     private function setWithoutResponsesExtraFieldsFilter(): void
     {
-        $responses = Responses::find()
-            ->select('task_id')
-            ->distinct()
-            ->andWhere(['IS NOT', 'performer_id', null])
-            ->column();
+        $tasksWithoutResponse = Responses::find()
+          ->distinct()
+          ->select('task_id')
+          ->andWhere(['IS NOT', 'performer_id', null])
+          ->column();
 
-        $this->query->andFilterWhere(['NOT IN', 'id', $responses]);
+        $this->query->andFilterWhere(['NOT IN', 'id', $tasksWithoutResponse]);
     }
 
     private function setRemoteWorkExtraFieldsFilter(): void
@@ -137,31 +135,33 @@ class TasksFilterForms extends Model
 
     private function setPeriodFilter(): void
     {
-        switch ($this->getPeriod()) {
-            case self::ALL_TIME:
-                return;
-            case self::CREATED_TODAY:
-                $date = 'HOUR';
-                break;
-            case self::CREATED_WEEK:
-                $date = 'DAY';
-                break;
-            case self::CREATED_MONTH:
-                $date = 'MONTH';
-                break;
+        $period = (int)ArrayHelper::getValue($this->data, 'period');
+
+        if ($period === self::ALL_TIME) {
+            return;
         }
 
+        $periods = [
+          self::CREATED_TODAY => 'HOUR',
+          self::CREATED_WEEK => 'DAY',
+          self::CREATED_MONTH => 'MONTH'
+        ];
+
+        $date = $periods[$period];
+
         $this->query->andFilterWhere([
-            '>',
-            'created_at',
-            new Expression("CURRENT_TIMESTAMP - INTERVAL {$this->getPeriod()} {$date}")
+          '>',
+          'created_at',
+          new Expression("CURRENT_TIMESTAMP - INTERVAL {$period} {$date}")
         ]);
     }
 
     private function setSearchFilter(): void
     {
-        if (!empty($this->getSearch())) {
-            $this->query->andFilterWhere(['LIKE', 'title', "{$this->getSearch()}"]);
+        $search = (string)ArrayHelper::getValue($this->data, 'search');
+
+        if (!empty($search)) {
+            $this->query->andFilterWhere(['LIKE', 'title', $search]);
         }
     }
 
@@ -170,15 +170,5 @@ class TasksFilterForms extends Model
         $extraFields = ArrayHelper::getValue($this->data, 'extraFields');
 
         return empty($extraFields) ? [] : $extraFields;
-    }
-
-    private function getSearch(): string
-    {
-        return ArrayHelper::getValue($this->data, 'search');
-    }
-
-    private function getPeriod(): int
-    {
-        return ArrayHelper::getValue($this->data, 'period');
     }
 }

@@ -2,9 +2,6 @@
 
 namespace frontend\models\forms;
 
-use frontend\models\Bookmarked_users;
-use frontend\models\Reviews;
-use frontend\models\Tasks;
 use frontend\models\Users;
 use frontend\models\UsersSpecializations;
 use yii\base\Model;
@@ -22,7 +19,7 @@ class UsersFiltersForm extends Model
 
     const FREE_NOW = 'freenow';
     const ONLINE_NOW = 'online';
-    const HAS_RESPONSES = 'responses';
+    const HAS_REVIEWS = 'reviews';
     const FAVORITES = 'favorites';
 
     public $categories = '';
@@ -31,6 +28,9 @@ class UsersFiltersForm extends Model
 
     private array $data = [];
     private ActiveQuery $query;
+
+    private array $inQuery = [];
+    private array $outQuery = [];
 
     public function attributeLabels(): array
     {
@@ -54,7 +54,7 @@ class UsersFiltersForm extends Model
         return [
           self::FREE_NOW => 'Сейчас свободен',
           self::ONLINE_NOW => 'Сейчас онлайн',
-          self::HAS_RESPONSES => 'Есть отзывы',
+          self::HAS_REVIEWS => 'Есть отзывы',
           self::FAVORITES => 'В избранном'
         ];
     }
@@ -129,23 +129,30 @@ class UsersFiltersForm extends Model
 
     public function setFilters(): void
     {
-        $this->setExtraFieldsFilters();
+        $user = new Users();
 
-        if (!empty(ArrayHelper::getValue($this->data, 'categories'))) {
-            $this->setCategoriesFilter();
-        }
+        $this->setCategoriesFilter();
+
+        $this->setExtraFieldsFilters($user);
+
+        $this->inQuery = array_diff($this->inQuery, $this->outQuery);
+
+        $this->query->andFilterWhere(['id' => $this->inQuery]);
 
         $this->setSearchFilter();
     }
 
     private function setCategoriesFilter(): void
     {
-        $categories = UsersSpecializations::find()
-          ->select(['performer_id'])
-          ->andFilterWhere(['category_id' => ArrayHelper::getValue($this->data, 'categories')])
-          ->column();
+        if (!empty(ArrayHelper::getValue($this->data, 'categories'))) {
+            $performers = UsersSpecializations::find()
+              ->distinct()
+              ->select(['performer_id'])
+              ->andFilterWhere(['category_id' => ArrayHelper::getValue($this->data, 'categories')])
+              ->column();
 
-        $this->query->andFilterWhere(['id' => $categories]);
+            $this->inQuery = $performers;
+        }
     }
 
     /**
@@ -154,42 +161,40 @@ class UsersFiltersForm extends Model
      */
     private function setSearchFilter(): void
     {
-        if (!empty($this->getSearch())) {
-            $this->query->where(['LIKE', "CONCAT(first_name, '', last_name)", "{$this->getSearch()}"]);
+        $search = (string)ArrayHelper::getValue($this->data, 'search');
+
+        if (!empty($search)) {
+            $this->query->where([
+              'LIKE',
+              "CONCAT(first_name, '', last_name)",
+              $search
+            ]);
         }
     }
 
-    private function setExtraFieldsFilters(): void
+    private function setExtraFieldsFilters(Users $user): void
     {
-        if (!empty($this->getExtraFields())) {
-            foreach ($this->getExtraFields() as $value) {
-                switch ($value) {
-                    case self::FREE_NOW:
-                        $this->setFreeNowExtraFieldsFilter();
-                        break;
-                    case self::ONLINE_NOW:
-                        $this->setOnlineNowExtraFieldsFilter();
-                        break;
-                    case self::HAS_RESPONSES:
-                        $this->setHasResponsesExtraFieldsFilter();
-                        break;
-                    case self::FAVORITES:
-                        $this->setFavoritesExtraFieldsFilter();
-                        break;
+        $extraFields = $this->getExtraFields();
+
+        if (!empty($extraFields)) {
+            $extraFieldsFilters = [
+              self::FREE_NOW => [$this, 'setFreeNowExtraFieldsFilter'],
+              self::ONLINE_NOW => [$this, 'setOnlineNowExtraFieldsFilter'],
+              self::HAS_REVIEWS => [$this, 'setHasReviewsExtraFieldsFilter'],
+              self::FAVORITES => [$this, 'setFavoritesExtraFieldsFilter']
+            ];
+
+            foreach ($extraFields as $extraField) {
+                if (ArrayHelper::keyExists($extraField, $extraFieldsFilters)) {
+                    call_user_func($extraFieldsFilters[$extraField], $user);
                 }
             }
         }
     }
 
-    private function setFreeNowExtraFieldsFilter(): void
+    private function setFreeNowExtraFieldsFilter(Users $user): void
     {
-        $tasks = Tasks::find()
-          ->select('performer_id')
-          ->distinct()
-          ->where(['status' => Tasks::STATUS_ACTIVE])
-          ->column();
-
-        $this->query->andFilterWhere(['NOT IN', 'id', $tasks]);
+        $this->outQuery = ArrayHelper::merge($this->outQuery, $user->getPerformersHasTasksNow());
     }
 
     private function setOnlineNowExtraFieldsFilter(): void
@@ -201,31 +206,21 @@ class UsersFiltersForm extends Model
         ]);
     }
 
-    private function setHasResponsesExtraFieldsFilter(): void
+    private function setHasReviewsExtraFieldsFilter(Users $user): void
     {
-        $reviews = Reviews::find()
-          ->select(['performer_id'])
-          ->distinct()
-          ->column();
-
-        $this->query->andFilterWhere(['id' => $reviews]);
+        $this->inQuery = empty($this->inQuery)
+          ? $user->getPerformersHasReviews()
+          : array_intersect($this->inQuery, $user->getPerformersHasReviews());
     }
 
-    private function setFavoritesExtraFieldsFilter(): void
+
+    private function setFavoritesExtraFieldsFilter(Users $user): void
     {
-        $usersID = [1]; // TODO исправить когда появится возможность добавлять в избранное
+        $userID = 1; // TODO исправить когда появится возможность добавлять в избранное
 
-        $bookmarkedPerformers = Bookmarked_users::find()
-          ->select(['bookmarked_user_id'])
-          ->where(['user_id' => $usersID])
-          ->column();
-
-        $this->query->andFilterWhere(['id' => $bookmarkedPerformers]);
-    }
-
-    private function getSearch(): string
-    {
-        return (string)ArrayHelper::getValue($this->data, 'search');
+        $this->inQuery = empty($this->inQuery)
+          ? $user->getBookmarkedUsersForUser($userID)
+          : array_intersect($this->inQuery, $user->getBookmarkedUsersForUser($userID));
     }
 
     private function getExtraFields(): array
