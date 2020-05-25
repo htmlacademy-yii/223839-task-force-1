@@ -147,7 +147,7 @@ class TasksFilterForms extends Model
           self::CREATED_MONTH => 'MONTH'
         ];
 
-        $date = $periods[$period];
+        $date = ArrayHelper::keyExists($period, $periods) ? $periods[$period] : 'MONTH';
 
         $this->query->andFilterWhere([
           '>',
