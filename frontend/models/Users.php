@@ -108,6 +108,11 @@ class Users extends \yii\db\ActiveRecord
         ];
     }
 
+    public static function findByUserName(string $userName)
+    {
+        return static::find()->where(['LIKE', "CONCAT(first_name, ' ', last_name)", $userName]);
+    }
+
     /**
      * Gets query for [[BookmarkedUsers]].
      *
@@ -214,7 +219,8 @@ class Users extends \yii\db\ActiveRecord
 
     public function getBookmarkedUsersForUser(int $id): array
     {
-        return Bookmarked_users::find()
+        return BookmarkedUsers::find()
+          ->distinct()
           ->select(['bookmarked_user_id'])
           ->where(['user_id' => $id])
           ->column();
@@ -259,14 +265,16 @@ class Users extends \yii\db\ActiveRecord
     /*
      *  Gets average rating for performer
      */
-    public function getPerformerRating()
+    public function getRating()
     {
-        if (($reviewsCount = count($this->reviewsPerformer)) === 0) {
+        $reviews = $this->isPerformer() ? $this->reviewsPerformer : $this->reviewsCustomer;
+
+        if (($reviewsCount = count($reviews)) === 0) {
             return 0;
         }
 
         $rating = 0;
-        foreach ($this->reviewsPerformer as $review) {
+        foreach ($reviews as $review) {
             $rating += $review->rating;
         }
 
@@ -297,7 +305,7 @@ class Users extends \yii\db\ActiveRecord
     {
         $options = array_merge(self::COUNTER_OPTIONS, $options);
 
-        $counter = $this->getTasksPerformer()->count();
+        $counter = $this->isPerformer() ? count($this->tasksPerformer) : count($this->tasksCustomer);
 
         if ($options['withWord']) {
             $terminations = [
@@ -317,7 +325,7 @@ class Users extends \yii\db\ActiveRecord
     {
         $options = array_merge(self::COUNTER_OPTIONS, $options);
 
-        $counter = count($this->getReviewsPerformer()->asArray()->all());
+        $counter = $this->isPerformer() ? count($this->reviewsPerformer) : count($this->reviewsCustomer);
 
         if ($options['withWord']) {
             $terminations = [
@@ -384,6 +392,11 @@ class Users extends \yii\db\ActiveRecord
         return $counter;
     }
 
+    public function getFullName(): string
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
     public function setPassword(string $password): void
     {
         $this->password = \Yii::$app->getSecurity()->generatePasswordHash($password);
@@ -392,5 +405,15 @@ class Users extends \yii\db\ActiveRecord
     public function updateLstActivity(): void
     {
         $this->last_activity = date('Y-m-d H:i:s', time());
+    }
+
+    public function isPerformer()
+    {
+        return $this->role === static::ROLE_PERFORMER;
+    }
+
+    public function isCustomer()
+    {
+        return $this->role === static::ROLE_CUSTOMER;
     }
 }

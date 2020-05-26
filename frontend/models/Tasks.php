@@ -2,9 +2,6 @@
 
 namespace frontend\models;
 
-use frontend\modules\WordsTerminations;
-use Yii;
-
 /**
  * This is the model class for table "tasks".
  *
@@ -61,10 +58,34 @@ class Tasks extends \yii\db\ActiveRecord
           [['description'], 'string'],
           [['title'], 'string', 'max' => 50],
           [['address'], 'string', 'max' => 100],
-          [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['author_id' => 'id']],
-          [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id']],
-          [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class, 'targetAttribute' => ['city_id' => 'id']],
-          [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['performer_id' => 'id']],
+          [
+            ['author_id'],
+            'exist',
+            'skipOnError' => true,
+            'targetClass' => Users::class,
+            'targetAttribute' => ['author_id' => 'id']
+          ],
+          [
+            ['category_id'],
+            'exist',
+            'skipOnError' => true,
+            'targetClass' => Categories::class,
+            'targetAttribute' => ['category_id' => 'id']
+          ],
+          [
+            ['city_id'],
+            'exist',
+            'skipOnError' => true,
+            'targetClass' => Cities::class,
+            'targetAttribute' => ['city_id' => 'id']
+          ],
+          [
+            ['performer_id'],
+            'exist',
+            'skipOnError' => true,
+            'targetClass' => Users::class,
+            'targetAttribute' => ['performer_id' => 'id']
+          ],
         ];
     }
 
@@ -91,6 +112,11 @@ class Tasks extends \yii\db\ActiveRecord
           'status' => 'Status',
           'remoteWork' => 'Remote Work',
         ];
+    }
+
+    public static function getTasksResponses()
+    {
+        return Responses::find();
     }
 
     /**

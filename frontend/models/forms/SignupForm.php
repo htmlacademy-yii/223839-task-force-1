@@ -17,26 +17,13 @@ class SignupForm extends Model
 
     public function rules()
     {
-        return [
-          [['email', 'user_name', 'password', 'city_id'], 'required', 'message' => 'Поле обязательно для заполнения'],
-
-          [['user_name', 'email'], 'trim'],
-          [['user_name'], 'string', 'min' => 6, 'max' => 70],
+        return array_merge(
+          static::usernameRules(),
+          static::emailRules(),
           [
-            'user_name',
-            'match',
-            'pattern' => '/^([a-zа-я-]+)\s([a-zа-я-]+)$/sui',
-            'message' =>
-              'Имя должно соответствовать шаблону Иван Иванов. Нельзя использовать цифры и специальные символы.'
-          ],
-
-          ['email', 'unique', 'targetClass' => Users::class, 'message' => "{attribute} {value} уже используется"],
-          ['email', 'email'],
-          ['email', 'match', 'pattern' => '/^([\w+\.]+@[а-яa-z]+\.[a-zа-я]+)$/sui'],
-          [['email'], 'string', 'min' => 3, 'max' => 50],
-
-          [['password'], 'string', 'min' => 8, 'max' => 255],
-        ];
+            [['email', 'user_name', 'password', 'city_id'], 'required', 'message' => 'Поле обязательно для заполнения'],
+            [['password'], 'string', 'min' => 8, 'max' => 255],
+          ]);
     }
 
     public function attributeLabels()
@@ -49,10 +36,33 @@ class SignupForm extends Model
         ];
     }
 
+    public static function usernameRules()
+    {
+        return [
+          [['user_name', 'email'], 'trim'],
+          [['user_name'], 'string', 'min' => 6, 'max' => 70],
+          [
+            'user_name',
+            'match',
+            'pattern' => '/^([a-zа-я-]+)\s([a-zа-я-]+)$/sui',
+            'message' =>
+              'Имя должно соответствовать шаблону Иван Иванов. Нельзя использовать цифры и специальные символы.'
+          ],
+        ];
+    }
+
+    public static function emailRules()
+    {
+        return [
+          ['email', 'unique', 'targetClass' => Users::class, 'message' => "{attribute} {value} уже используется"],
+          ['email', 'email'],
+          ['email', 'match', 'pattern' => '/^([\w+\.]+@[а-яa-z]+\.[a-zа-я]+)$/sui'],
+          [['email'], 'string', 'min' => 3, 'max' => 50],
+        ];
+    }
+
     public function register(): bool
     {
-        [$this->firstName, $this->lastName] = explode(' ', $this->user_name);
-
         $user = $this->factoryUser();
 
         return $user->save();
@@ -60,10 +70,12 @@ class SignupForm extends Model
 
     public function factoryUser(): Users
     {
+        [$firstName, $lastName] = explode(' ', $this->user_name);
+
         $user = new Users();
         $user->email = $this->email;
-        $user->first_name = $this->firstName;
-        $user->last_name = $this->lastName;
+        $user->first_name = $firstName;
+        $user->last_name = $lastName;
         $user->city_id = $this->city_id;
         $user->role = $user::ROLE_PERFORMER;
         $user->date_joined = date('Y-m-d H:i:s', time());

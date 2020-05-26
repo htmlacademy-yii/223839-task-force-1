@@ -5,7 +5,6 @@ namespace frontend\controllers;
 use frontend\models\Categories;
 use frontend\models\forms\UsersFiltersForm;
 use frontend\models\Users;
-
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -15,22 +14,22 @@ class UsersController extends Controller
     public function actionIndex()
     {
         $categories = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
+        $sorts = UsersFiltersForm::getSortsList();
 
         $searchModel = new UsersFiltersForm();
+        $user = new Users();
 
-        $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
+        $dataProvider = $searchModel->search(\Yii::$app->request->queryParams, $user);
 
         $pagination = $dataProvider->getPagination();
         $performers = $dataProvider->getModels();
 
-        return $this->render('index', compact('performers', 'categories', 'searchModel', 'pagination'));
+        return $this->render('index', compact('performers', 'categories', 'searchModel', 'pagination', 'sorts'));
     }
 
     public function actionView(int $id)
     {
-        $user = Users::findOne($id);
-
-        if(!$user) {
+        if (!$user = Users::findOne($id)) {
             throw new NotFoundHttpException();
         }
 

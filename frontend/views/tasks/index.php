@@ -15,23 +15,21 @@ $this->title = "TaskForce";
 
 <section class="new-task">
     <div class="new-task__wrapper">
-
         <h1>Новые задания</h1>
-
         <?php
         foreach ($tasks as $task) : ?>
             <div class="new-task__card">
                 <div class="new-task__title">
-
-                    <?= Html::a('<h2>' . Html::encode($task->title) . '</h2>',
-                      ['tasks/view', 'id' => $task->id],
-                      ['class' => 'link-regular']
-                    ) ?>
+                    <h2>
+                        <?= Html::a(Html::encode($task->title),
+                          ['tasks/view', 'id' => $task->id],
+                          ['class' => 'link-regular']
+                        ) ?>
+                    </h2>
                     <?= Html::a('<p>' . Html::encode($task->category->name) . '</p>',
                       ['#'],
                       ['class' => 'new-task__type link-regular']
                     ) ?>
-
                 </div>
                 <div class="new-task__icon new-task__icon--<?= $task->category->icon ?>"></div>
                 <p class="new-task_description"><?= HTMLPurifier::process($task->description) ?></p>
@@ -73,59 +71,57 @@ $this->title = "TaskForce";
             'class' => 'search-task__form'
           ]
         ]);
-        $categories = array_reduce($categories, function ($acc, $category) {
-            $acc[$category['id']] = $category['name'];
-            return $acc;
-        });
 
         $loadCategories = $searchModel->categories;
         $loadExtraFields = $searchModel->extraFields;
         ?>
-        <?= Html::beginTag('fieldset', ['class' => 'search-task__categories']) ?>
-        <?= Html::tag('legend', 'Категории') ?>
-        <?= $form
-          ->field($searchModel, 'categories')
-          ->label(false)
-          ->checkboxList($categories,
-            [
-              'item' => function (
-                int $index,
-                string $label,
-                string $name,
-                bool $checked,
-                string $value
-              ) use ($categories) : string {
-                  $checked = ($checked === true) ? 'checked' : '';
-                  $id = "category-{$index}";
-                  return "<input type='checkbox' id='{$id}' name='{$name}'
+        <fieldset class='search-task__categories'>
+            <legend>Категории</legend>
+            <?= $form
+              ->field($searchModel, 'categories')
+              ->label(false)
+              ->checkboxList($categories,
+                [
+                  'item' => function (
+                    int $index,
+                    string $label,
+                    string $name,
+                    bool $checked,
+                    string $value
+                  ) use ($categories) : string {
+                      $checked = ($checked === true) ? 'checked' : '';
+                      $id = "category-{$index}";
+                      return "<input type='checkbox' id='{$id}' name='{$name}'
                     class='visually-hidden checkbox__input' value='{$value}' {$checked}>
                     <label for='{$id}'>{$label}</label>";
-              }
-            ])
-        ?>
-        <?= Html::endTag('fieldset') ?>
-        <?= Html::beginTag('fieldset', ['class' => 'search-task__categories']) ?>
-        <?= Html::tag('legend', 'Дополнительно') ?>
-        <?= $form
-          ->field($searchModel, 'extraFields')
-          ->label(false)
-          ->checkboxList($searchModel::getExtraFieldsdList(), [
-            'item' => function (
-              int $index,
-              string $label,
-              string $name,
-              bool $checked,
-              string $value
-            ) use ($loadExtraFields) : string {
-                $checked = ($checked === true) ? 'checked' : '';
-                $id = "extraFields-{$index}";
-                return "<input type='checkbox' id='{$id}' name='{$name}]'
+                  }
+                ])
+            ?>
+        </fieldset>
+
+        <fieldset class="search-task__categories">
+            <legend>Дополнительно</legend>
+            <?= $form
+              ->field($searchModel, 'extraFields')
+              ->label(false)
+              ->checkboxList($searchModel::getExtraFieldsList(), [
+                'item' => function (
+                  int $index,
+                  string $label,
+                  string $name,
+                  bool $checked,
+                  string $value
+                ) use ($loadExtraFields) : string {
+                    $checked = ($checked === true) ? 'checked' : '';
+                    $id = "extraFields-{$index}";
+                    return "<input type='checkbox' id='{$id}' name='{$name}]'
                     class='visually-hidden checkbox__input' value='{$value}' {$checked}>
                     <label for='{$id}'>{$label}</label>";
-            }
-          ])
-        ?>
-        <?= Html::endTag('fieldset') ?>
+                }
+              ])
+            ?>
+        </fieldset>
+
         <?= $form
           ->field($searchModel, 'period', ['options' => ['tag' => false]])
           ->label('Период', ['class' => 'search-task__name'])
@@ -134,6 +130,7 @@ $this->title = "TaskForce";
           ->field($searchModel, 'search', ['options' => ['tag' => false]])
           ->input('search', ['class' => 'input-middle input'])
           ->label('Поиск по названию', ['class' => 'search-task__name']) ?>
+
         <?= Html::submitButton('Искать', ['class' => 'button']) ?>
         <?php
         $form::end() ?>

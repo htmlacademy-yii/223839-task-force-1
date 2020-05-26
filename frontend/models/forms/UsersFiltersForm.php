@@ -12,10 +12,10 @@ use yii\helpers\ArrayHelper;
 
 class UsersFiltersForm extends Model
 {
-    const USER_SORT_RATING = 'rating';
-    const USER_SORT_COUNT_ORDERS = 'orders';
-    const USER_SORT_POPULAR = 'popular';
-    const USER_SORT_LAST_ACTIVITY = 'last_activity';
+    const SORT_RATING = 'rating';
+    const SORT_COUNT_ORDERS = 'orders';
+    const SORT_POPULAR = 'popular';
+    const SORT_LAST_ACTIVITY = 'last_activity';
 
     const FREE_NOW = 'freenow';
     const ONLINE_NOW = 'online';
@@ -24,13 +24,8 @@ class UsersFiltersForm extends Model
 
     public $categories = '';
     public $extraFields = '';
-    public string $search = '';
-
-    private array $data = [];
-    private ActiveQuery $query;
-
-    private array $inQuery = [];
-    private array $outQuery = [];
+    public $search = '';
+    public $sort = self::SORT_LAST_ACTIVITY;
 
     public function attributeLabels(): array
     {
@@ -52,16 +47,26 @@ class UsersFiltersForm extends Model
     public static function getExtraFieldsList(): array
     {
         return [
-          self::FREE_NOW => 'Сейчас свободен',
-          self::ONLINE_NOW => 'Сейчас онлайн',
-          self::HAS_REVIEWS => 'Есть отзывы',
-          self::FAVORITES => 'В избранном'
+          static::FREE_NOW => 'Сейчас свободен',
+          static::ONLINE_NOW => 'Сейчас онлайн',
+          static::HAS_REVIEWS => 'Есть отзывы',
+          static::FAVORITES => 'В избранном'
         ];
     }
 
-    public function search(array $data): ActiveDataProvider
+    public static function getSortsList(): array
     {
-        $this->query = Users::find()
+        return [
+          static::SORT_RATING => ['name' => 'Рейтингу', 'link' => static::SORT_RATING],
+          static::SORT_COUNT_ORDERS => ['name' => 'Числу заказов', 'link' => static::SORT_COUNT_ORDERS],
+          static::SORT_POPULAR => ['name' => 'Популярности', 'link' => static::SORT_POPULAR]
+          // static::SORT_LAST_ACTIVITY => ['name' => 'Последней активности', 'link' => static::SORT_LAST_ACTIVITY],
+        ];
+    }
+
+    public function search(array $data, Users $user): ActiveDataProvider
+    {
+        $query = Users::find()
           ->select(['users.*'])
           ->andWhere(['role' => Users::ROLE_PERFORMER])
           ->with([
@@ -71,15 +76,10 @@ class UsersFiltersForm extends Model
             'categories'
           ]);
 
-        if (isset($data['sort'])) {
-            $this->setSort($data['sort']);
-        } else {
-            ArrayHelper::setValue($data, 'sort', self::USER_SORT_LAST_ACTIVITY);
-            $this->setSort($data['sort']);
-        }
+        $this->setSort($query, $data);
 
         $dataProvider = new ActiveDataProvider([
-          'query' => $this->query,
+          'query' => $query,
           'pagination' => ['pageSize' => 5],
           'sort' => [
             'attributes' => [
@@ -91,67 +91,105 @@ class UsersFiltersForm extends Model
           ]
         ]);
 
-        if (!$this->load($data) && $this->validate()) {
+        if (!ArrayHelper::keyExists($this->formName(), $data) || ArrayHelper::keyExists('sort', $data)) {
             return $dataProvider;
         }
 
-        $this->data = ArrayHelper::getValue($data, $this->formName());
-        $this->setFilters();
+        $data = $this->getFilterData($query, $data, $user);
+
+        if ($this->validate()) {
+            $this->load($data);
+        }
 
         return $dataProvider;
     }
 
-    public function setSort(string $sort): void
+    private function getFilterData(ActiveQuery $query, array $data, Users $user): array
     {
-        switch ($sort) {
-            case self::USER_SORT_LAST_ACTIVITY:
-                $this->query->orderBy(['last_activity' => SORT_DESC]);
-                break;
-            case self::USER_SORT_RATING:
-                $this->query
-                  ->addSelect(['AVG(reviews.rating) AS rating'])
-                  ->joinWith('reviewsPerformer', false)
-                  ->groupBy('users.id')
-                  ->orderBy(['rating' => SORT_DESC]);
-                break;
-            case self::USER_SORT_COUNT_ORDERS:
-                $this->query
-                  ->addSelect(['COUNT(tasks.performer_id) AS tasks_counter'])
-                  ->joinWith('tasksPerformer', false)
-                  ->groupBy('users.id')
-                  ->orderBy(['tasks_counter' => SORT_DESC]);
-                break;
-            case self::USER_SORT_POPULAR:
-                $this->query->orderBy(['visit_counter' => SORT_DESC]);
-                break;
+        $data = ArrayHelper::getValue($data, $this->formName());
+
+        $this->setFilters($query, $data, $user);
+
+        if (empty($this->search)) {
+            $acc = $data;
+            $data = [];
+            $data[$this->formName()] = $acc;
+        } else {
+            $data = []; // reset filters
+            $data[$this->formName()] = $this->search;
+        }
+
+        return $data;
+    }
+
+    private function setFilters(ActiveQuery $query, array $data, Users $user): void
+    {
+        $this->setCategoriesFilter($query, $data);
+
+        $this->setExtraFieldsFilters($query, $data, $user);
+
+        $this->setSearchFilter($query, $data);
+    }
+
+
+    private function setSort(ActiveQuery $query, array $data): void
+    {
+        $sort = is_null(ArrayHelper::getValue($data, 'sort'))
+          ? static::SORT_LAST_ACTIVITY
+          : ArrayHelper::getValue($data, 'sort');
+
+        $sorts = [
+          static::SORT_LAST_ACTIVITY => [$this, 'setSortLastActivity'],
+          static::SORT_RATING => [$this, 'setSortRating'],
+          static::SORT_COUNT_ORDERS => [$this, 'setSortCountOrders'],
+          static::SORT_POPULAR => [$this, 'setSortPopular'],
+        ];
+
+        foreach ($sorts as $item) {
+            if (ArrayHelper::keyExists($sort, $sorts)) {
+                call_user_func($sorts[$sort], $query);
+            }
         }
     }
 
-    public function setFilters(): void
+    private function setSortLastActivity(ActiveQuery $query): void
     {
-        $user = new Users();
+        $query->orderBy(['last_activity' => SORT_DESC]);
 
-        $this->setCategoriesFilter();
-
-        $this->setExtraFieldsFilters($user);
-
-        $this->inQuery = array_diff($this->inQuery, $this->outQuery);
-
-        $this->query->andFilterWhere(['id' => $this->inQuery]);
-
-        $this->setSearchFilter();
+        $this->sort = static::SORT_LAST_ACTIVITY;
     }
 
-    private function setCategoriesFilter(): void
+    private function setSortRating(ActiveQuery $query): void
     {
-        if (!empty(ArrayHelper::getValue($this->data, 'categories'))) {
-            $performers = UsersSpecializations::find()
-              ->distinct()
-              ->select(['performer_id'])
-              ->andFilterWhere(['category_id' => ArrayHelper::getValue($this->data, 'categories')])
-              ->column();
+        $query->addSelect(['AVG(reviews.rating) AS rating'])
+          ->joinWith('reviewsPerformer', false)
+          ->groupBy('users.id')
+          ->orderBy(['rating' => SORT_DESC]);
 
-            $this->inQuery = $performers;
+        $this->sort = static::SORT_RATING;
+    }
+
+    private function setSortCountOrders(ActiveQuery $query): void
+    {
+        $query->addSelect(['COUNT(tasks.performer_id) AS tasks_counter'])
+          ->joinWith('tasksPerformer', false)
+          ->groupBy('users.id')
+          ->orderBy(['tasks_counter' => SORT_DESC]);
+
+        $this->sort = static::SORT_COUNT_ORDERS;
+    }
+
+    private function setSortPopular(ActiveQuery $query): void
+    {
+        $query->orderBy(['visit_counter' => SORT_DESC]);
+
+        $this->sort = static::SORT_POPULAR;
+    }
+
+    private function setCategoriesFilter(ActiveQuery $query, array $data): void
+    {
+        if (!empty($categories = ArrayHelper::getValue($data, 'categories'))) {
+            $query->andFilterWhere(['id' => UsersSpecializations::getPerformersInCategories($categories)->column()]);
         }
     }
 
@@ -159,74 +197,60 @@ class UsersFiltersForm extends Model
      * Метод сбрасывает все выбранные фильтры
      * и ищет пользователя с нестрогим совпадением по его имени и фамилии.
      */
-    private function setSearchFilter(): void
+    private function setSearchFilter(ActiveQuery $query, array $data): void
     {
-        $search = (string)ArrayHelper::getValue($this->data, 'search');
-
-        if (!empty($search)) {
-            $this->query->where([
-              'LIKE',
-              "CONCAT(first_name, '', last_name)",
-              $search
-            ]);
+        if (!empty($search = (string)ArrayHelper::getValue($data, 'search'))) {
+            $this->search = $search;
+            $query->where(['id' => Users::findByUserName($search)->column()]);
         }
     }
 
-    private function setExtraFieldsFilters(Users $user): void
+    private function setExtraFieldsFilters(ActiveQuery $query, array $data, Users $user): void
     {
-        $extraFields = $this->getExtraFields();
-
-        if (!empty($extraFields)) {
+        if (!empty($extraFields = $this->getExtraFields($data))) {
             $extraFieldsFilters = [
-              self::FREE_NOW => [$this, 'setFreeNowExtraFieldsFilter'],
-              self::ONLINE_NOW => [$this, 'setOnlineNowExtraFieldsFilter'],
-              self::HAS_REVIEWS => [$this, 'setHasReviewsExtraFieldsFilter'],
-              self::FAVORITES => [$this, 'setFavoritesExtraFieldsFilter']
+              static::FREE_NOW => [$this, 'setFreeNowExtraFieldsFilter'],
+              static::ONLINE_NOW => [$this, 'setOnlineNowExtraFieldsFilter'],
+              static::HAS_REVIEWS => [$this, 'setHasReviewsExtraFieldsFilter'],
+              static::FAVORITES => [$this, 'setFavoritesExtraFieldsFilter']
             ];
 
             foreach ($extraFields as $extraField) {
                 if (ArrayHelper::keyExists($extraField, $extraFieldsFilters)) {
-                    call_user_func($extraFieldsFilters[$extraField], $user);
+                    call_user_func($extraFieldsFilters[$extraField], $query, $user);
                 }
             }
         }
     }
 
-    private function setFreeNowExtraFieldsFilter(Users $user): void
+    private function setFreeNowExtraFieldsFilter(ActiveQuery $query, Users $user): void
     {
-        $this->outQuery = ArrayHelper::merge($this->outQuery, $user->getPerformersHasTasksNow());
+        $query->andFilterWhere(['NOT IN', 'id', $user->getPerformersHasTasksNow()]);
     }
 
-    private function setOnlineNowExtraFieldsFilter(): void
+    private function setOnlineNowExtraFieldsFilter(ActiveQuery $query): void
     {
-        $this->query->andFilterWhere([
+        $query->andFilterWhere([
           '>',
           'last_activity',
           new Expression('CURRENT_TIMESTAMP - INTERVAL 1800 SECOND')
         ]);
     }
 
-    private function setHasReviewsExtraFieldsFilter(Users $user): void
+    private function setHasReviewsExtraFieldsFilter(ActiveQuery $query, Users $user): void
     {
-        $this->inQuery = empty($this->inQuery)
-          ? $user->getPerformersHasReviews()
-          : array_intersect($this->inQuery, $user->getPerformersHasReviews());
+        $query->andFilterWhere(['id' => $user->getPerformersHasReviews()]);
     }
 
-
-    private function setFavoritesExtraFieldsFilter(Users $user): void
+    private function setFavoritesExtraFieldsFilter(ActiveQuery $query, Users $user): void
     {
         $userID = 1; // TODO исправить когда появится возможность добавлять в избранное
 
-        $this->inQuery = empty($this->inQuery)
-          ? $user->getBookmarkedUsersForUser($userID)
-          : array_intersect($this->inQuery, $user->getBookmarkedUsersForUser($userID));
+        $query->andFilterWhere(['id' => $user->getBookmarkedUsersForUser($userID)]);
     }
 
-    private function getExtraFields(): array
+    private function getExtraFields(array $data): array
     {
-        $extraFields = ArrayHelper::getValue($this->data, 'extraFields');
-
-        return empty($extraFields) ? [] : $extraFields;
+        return empty($extraFields = ArrayHelper::getValue($data, 'extraFields')) ? [] : $extraFields;
     }
 }

@@ -5,6 +5,7 @@ namespace frontend\controllers;
 use frontend\models\Categories;
 use frontend\models\forms\TasksFilterForms;
 use frontend\models\Tasks;
+use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
@@ -20,10 +21,7 @@ class TasksController extends Controller
      */
     public function actionIndex()
     {
-        $categories = Categories::find()
-          ->select(['id', 'name'])
-          ->asArray()
-          ->all();
+        $categories = ArrayHelper::map(Categories::find()->select(['id', 'name'])->all(), 'id', 'name');
 
         $searchModel = new TasksFilterForms();
 
@@ -37,10 +35,8 @@ class TasksController extends Controller
 
     public function actionView(int $id)
     {
-        $task = Tasks::findOne($id);
-
-        if (!$task) {
-            throw new NotFoundHttpException();
+        if (!($task = Tasks::findOne($id))) {
+            throw new NotFoundHttpException;
         }
 
         return $this->render('view', compact('task'));

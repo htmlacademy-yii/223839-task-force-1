@@ -14,7 +14,7 @@ use Yii;
  * @property Users $user
  * @property Users $bookmarkedUser
  */
-class Bookmarked_users extends \yii\db\ActiveRecord
+class BookmarkedUsers extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -32,8 +32,8 @@ class Bookmarked_users extends \yii\db\ActiveRecord
         return [
             [['user_id', 'bookmarked_user_id'], 'required'],
             [['user_id', 'bookmarked_user_id'], 'integer'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['user_id' => 'id']],
-            [['bookmarked_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['bookmarked_user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['bookmarked_user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['bookmarked_user_id' => 'id']],
         ];
     }
 
@@ -56,7 +56,7 @@ class Bookmarked_users extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(Users::className(), ['id' => 'user_id']);
+        return $this->hasOne(Users::class, ['id' => 'user_id']);
     }
 
     /**
@@ -66,6 +66,6 @@ class Bookmarked_users extends \yii\db\ActiveRecord
      */
     public function getBookmarkedUser()
     {
-        return $this->hasOne(Users::className(), ['id' => 'bookmarked_user_id']);
+        return $this->hasOne(Users::class, ['id' => 'bookmarked_user_id']);
     }
 }

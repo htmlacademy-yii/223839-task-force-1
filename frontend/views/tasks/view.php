@@ -15,7 +15,7 @@ $this->title = $task->title;
         <div class="content-view__card-wrapper">
             <div class="content-view__header">
                 <div class="content-view__headline">
-                    <?= Html::tag('h1', Html::encode($task->title)) ?>
+                    <h1><?= Html::encode($task->title) ?></h1>
                     <span>Размещено в категории
                         <?= Html::a(
                           Html::encode($task->category->name),
@@ -79,13 +79,13 @@ $this->title = $task->title;
                         <div class="feedback-card__top--name">
                             <p>
                                 <?= Html::a(
-                                  Html::encode("{$response->performer->first_name} {$response->performer->last_name}"),
+                                  Html::encode($response->performer->getFullName()),
                                   ['users/view', 'id' => $response->performer_id],
                                   ['class' => 'link-regular']
                                 ) ?>
                             </p>
                             <?php
-                            $rating = $response->performer->getPerformerRating();
+                            $rating = $response->performer->getRating();
 
                             for ($i = 0; $i < 5; $i++) {
                                 if ($i < floor($rating)) {
@@ -97,11 +97,9 @@ $this->title = $task->title;
                             echo "<b>{$rating}<b>";
                             ?>
                         </div>
-                        <?= Html::tag(
-                          'span',
-                          Yii::$app->formatter->asRelativeTime($response->response_date),
-                          ['class' => 'new-task__time']
-                        ) ?>
+                        <span class="new-task__time">
+                            <?= Yii::$app->formatter->asRelativeTime($response->response_date) ?>
+                        </span>
                     </div>
                     <div class="feedback-card__content">
                         <p><?= Html::encode($response->text) ?></p>
@@ -128,7 +126,7 @@ $this->title = $task->title;
                 <img src="../img/man-brune.jpg" width="62" height="62" alt="Аватар заказчика">
                 <div class="profile-mini__name five-stars__rate">
                     <p>
-                        <?= Html::encode("{$task->author->first_name} {$task->author->last_name} ") ?>
+                        <?= Html::encode($task->author->getFullName()) ?>
                     </p>
                 </div>
             </div>
