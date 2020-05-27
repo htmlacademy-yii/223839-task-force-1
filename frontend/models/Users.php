@@ -203,7 +203,7 @@ class Users extends \yii\db\ActiveRecord
         return $this->hasMany(Tasks::class, ['performer_id' => 'id']);
     }
 
-    public function getPerformersHasTasksNow(): array
+    public static function getPerformersHasTasksNow(): array
     {
         return Tasks::find()
           ->distinct()
@@ -212,12 +212,12 @@ class Users extends \yii\db\ActiveRecord
           ->column();
     }
 
-    public function getPerformersHasReviews(): array
+    public static function getPerformersHasReviews(): array
     {
         return Reviews::find()->distinct()->select(['performer_id'])->column();
     }
 
-    public function getBookmarkedUsersForUser(int $id): array
+    public static function getBookmarkedUsersForUser(int $id): array
     {
         return BookmarkedUsers::find()
           ->distinct()
@@ -283,7 +283,7 @@ class Users extends \yii\db\ActiveRecord
 
     public function getAge(array $options = []): string
     {
-        $options = array_merge(self::COUNTER_OPTIONS, $options);
+        $options = array_merge(static::COUNTER_OPTIONS, $options);
 
         $age = date('Y', time()) - Yii::$app->formatter->asDate($this->birthday, 'Y');
 
@@ -303,7 +303,7 @@ class Users extends \yii\db\ActiveRecord
 
     public function getCountTasks(array $options = [])
     {
-        $options = array_merge(self::COUNTER_OPTIONS, $options);
+        $options = array_merge(static::COUNTER_OPTIONS, $options);
 
         $counter = $this->isPerformer() ? count($this->tasksPerformer) : count($this->tasksCustomer);
 
@@ -323,7 +323,7 @@ class Users extends \yii\db\ActiveRecord
 
     public function getCountReviews(array $options = [])
     {
-        $options = array_merge(self::COUNTER_OPTIONS, $options);
+        $options = array_merge(static::COUNTER_OPTIONS, $options);
 
         $counter = $this->isPerformer() ? count($this->reviewsPerformer) : count($this->reviewsCustomer);
 
@@ -343,7 +343,7 @@ class Users extends \yii\db\ActiveRecord
 
     public function getCountYearsOnSite(array $options = []): string
     {
-        $options = array_merge(self::COUNTER_OPTIONS, $options);
+        $options = array_merge(static::COUNTER_OPTIONS, $options);
 
         $counter = date('Y', time()) - Yii::$app->formatter->asDate($this->date_joined, 'Y');
 
@@ -402,17 +402,17 @@ class Users extends \yii\db\ActiveRecord
         $this->password = \Yii::$app->getSecurity()->generatePasswordHash($password);
     }
 
-    public function updateLstActivity(): void
+    public function updateLastActivity(): void
     {
         $this->last_activity = date('Y-m-d H:i:s', time());
     }
 
-    public function isPerformer()
+    public function isPerformer(): bool
     {
         return $this->role === static::ROLE_PERFORMER;
     }
 
-    public function isCustomer()
+    public function isCustomer(): bool
     {
         return $this->role === static::ROLE_CUSTOMER;
     }

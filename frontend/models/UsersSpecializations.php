@@ -2,6 +2,8 @@
 
 namespace frontend\models;
 
+use yii\db\ActiveQuery;
+
 /**
  * This is the model class for table "users_specializations".
  *
@@ -59,7 +61,7 @@ class UsersSpecializations extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function getPerformersInCategories(array $categories)
+    public static function getPerformersInCategories(array $categories): ActiveQuery
     {
         return static::find()->distinct()->select(['performer_id'])->where(['category_id' => $categories]);
     }

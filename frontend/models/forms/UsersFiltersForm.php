@@ -24,10 +24,10 @@ class UsersFiltersForm extends Model
 
     public $categories = '';
     public $extraFields = '';
-    public $search = '';
-    public $sort = self::SORT_LAST_ACTIVITY;
+    public string $search = '';
+    public string $sort = self::SORT_LAST_ACTIVITY;
 
-    public function attributeLabels(): array
+    public function attributeLabels()
     {
         return [
           'categories' => 'Категории',
@@ -37,7 +37,7 @@ class UsersFiltersForm extends Model
         ];
     }
 
-    public function rules(): array
+    public function rules()
     {
         return [
           [['categories', 'extraFields', 'search'], 'safe']
@@ -64,7 +64,7 @@ class UsersFiltersForm extends Model
         ];
     }
 
-    public function search(array $data, Users $user): ActiveDataProvider
+    public function search(array $data): ActiveDataProvider
     {
         $query = Users::find()
           ->select(['users.*'])
@@ -91,11 +91,15 @@ class UsersFiltersForm extends Model
           ]
         ]);
 
-        if (!ArrayHelper::keyExists($this->formName(), $data) || ArrayHelper::keyExists('sort', $data)) {
+        if ($this->isLoadWithoutFilters($data)) {
             return $dataProvider;
         }
 
-        $data = $this->getFilterData($query, $data, $user);
+        $data = $this->getFilterData($data);
+
+        $this->setFilters($query, $data);
+
+        $data = $this->getReadyDataToLoad($query, $data);
 
         if ($this->validate()) {
             $this->load($data);
@@ -104,38 +108,24 @@ class UsersFiltersForm extends Model
         return $dataProvider;
     }
 
-    private function getFilterData(ActiveQuery $query, array $data, Users $user): array
+    private function getReadyDataToLoad(ActiveQuery $query, array $data): array
     {
-        $data = ArrayHelper::getValue($data, $this->formName());
-
-        $this->setFilters($query, $data, $user);
-
         if (empty($this->search)) {
-            $acc = $data;
+            $accumulated = $data;
             $data = [];
-            $data[$this->formName()] = $acc;
+            $data[$this->formName()] = $accumulated;
         } else {
-            $data = []; // reset filters
+            $data = []; // reset filters to form
             $data[$this->formName()] = $this->search;
         }
 
         return $data;
     }
 
-    private function setFilters(ActiveQuery $query, array $data, Users $user): void
-    {
-        $this->setCategoriesFilter($query, $data);
-
-        $this->setExtraFieldsFilters($query, $data, $user);
-
-        $this->setSearchFilter($query, $data);
-    }
-
-
     private function setSort(ActiveQuery $query, array $data): void
     {
-        $sort = is_null(ArrayHelper::getValue($data, 'sort'))
-          ? static::SORT_LAST_ACTIVITY
+        $sorting = is_null(ArrayHelper::getValue($data, 'sort'))
+          ? static::SORT_LAST_ACTIVITY // default sorting
           : ArrayHelper::getValue($data, 'sort');
 
         $sorts = [
@@ -146,8 +136,8 @@ class UsersFiltersForm extends Model
         ];
 
         foreach ($sorts as $item) {
-            if (ArrayHelper::keyExists($sort, $sorts)) {
-                call_user_func($sorts[$sort], $query);
+            if (ArrayHelper::keyExists($sorting, $sorts)) {
+                call_user_func($sorts[$sorting], $query);
             }
         }
     }
@@ -186,6 +176,30 @@ class UsersFiltersForm extends Model
         $this->sort = static::SORT_POPULAR;
     }
 
+    private function setFilters(ActiveQuery $query, array $data): void
+    {
+        $this->setCategoriesFilter($query, $data);
+
+        $this->setExtraFieldsFilters($query, $data);
+
+        $this->setSearchByUserNameFilter($query, $data);
+    }
+
+    /**
+     * if the search field is not empty, resets the all filters
+     *
+     * @param ActiveQuery $query
+     * @param array $data
+     */
+    private function setSearchByUserNameFilter(ActiveQuery $query, array $data): void
+    {
+        if (!empty($search = (string)ArrayHelper::getValue($data, 'search'))) {
+            $this->search = $search;
+
+            $query->where(['id' => Users::findByUserName($search)->column()]);
+        }
+    }
+
     private function setCategoriesFilter(ActiveQuery $query, array $data): void
     {
         if (!empty($categories = ArrayHelper::getValue($data, 'categories'))) {
@@ -193,19 +207,7 @@ class UsersFiltersForm extends Model
         }
     }
 
-    /**
-     * Метод сбрасывает все выбранные фильтры
-     * и ищет пользователя с нестрогим совпадением по его имени и фамилии.
-     */
-    private function setSearchFilter(ActiveQuery $query, array $data): void
-    {
-        if (!empty($search = (string)ArrayHelper::getValue($data, 'search'))) {
-            $this->search = $search;
-            $query->where(['id' => Users::findByUserName($search)->column()]);
-        }
-    }
-
-    private function setExtraFieldsFilters(ActiveQuery $query, array $data, Users $user): void
+    private function setExtraFieldsFilters(ActiveQuery $query, array $data): void
     {
         if (!empty($extraFields = $this->getExtraFields($data))) {
             $extraFieldsFilters = [
@@ -217,15 +219,15 @@ class UsersFiltersForm extends Model
 
             foreach ($extraFields as $extraField) {
                 if (ArrayHelper::keyExists($extraField, $extraFieldsFilters)) {
-                    call_user_func($extraFieldsFilters[$extraField], $query, $user);
+                    call_user_func($extraFieldsFilters[$extraField], $query);
                 }
             }
         }
     }
 
-    private function setFreeNowExtraFieldsFilter(ActiveQuery $query, Users $user): void
+    private function setFreeNowExtraFieldsFilter(ActiveQuery $query): void
     {
-        $query->andFilterWhere(['NOT IN', 'id', $user->getPerformersHasTasksNow()]);
+        $query->andFilterWhere(['NOT IN', 'id', Users::getPerformersHasTasksNow()]);
     }
 
     private function setOnlineNowExtraFieldsFilter(ActiveQuery $query): void
@@ -237,20 +239,30 @@ class UsersFiltersForm extends Model
         ]);
     }
 
-    private function setHasReviewsExtraFieldsFilter(ActiveQuery $query, Users $user): void
+    private function setHasReviewsExtraFieldsFilter(ActiveQuery $query): void
     {
-        $query->andFilterWhere(['id' => $user->getPerformersHasReviews()]);
+        $query->andFilterWhere(['id' => Users::getPerformersHasReviews()]);
     }
 
-    private function setFavoritesExtraFieldsFilter(ActiveQuery $query, Users $user): void
+    private function setFavoritesExtraFieldsFilter(ActiveQuery $query): void
     {
         $userID = 1; // TODO исправить когда появится возможность добавлять в избранное
 
-        $query->andFilterWhere(['id' => $user->getBookmarkedUsersForUser($userID)]);
+        $query->andFilterWhere(['id' => Users::getBookmarkedUsersForUser($userID)]);
     }
 
     private function getExtraFields(array $data): array
     {
         return empty($extraFields = ArrayHelper::getValue($data, 'extraFields')) ? [] : $extraFields;
+    }
+
+    private function isLoadWithoutFilters(array $data): bool
+    {
+        return !ArrayHelper::keyExists($this->formName(), $data) || ArrayHelper::keyExists('sort', $data);
+    }
+
+    private function getFilterData($data)
+    {
+        return ArrayHelper::getValue($data, $this->formName());
     }
 }

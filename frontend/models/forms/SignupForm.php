@@ -12,9 +12,6 @@ class SignupForm extends Model
     public string $password = '';
     public int $city_id = 0;
 
-    private string $firstName = '';
-    private string $lastName = '';
-
     public function rules()
     {
         return array_merge(
@@ -36,7 +33,7 @@ class SignupForm extends Model
         ];
     }
 
-    public static function usernameRules()
+    public static function usernameRules(): array
     {
         return [
           [['user_name', 'email'], 'trim'],
@@ -51,7 +48,7 @@ class SignupForm extends Model
         ];
     }
 
-    public static function emailRules()
+    public static function emailRules(): array
     {
         return [
           ['email', 'unique', 'targetClass' => Users::class, 'message' => "{attribute} {value} уже используется"],

@@ -68,11 +68,15 @@ class TasksFilterForms extends Model
 
         $dataProvider = new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => 5]]);
 
-        if (!ArrayHelper::keyExists($this->formName(), $data)) {
+        if ($this->isLoadWithoutFilters($data)) {
             return $dataProvider;
         }
 
-        $data = $this->getFilterData($query, $data);
+        $data = $this->getFilterData($data);
+
+        $this->setFilters($query, $data);
+
+        $data = $this->getReadyDataToLoad($query, $data);
 
         if ($this->validate()) {
             $this->load($data);
@@ -81,15 +85,11 @@ class TasksFilterForms extends Model
         return $dataProvider;
     }
 
-    private function getFilterData(ActiveQuery $query, array $data): array
+    private function getReadyDataToLoad(ActiveQuery $query, array $data): array
     {
-        $data = ArrayHelper::getValue($data, $this->formName());
-
-        $this->setFilters($query, $data);
-
-        $acc = $data;
+        $accumulated = $data;
         $data = [];
-        $data[$this->formName()] = $acc;
+        $data[$this->formName()] = $accumulated;
 
         return $data;
     }
@@ -169,5 +169,15 @@ class TasksFilterForms extends Model
     private function getExtraFields(array $data): array
     {
         return empty($extraFields = ArrayHelper::getValue($data, 'extraFields')) ? [] : $extraFields;
+    }
+
+    private function isLoadWithoutFilters(array $data): bool
+    {
+        return !ArrayHelper::keyExists($this->formName(), $data);
+    }
+
+    private function getFilterData($data): array
+    {
+        return ArrayHelper::getValue($data, $this->formName());
     }
 }

@@ -17,9 +17,8 @@ class UsersController extends Controller
         $sorts = UsersFiltersForm::getSortsList();
 
         $searchModel = new UsersFiltersForm();
-        $user = new Users();
 
-        $dataProvider = $searchModel->search(\Yii::$app->request->queryParams, $user);
+        $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
 
         $pagination = $dataProvider->getPagination();
         $performers = $dataProvider->getModels();

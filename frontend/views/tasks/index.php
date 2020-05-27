@@ -26,10 +26,12 @@ $this->title = "TaskForce";
                           ['class' => 'link-regular']
                         ) ?>
                     </h2>
-                    <?= Html::a('<p>' . Html::encode($task->category->name) . '</p>',
-                      ['#'],
-                      ['class' => 'new-task__type link-regular']
-                    ) ?>
+                    <p>
+                        <?= Html::a(Html::encode($task->category->name),
+                          ['#'],
+                          ['class' => 'new-task__type link-regular']
+                        ) ?>
+                    </p>
                 </div>
                 <div class="new-task__icon new-task__icon--<?= $task->category->icon ?>"></div>
                 <p class="new-task_description"><?= HTMLPurifier::process($task->description) ?></p>
