@@ -157,7 +157,7 @@ class TasksFilterForms extends Model
 
     private function setSearchFilter(ActiveQuery $query, array $data): void
     {
-        if (isset($data['search']) && $search = (string)ArrayHelper::getValue($data, 'search')) {
+        if (isset($data['search']) && !empty($search = (string)ArrayHelper::getValue($data, 'search'))) {
             $query->andFilterWhere(['LIKE', 'title', $search]);
         }
     }

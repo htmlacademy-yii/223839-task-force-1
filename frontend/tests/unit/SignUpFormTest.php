@@ -65,7 +65,7 @@ class SignUpFormTest extends \Codeception\Test\Unit
     /**
      * @dataProvider getWrongVariantsName
      */
-    public function testUserRegisterWrong($name)
+    public function testUserRegisterWrongName($name)
     {
         $model = $this->make(SignupForm::class, [
           'user_name' => $name,
@@ -76,8 +76,8 @@ class SignUpFormTest extends \Codeception\Test\Unit
 
         $message = "{$name}";
 
-        $this->assertFalse($model->validate(), $name);
-        $this->assertFalse($model->register(), $name);
+        $this->assertFalse($model->validate(), $message);
+        $this->assertFalse($model->register(), $message);
     }
 
     public function getWrongVariantsName()
@@ -94,6 +94,40 @@ class SignUpFormTest extends \Codeception\Test\Unit
           'User' => ['User'],
           '!!! !!!' => ['!!! !!!'],
           '!!!' => ['!!!'],
+        ];
+    }
+
+    /**
+     * @dataProvider getWrongVariantsEmail
+     */
+    public function testUserRegisterWrongEmail($email)
+    {
+        $model = $this->make(SignupForm::class, [
+          'user_name' => 'bill lading',
+          'city_id' => 1,
+          'email' => $email,
+          'password' => 'dpkjvfqvtyz',
+        ]);
+
+        $message = "{email}";
+
+        $this->assertFalse($model->validate(), $message);
+        $this->assertFalse($model->register(), $message);
+    }
+
+    public function getWrongVariantsEmail()
+    {
+        return [
+          'eml' => ['em1'],
+          'Bill Of Lading@mal.ru' => ['Bill Of Lading@mal.ru'],
+          'Ladin12g@Bill' => ['Ladin12g@Bill'],
+          'Лэдинг @бил @biz name' => ['Лэдинг @бил @biz name'],
+          'Usa@_Lading.com' => ['Usa@_Lading.com'],
+          'asdasd@sadasds232.com' => ['asdasd@sadasds232.com'],
+          'asdasd' => ['asdasd'],
+          '21312 123123' => ['21312 123123'],
+          '!!!@!!!.rus' => ['!!!@!!!.rus'],
+          'lasing,bill@mail.com' => ['lasing,bill@mail.com'],
         ];
     }
 }
