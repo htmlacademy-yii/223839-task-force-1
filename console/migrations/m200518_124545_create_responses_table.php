@@ -12,6 +12,12 @@ class m200518_124545_create_responses_table extends Migration
      */
     public function safeUp()
     {
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+        }
+
         $this->createTable('{{%responses}}', [
           'id' => $this->primaryKey()->unsigned(),
           'task_id' => $this->integer()->unsigned()->notNull(),
@@ -19,7 +25,7 @@ class m200518_124545_create_responses_table extends Migration
           'response_date' => $this->timestamp()->notNull(),
           'text' => $this->text()->notNull(),
           'offer_price' => $this->integer()->notNull()
-        ]);
+        ], $tableOptions);
 
         $this->createIndex(
           'performer_id',

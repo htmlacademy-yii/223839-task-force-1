@@ -118,7 +118,7 @@ $this->title = "TaskForce";
                   string $value
                 ) use ($loadCategories) : string {
                     $checked = ($checked === true) ? 'checked' : '';
-                    $id = "category-{$index}";
+                    $id = "category-{$value}";
 
                     return "<input type='checkbox' id='{$id}' name='{$name}'
                     class='visually-hidden checkbox__input' value='{$value}' {$checked}>
@@ -140,7 +140,7 @@ $this->title = "TaskForce";
                   string $value
                 ) use ($loadExtraFields) : string {
                     $checked = ($checked === true) ? 'checked' : '';
-                    $id = "extraFields-{$index}";
+                    $id = "extraFields-{$value}";
 
                     return "<input type='checkbox' id='{$id}' name='{$name}'
                     class='visually-hidden checkbox__input' value='{$value}' {$checked}>

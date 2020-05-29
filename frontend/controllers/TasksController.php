@@ -36,7 +36,7 @@ class TasksController extends Controller
     public function actionView(int $id)
     {
         if (!($task = Tasks::findOne($id))) {
-            throw new NotFoundHttpException;
+            throw new NotFoundHttpException();
         }
 
         return $this->render('view', compact('task'));

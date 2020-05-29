@@ -10,7 +10,7 @@ class SignupForm extends Model
     public string $email = '';
     public string $user_name = '';
     public string $password = '';
-    public int $city_id = 0;
+    public int $city_id = 1;
 
     public function rules()
     {
@@ -52,8 +52,8 @@ class SignupForm extends Model
     {
         return [
           ['email', 'unique', 'targetClass' => Users::class, 'message' => "{attribute} {value} уже используется"],
-          ['email', 'email'],
-          ['email', 'match', 'pattern' => '/^([\w+\.]+@[а-яa-z]+\.[a-zа-я]+)$/sui'],
+          //          ['email', 'email'],
+          ['email', 'match', 'pattern' => '/^([0-9a-zа-я\.]+@)([а-яa-z]{2,}\.)+([a-zа-я]{2,})+$/sui'],
           [['email'], 'string', 'min' => 3, 'max' => 50],
         ];
     }
@@ -62,21 +62,24 @@ class SignupForm extends Model
     {
         $user = $this->factoryUser();
 
-        return $user->save();
+        if ($this->validate()) {
+            return $user->save();
+        }
+        return false;
     }
 
-    public function factoryUser(): Users
+    private function factoryUser(): Users
     {
-        [$firstName, $lastName] = explode(' ', $this->user_name);
+        [$firstName, $lastName] = explode(' ', $this->user_name . ' ');
 
         $user = new Users();
         $user->email = $this->email;
         $user->first_name = $firstName;
         $user->last_name = $lastName;
-        $user->city_id = $this->city_id;
+        $user->city_id = empty($this->city_id) ? 1 : $this->city_id;
         $user->role = $user::ROLE_PERFORMER;
-        $user->date_joined = date('Y-m-d H:i:s', time());
-        $user->last_activity = date('Y-m-d H:i:s', time());
+        $user->date_joined = \Yii::$app->formatter->asDate('now', 'php:Y-m-d H:i:s');
+        $user->last_activity = \Yii::$app->formatter->asDate('now', 'php:Y-m-d H:i:s');
         $user->setPassword($this->password);
 
         return $user;

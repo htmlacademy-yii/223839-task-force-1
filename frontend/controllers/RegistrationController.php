@@ -19,6 +19,8 @@ class RegistrationController extends Controller
             if ($model->validate() && $model->register()) {
                 \Yii::$app->session->setFlash('success', 'You have successfully registered');
                 return $this->goHome();
+            } else {
+                \Yii::$app->session->setFlash('error', 'error has occurred, try again');
             }
         }
 

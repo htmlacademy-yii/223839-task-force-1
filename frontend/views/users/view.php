@@ -72,10 +72,10 @@ $this->title = Html::encode($user->getFullName());
         </div>
     </div>
     <div class="content-view__feedback">
-        <h2>Отзывы<span>(<?= $user->countReviews ?>)</span></h2>
+        <h2>Отзывы<span>(<?= $user->getCountReviews() ?>)</span></h2>
         <div class="content-view__feedback-wrapper reviews-wrapper">
             <?php
-            foreach ($user->reviewsPerformer as $review) : ?>
+            foreach ($user->getReviews() as $review) : ?>
                 <div class="feedback-card__reviews">
                     <p class="link-task link">Задание
                         <?= Html::a(

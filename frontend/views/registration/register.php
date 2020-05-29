@@ -18,8 +18,9 @@ $this->title = 'Registration';
         $form = \yii\widgets\ActiveForm::begin([
           'method' => 'POST',
           'action' => ['/signup'],
-          'id' => 'SignUp-form',
+          'id' => 'signup-form',
           'errorCssClass' => 'input-danger',
+          'enableClientValidation' => true,
           'options' => [
             'class' => 'registration__user-form form-create'
           ]
@@ -67,6 +68,12 @@ $this->title = 'Registration';
           ->error(['tag' => 'span'])
           ->hint('Длина пароля от 8 символов', ['tag' => 'span'])
         ?>
+
+        <?php
+        if (Yii::$app->session->hasFlash('error')) : ?>
+            <?= Yii::$app->session->getFlash('error') ?>
+        <?php
+        endif; ?>
 
         <?= Html::submitButton('Создать аккаунт', ['class' => 'button button__registration']) ?>
 

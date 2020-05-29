@@ -66,12 +66,6 @@ class TasksFilterForms extends Model
           ->with(['city', 'category', 'responses'])
           ->orderBy(['created_at' => SORT_DESC]);
 
-        $dataProvider = new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => 5]]);
-
-        if ($this->isLoadWithoutFilters($data)) {
-            return $dataProvider;
-        }
-
         $data = $this->getFilterData($data);
 
         $this->setFilters($query, $data);
@@ -82,7 +76,7 @@ class TasksFilterForms extends Model
             $this->load($data);
         }
 
-        return $dataProvider;
+        return new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => 5]]);
     }
 
     private function getReadyDataToLoad(ActiveQuery $query, array $data): array
@@ -107,7 +101,7 @@ class TasksFilterForms extends Model
 
     private function setExtraFieldsFilter(ActiveQuery $query, array $data): void
     {
-        if (!empty($extraFields = $this->getExtraFields($data))) {
+        if (isset($data['extraFields']) && !empty($extraFields = $this->getExtraFields($data))) {
             $extraFieldsFilters = [
               static::WITHOUT_RESPONSES => [$this, 'setWithoutResponsesExtraFieldsFilter'],
               static::REMOTE_WORK => [$this, 'setRemoteWorkExtraFieldsFilter'],
@@ -135,7 +129,9 @@ class TasksFilterForms extends Model
 
     private function setCategoriesFilter(ActiveQuery $query, array $data): void
     {
-        $query->andFilterWhere(['category_id' => ArrayHelper::getValue($data, 'categories')]);
+        if (isset($data['categories']) && !empty($categories = $data['categories'])) {
+            $query->andFilterWhere(['category_id' => $categories]);
+        }
     }
 
     private function setPeriodFilter(ActiveQuery $query, array $data): void
@@ -161,7 +157,7 @@ class TasksFilterForms extends Model
 
     private function setSearchFilter(ActiveQuery $query, array $data): void
     {
-        if (!empty($search = (string)ArrayHelper::getValue($data, 'search'))) {
+        if (isset($data['search']) && $search = (string)ArrayHelper::getValue($data, 'search')) {
             $query->andFilterWhere(['LIKE', 'title', $search]);
         }
     }
@@ -171,13 +167,8 @@ class TasksFilterForms extends Model
         return empty($extraFields = ArrayHelper::getValue($data, 'extraFields')) ? [] : $extraFields;
     }
 
-    private function isLoadWithoutFilters(array $data): bool
-    {
-        return !ArrayHelper::keyExists($this->formName(), $data);
-    }
-
     private function getFilterData($data): array
     {
-        return ArrayHelper::getValue($data, $this->formName());
+        return is_null($data = ArrayHelper::getValue($data, $this->formName())) ? [] : $data;
     }
 }

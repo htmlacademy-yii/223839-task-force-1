@@ -183,6 +183,11 @@ class Users extends \yii\db\ActiveRecord
         return $this->hasMany(Reviews::class, ['performer_id' => 'id']);
     }
 
+    public function getReviews(): array
+    {
+        return $this->isPerformer() ? $this->getReviewsPerformer()->all() : $this->getReviewsCustomer()->all();
+    }
+
     /**
      * Gets query for [[TasksCustomer]].
      *
@@ -404,7 +409,7 @@ class Users extends \yii\db\ActiveRecord
 
     public function updateLastActivity(): void
     {
-        $this->last_activity = date('Y-m-d H:i:s', time());
+        $this->last_activity = \Yii::$app->formatter->asDate('now', 'php:Y-m-d H:i:s');
     }
 
     public function isPerformer(): bool

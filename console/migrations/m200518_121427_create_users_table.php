@@ -12,6 +12,12 @@ class m200518_121427_create_users_table extends Migration
      */
     public function safeUp()
     {
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+        }
+
         $this->createTable('{{%users}}', [
           'id' => $this->primaryKey()->unsigned(),
           'first_name' => $this->char(30)->notNull(),
@@ -35,7 +41,7 @@ class m200518_121427_create_users_table extends Migration
           'skype' => $this->char(50)->null(),
           'telegram' => $this->char(50)->null(),
           'visit_counter' => $this->integer()->unsigned()->defaultValue(0)->notNull()
-        ]);
+        ], $tableOptions);
 
         $this->createIndex(
           'city_id',

@@ -1,30 +1,17 @@
-<?php
-/* @var $this \yii\web\View */
-
-/* @var $content string */
-
-use frontend\assets\AppAsset;
-use yii\helpers\Html;
-
-AppAsset::register($this);
-?>
-<?php
-$this->beginPage() ?>
 <!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>">
+<html lang="ru-RU">
 <head>
-    <meta charset="<?= Yii::$app->charset ?>">
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <?php
-    $this->registerCsrfMetaTags() ?>
-    <title><?= Html::encode($this->title) ?></title>
-    <?php
-    $this->head() ?>
-</head>
+        <title>Registration</title>
+    <meta name="csrf-param" content="_csrf-frontend">
+<meta name="csrf-token" content="NrGLgqAql-mO3PHsQHy4OrfseIsIcukoGNrW2Bkyvd8BweK66WLIj8Obso0rRIBi5MEt2GkwvmxPu4CfYXjpsg==">
+
+<link href="/assets/25827c9b/css/bootstrap.css" rel="stylesheet">
+<link href="/css/normalize.css" rel="stylesheet">
+<link href="/css/style.css" rel="stylesheet"></head>
 <body>
-<?php
-$this->beginBody() ?>
 <div class="table-layout">
     <header class="page-header">
         <div class="main-container page-header__container">
@@ -73,10 +60,10 @@ $this->beginBody() ?>
             <div class="header__nav">
                 <ul class="header-nav__list site-list">
                     <li class="site-list__item">
-                        <a href="<?= \yii\helpers\Url::to(['tasks/']) ?>">Задания</a>
+                        <a href="/index-test.php/tasks">Задания</a>
                     </li>
                     <li class="site-list__item">
-                        <a href="<?= \yii\helpers\Url::to(['users/']) ?>">Исполнители</a>
+                        <a href="/index-test.php/users">Исполнители</a>
                     </li>
                     <li class="site-list__item">
                         <a href="#">Создать задание</a>
@@ -86,72 +73,55 @@ $this->beginBody() ?>
                     </li>
                 </ul>
             </div>
-            <?php
-            if (Yii::$app->controller->id !== 'registration') : ?>
-
-                <div class="header__town">
-                    <select class="multiple-select input town-select" size="1" name="town[]">
-                        <option value="Moscow">Москва</option>
-                        <option selected value="SPB">Санкт-Петербург</option>
-                        <option value="Krasnodar">Краснодар</option>
-                        <option value="Irkutsk">Иркутск</option>
-                        <option value="Vladivostok">Владивосток</option>
-                    </select>
-                </div>
-                <div class="header__lightbulb"></div>
-                <div class="lightbulb__pop-up">
-                    <h3>Новые события</h3>
-                    <p class="lightbulb__new-task lightbulb__new-task--message">
-                        Новое сообщение в чате
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
-                    <p class="lightbulb__new-task lightbulb__new-task--executor">
-                        Выбран исполнитель для
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
-                    <p class="lightbulb__new-task lightbulb__new-task--close">
-                        Завершено задание
-                        <a href="#" class="link-regular">«Помочь с курсовой»</a>
-                    </p>
-                </div>
-                <div class="header__account">
-                    <a class="header__account-photo">
-                        <img src="../img/user-photo.png"
-                             width="43" height="44"
-                             alt="Аватар пользователя">
-                    </a>
-                    <span class="header__account-name">
-                 Василий
-                </span>
-                </div>
-                <div class="account__pop-up">
-                    <ul class="account__pop-up-list">
-                        <li>
-                            <a href="#">Мои задания</a>
-                        </li>
-                        <li>
-                            <a href="#">Настройки</a>
-                        </li>
-                        <li>
-                            <a href="#">Выход</a>
-                        </li>
-                    </ul>
-                </div>
-
-            <?php
-            endif; ?>
-        </div>
+                    </div>
     </header>
 
     <main class="page-main">
         <div class="main-container page-container">
-            <?php
-            if (Yii::$app->session->hasFlash('success')) : ?>
-                <?= Yii::$app->session->getFlash('success') ?>
-            <?php
-            endif; ?>
+            
+            <section class="registration__user">
+    <h1>Регистрация аккаунта</h1>
+    <div class="registration-wrapper">
 
-            <?= $content ?>
+        <form id="signup-form" class="registration__user-form form-create" action="/index-test.php/signup" method="POST">
+<input type="hidden" name="_csrf-frontend" value="NrGLgqAql-mO3PHsQHy4OrfseIsIcukoGNrW2Bkyvd8BweK66WLIj8Obso0rRIBi5MEt2GkwvmxPu4CfYXjpsg==">
+        <div class="form-group field-signupform-email required">
+<label class="control-label" for="signupform-email">Электронная почта</label>
+<textarea id="signupform-email" class="input textarea" name="SignupForm[email]" rows="1" placeholder="user@mail.ru" autofocus aria-required="true"></textarea>
+<span class="hint-block">Введите валидный адрес электронной почты</span>
+<span class="help-block"></span>
+</div>
+        <div class="form-group field-signupform-user_name required">
+<label class="control-label" for="signupform-user_name">Ваше имя и фамилия</label>
+<textarea id="signupform-user_name" class="input textarea" name="SignupForm[user_name]" rows="1" placeholder="Ваше Имя" aria-required="true"></textarea>
+<span class="hint-block">Введите ваше имя и фамилию</span>
+<span class="help-block"></span>
+</div>
+
+        <div class="form-group field-signupform-city_id required">
+<label class="control-label" for="signupform-city_id">Город проживания</label>
+<select id="signupform-city_id" class="multiple-select input town-select registration-town" name="SignupForm[city_id]" size="1" aria-required="true">
+<option value="1" selected>Москва</option>
+<option value="2">Санкт-Петербург</option>
+<option value="3">Новосибирск</option>
+<option value="4">Нижний Новгород</option>
+<option value="5">Чехов</option>
+</select>
+<span class="hint-block">Укажите город, чтобы находить подходящие задачи</span>
+<span class="help-block"></span>
+</div>
+        <div class="form-group field-signupform-password required">
+<label class="control-label" for="signupform-password">Пароль</label>
+<input type="password" id="signupform-password" class="input textarea" name="SignupForm[password]" value="" aria-required="true">
+<span class="hint-block">Длина пароля от 8 символов</span>
+<span class="help-block"></span>
+</div>
+        
+        <button type="submit" class="button button__registration">Создать аккаунт</button>
+        </form>    </div>
+
+</section>
+
         </div>
     </main>
 
@@ -170,16 +140,16 @@ $this->beginBody() ?>
             <div class="page-footer__links">
                 <ul class="links__list">
                     <li class="links__item">
-                        <a href="<?= \yii\helpers\Url::toRoute(['/tasks/index']) ?>">Задания</a>
+                        <a href="/index-test.php/tasks/search">Задания</a>
                     </li>
                     <li class="links__item">
                         <a href="">Мой профиль</a>
                     </li>
                     <li class="links__item">
-                        <a href="<?= \yii\helpers\Url::toRoute(['/users/index']) ?>">Исполнители</a>
+                        <a href="/index-test.php/users/search">Исполнители</a>
                     </li>
                     <li class="links__item">
-                        <a href="<?= \yii\helpers\Url::toRoute(['/signup']) ?>">Регистрация</a>
+                        <a href="/index-test.php/signup">Регистрация</a>
                     </li>
                     <li class="links__item">
                         <a href="">Создать задание</a>
@@ -198,9 +168,7 @@ $this->beginBody() ?>
                 </a>
             </div>
 
-            <?php
-            if (Yii::$app->controller->id === 'registration') : ?>
-                <div class="clipart-woman">
+                            <div class="clipart-woman">
                     <img src="../img/clipart-woman.png" width="238" height="450">
                 </div>
                 <div class="clipart-message">
@@ -212,16 +180,20 @@ $this->beginBody() ?>
                             от 500 рублей в час.</p>
                     </div>
                 </div>
-            <?php
-            endif; ?>
-
+            
         </div>
     </footer>
 
 </div>
-<?php
-$this->endBody() ?>
-</body>
+<script src="/assets/efcc193c/jquery.js"></script>
+<script src="/assets/e3a9dec/yii.js"></script>
+<script src="/assets/e3a9dec/yii.validation.js"></script>
+<script src="/assets/e3a9dec/yii.activeForm.js"></script>
+<script src="/js/vue.js"></script>
+<script src="/js/main.js"></script>
+<script src="/js/dropzone.js"></script>
+<script src="/js/messenger.js"></script>
+<script>jQuery(function ($) {
+jQuery('#signup-form').yiiActiveForm([{"id":"signupform-email","name":"email","container":".field-signupform-email","input":"#signupform-email","validate":function (attribute, value, messages, deferred, $form) {value = yii.validation.trim($form, attribute, [], value);yii.validation.regularExpression(value, messages, {"pattern":/^([0-9a-zа-я\.]+@)([а-яa-z]{2,}\.)+([a-zа-я]{2,})+$/ui,"not":false,"message":"Значение «email» неверно.","skipOnEmpty":1});yii.validation.string(value, messages, {"message":"Значение «email» должно быть строкой.","min":3,"tooShort":"Значение «email» должно содержать минимум 3 символа.","max":50,"tooLong":"Значение «email» должно содержать максимум 50 символов.","skipOnEmpty":1});yii.validation.required(value, messages, {"message":"Поле обязательно для заполнения"});}},{"id":"signupform-user_name","name":"user_name","container":".field-signupform-user_name","input":"#signupform-user_name","validate":function (attribute, value, messages, deferred, $form) {value = yii.validation.trim($form, attribute, [], value);yii.validation.string(value, messages, {"message":"Значение «user name» должно быть строкой.","min":6,"tooShort":"Значение «user name» должно содержать минимум 6 символов.","max":70,"tooLong":"Значение «user name» должно содержать максимум 70 символов.","skipOnEmpty":1});yii.validation.regularExpression(value, messages, {"pattern":/^([a-zа-я-]+)\s([a-zа-я-]+)$/ui,"not":false,"message":"Имя должно соответствовать шаблону Иван Иванов. Нельзя использовать цифры и специальные символы.","skipOnEmpty":1});yii.validation.required(value, messages, {"message":"Поле обязательно для заполнения"});}},{"id":"signupform-city_id","name":"city_id","container":".field-signupform-city_id","input":"#signupform-city_id","validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Поле обязательно для заполнения"});}},{"id":"signupform-password","name":"password","container":".field-signupform-password","input":"#signupform-password","validate":function (attribute, value, messages, deferred, $form) {yii.validation.required(value, messages, {"message":"Поле обязательно для заполнения"});yii.validation.string(value, messages, {"message":"Значение «password» должно быть строкой.","min":8,"tooShort":"Значение «password» должно содержать минимум 8 символов.","max":255,"tooLong":"Значение «password» должно содержать максимум 255 символов.","skipOnEmpty":1});}}], {"errorCssClass":"input-danger"});
+});</script></body>
 </html>
-<?php
-$this->endPage() ?>

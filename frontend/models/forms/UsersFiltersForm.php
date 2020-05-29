@@ -78,7 +78,17 @@ class UsersFiltersForm extends Model
 
         $this->setSort($query, $data);
 
-        $dataProvider = new ActiveDataProvider([
+        $data = $this->getFilterData($data);
+
+        $this->setFilters($query, $data);
+
+        $data = $this->getReadyDataToLoad($query, $data);
+
+        if ($this->validate()) {
+            $this->load($data);
+        }
+
+        return new ActiveDataProvider([
           'query' => $query,
           'pagination' => ['pageSize' => 5],
           'sort' => [
@@ -90,22 +100,6 @@ class UsersFiltersForm extends Model
             ]
           ]
         ]);
-
-        if ($this->isLoadWithoutFilters($data)) {
-            return $dataProvider;
-        }
-
-        $data = $this->getFilterData($data);
-
-        $this->setFilters($query, $data);
-
-        $data = $this->getReadyDataToLoad($query, $data);
-
-        if ($this->validate()) {
-            $this->load($data);
-        }
-
-        return $dataProvider;
     }
 
     private function getReadyDataToLoad(ActiveQuery $query, array $data): array
@@ -193,7 +187,7 @@ class UsersFiltersForm extends Model
      */
     private function setSearchByUserNameFilter(ActiveQuery $query, array $data): void
     {
-        if (!empty($search = (string)ArrayHelper::getValue($data, 'search'))) {
+        if (isset($data['search']) && !empty($search = (string)ArrayHelper::getValue($data, 'search'))) {
             $this->search = $search;
 
             $query->where(['id' => Users::findByUserName($search)->column()]);
@@ -202,14 +196,14 @@ class UsersFiltersForm extends Model
 
     private function setCategoriesFilter(ActiveQuery $query, array $data): void
     {
-        if (!empty($categories = ArrayHelper::getValue($data, 'categories'))) {
+        if (isset($data['categories']) && !empty($categories = ArrayHelper::getValue($data, 'categories'))) {
             $query->andFilterWhere(['id' => UsersSpecializations::getPerformersInCategories($categories)->column()]);
         }
     }
 
     private function setExtraFieldsFilters(ActiveQuery $query, array $data): void
     {
-        if (!empty($extraFields = $this->getExtraFields($data))) {
+        if (isset($data['extraFields']) && !empty($extraFields = $this->getExtraFields($data))) {
             $extraFieldsFilters = [
               static::FREE_NOW => [$this, 'setFreeNowExtraFieldsFilter'],
               static::ONLINE_NOW => [$this, 'setOnlineNowExtraFieldsFilter'],
@@ -256,13 +250,8 @@ class UsersFiltersForm extends Model
         return empty($extraFields = ArrayHelper::getValue($data, 'extraFields')) ? [] : $extraFields;
     }
 
-    private function isLoadWithoutFilters(array $data): bool
-    {
-        return !ArrayHelper::keyExists($this->formName(), $data) || ArrayHelper::keyExists('sort', $data);
-    }
-
     private function getFilterData($data)
     {
-        return ArrayHelper::getValue($data, $this->formName());
+        return is_null($data = ArrayHelper::getValue($data, $this->formName())) ? [] : $data;
     }
 }
