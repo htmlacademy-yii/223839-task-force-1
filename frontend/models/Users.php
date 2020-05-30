@@ -42,7 +42,7 @@ use Yii;
  */
 class Users extends \yii\db\ActiveRecord
 {
-    const ROLE_CUSTOMER = 'CUSTOMER';
+    const ROLE_CUSTOMER  = 'CUSTOMER';
     const ROLE_PERFORMER = 'PERFORMER';
 
     const COUNTER_OPTIONS = [
@@ -74,8 +74,8 @@ class Users extends \yii\db\ActiveRecord
           [
             ['city_id'],
             'exist',
-            'skipOnError' => true,
-            'targetClass' => Cities::class,
+            'skipOnError'     => true,
+            'targetClass'     => Cities::class,
             'targetAttribute' => ['city_id' => 'id']
           ],
         ];
@@ -87,23 +87,23 @@ class Users extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-          'id' => 'ID',
-          'first_name' => 'First Name',
-          'last_name' => 'Last Name',
-          'address' => 'Address',
-          'biography' => 'Biography',
-          'city_id' => 'City ID',
-          'password' => 'Password',
-          'birthday' => 'Birthday',
-          'role' => 'Role',
-          'is_public' => 'Is Public',
-          'avatar' => 'Avatar',
-          'date_joined' => 'Date Joined',
+          'id'            => 'ID',
+          'first_name'    => 'First Name',
+          'last_name'     => 'Last Name',
+          'address'       => 'Address',
+          'biography'     => 'Biography',
+          'city_id'       => 'City ID',
+          'password'      => 'Password',
+          'birthday'      => 'Birthday',
+          'role'          => 'Role',
+          'is_public'     => 'Is Public',
+          'avatar'        => 'Avatar',
+          'date_joined'   => 'Date Joined',
           'last_activity' => 'Last Activity',
-          'phone' => 'Phone',
-          'email' => 'Email',
-          'skype' => 'Skype',
-          'telegram' => 'Telegram',
+          'phone'         => 'Phone',
+          'email'         => 'Email',
+          'skype'         => 'Skype',
+          'telegram'      => 'Telegram',
           'visit_counter' => 'Visit Counter',
         ];
     }
@@ -300,9 +300,9 @@ class Users extends \yii\db\ActiveRecord
                 2 => 'года',
                 5 => 'лет'
               ];
-            $age .= ' ' . WordsTerminations::getWordTermination($age, $terminations);;
-        }
 
+            $age .= ' ' . WordsTerminations::getWordTermination($age, $terminations);
+        }
         return $age;
     }
 
@@ -393,7 +393,6 @@ class Users extends \yii\db\ActiveRecord
                 return $counter . ' ' . WordsTerminations::getWordTermination($counter, $terminations);
             }
         }
-
         return $counter;
     }
 

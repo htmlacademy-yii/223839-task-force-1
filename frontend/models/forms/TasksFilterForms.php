@@ -12,25 +12,25 @@ use yii\helpers\ArrayHelper;
 class TasksFilterForms extends Model
 {
     const CREATED_TODAY = 24; // HOUR
-    const CREATED_WEEK = 7; // DAY
+    const CREATED_WEEK  = 7; // DAY
     const CREATED_MONTH = 1; // MONTH
-    const ALL_TIME = 0;
+    const ALL_TIME      = 0;
 
     const WITHOUT_RESPONSES = 'withoutResponses';
-    const REMOTE_WORK = 'remoteWork';
+    const REMOTE_WORK       = 'remoteWork';
 
-    public $categories = '';
-    public $extraFields = '';
-    public int $period = self::CREATED_WEEK;
-    public string $search = '';
+    public        $categories  = '';
+    public        $extraFields = '';
+    public int    $period      = self::CREATED_WEEK;
+    public string $search      = '';
 
     public function attributeLabels(): array
     {
         return [
-          'categories' => 'Категории',
+          'categories'  => 'Категории',
           'extraFields' => 'Дополнительно',
-          'period' => 'Период',
-          'search' => 'Поиск по названию'
+          'period'      => 'Период',
+          'search'      => 'Поиск по названию'
         ];
     }
 
@@ -45,9 +45,9 @@ class TasksFilterForms extends Model
     {
         return [
           static::CREATED_TODAY => 'За день',
-          static::CREATED_WEEK => 'За неделю',
+          static::CREATED_WEEK  => 'За неделю',
           static::CREATED_MONTH => 'За месяц',
-          static::ALL_TIME => 'За все время'
+          static::ALL_TIME      => 'За все время'
         ];
     }
 
@@ -55,7 +55,7 @@ class TasksFilterForms extends Model
     {
         return [
           static::WITHOUT_RESPONSES => 'Нет откликов',
-          static::REMOTE_WORK => 'Удаленная работа'
+          static::REMOTE_WORK       => 'Удаленная работа'
         ];
     }
 
@@ -82,7 +82,9 @@ class TasksFilterForms extends Model
     private function getReadyDataToLoad(ActiveQuery $query, array $data): array
     {
         $accumulated = $data;
+
         $data = [];
+
         $data[$this->formName()] = $accumulated;
 
         return $data;
@@ -101,10 +103,10 @@ class TasksFilterForms extends Model
 
     private function setExtraFieldsFilter(ActiveQuery $query, array $data): void
     {
-        if (isset($data['extraFields']) && !empty($extraFields = $this->getExtraFields($data))) {
+        if (isset($data['extraFields']) && false === empty($extraFields = $this->getExtraFields($data))) {
             $extraFieldsFilters = [
               static::WITHOUT_RESPONSES => [$this, 'setWithoutResponsesExtraFieldsFilter'],
-              static::REMOTE_WORK => [$this, 'setRemoteWorkExtraFieldsFilter'],
+              static::REMOTE_WORK       => [$this, 'setRemoteWorkExtraFieldsFilter'],
             ];
 
             foreach ($extraFields as $extraField) {
@@ -129,7 +131,7 @@ class TasksFilterForms extends Model
 
     private function setCategoriesFilter(ActiveQuery $query, array $data): void
     {
-        if (isset($data['categories']) && !empty($categories = $data['categories'])) {
+        if (isset($data['categories']) && false === empty($categories = $data['categories'])) {
             $query->andFilterWhere(['category_id' => $categories]);
         }
     }
@@ -142,7 +144,7 @@ class TasksFilterForms extends Model
 
         $periods = [
           static::CREATED_TODAY => 'HOUR',
-          static::CREATED_WEEK => 'DAY',
+          static::CREATED_WEEK  => 'DAY',
           static::CREATED_MONTH => 'MONTH'
         ];
 
@@ -157,7 +159,9 @@ class TasksFilterForms extends Model
 
     private function setSearchFilter(ActiveQuery $query, array $data): void
     {
-        if (isset($data['search']) && !empty($search = (string)ArrayHelper::getValue($data, 'search'))) {
+        $search = (string)ArrayHelper::getValue($data, 'search');
+
+        if (isset($data['search']) && false === empty($search)) {
             $query->andFilterWhere(['LIKE', 'title', $search]);
         }
     }
@@ -167,7 +171,7 @@ class TasksFilterForms extends Model
         return empty($extraFields = ArrayHelper::getValue($data, 'extraFields')) ? [] : $extraFields;
     }
 
-    private function getFilterData($data): array
+    private function getFilterData(array $data): array
     {
         return is_null($data = ArrayHelper::getValue($data, $this->formName())) ? [] : $data;
     }

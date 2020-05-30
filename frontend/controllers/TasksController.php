@@ -23,6 +23,8 @@ class TasksController extends Controller
     {
         $categories = ArrayHelper::map(Categories::find()->select(['id', 'name'])->all(), 'id', 'name');
 
+//        var_dump($categories);
+
         $searchModel = new TasksFilterForms();
 
         $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);

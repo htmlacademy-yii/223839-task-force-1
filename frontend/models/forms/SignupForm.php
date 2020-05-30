@@ -7,10 +7,10 @@ use yii\base\Model;
 
 class SignupForm extends Model
 {
-    public string $email = '';
+    public string $email     = '';
     public string $user_name = '';
-    public string $password = '';
-    public int $city_id = 1;
+    public string $password  = '';
+    public int    $city_id   = 1;
 
     public function rules()
     {
@@ -26,10 +26,10 @@ class SignupForm extends Model
     public function attributeLabels()
     {
         return [
-          'email' => 'email',
+          'email'     => 'email',
           'user_name' => 'user name',
-          'city_id' => 'city ID',
-          'password' => 'password'
+          'city_id'   => 'city ID',
+          'password'  => 'password'
         ];
     }
 
@@ -73,12 +73,13 @@ class SignupForm extends Model
         [$firstName, $lastName] = explode(' ', $this->user_name . ' ');
 
         $user = new Users();
-        $user->email = $this->email;
-        $user->first_name = $firstName;
-        $user->last_name = $lastName;
-        $user->city_id = empty($this->city_id) ? 1 : $this->city_id;
-        $user->role = $user::ROLE_PERFORMER;
-        $user->date_joined = \Yii::$app->formatter->asDate('now', 'php:Y-m-d H:i:s');
+
+        $user->email         = $this->email;
+        $user->first_name    = $firstName;
+        $user->last_name     = $lastName;
+        $user->city_id       = empty($this->city_id) ? 1 : $this->city_id;
+        $user->role          = $user::ROLE_PERFORMER;
+        $user->date_joined   = \Yii::$app->formatter->asDate('now', 'php:Y-m-d H:i:s');
         $user->last_activity = \Yii::$app->formatter->asDate('now', 'php:Y-m-d H:i:s');
         $user->setPassword($this->password);
 

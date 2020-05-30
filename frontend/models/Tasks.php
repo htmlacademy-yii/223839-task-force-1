@@ -31,11 +31,11 @@ namespace frontend\models;
  */
 class Tasks extends \yii\db\ActiveRecord
 {
-    const STATUS_NEW = 1;
-    const STATUS_CANCELED = 2;
-    const STATUS_ACTIVE = 3;
+    const STATUS_NEW       = 1;
+    const STATUS_CANCELED  = 2;
+    const STATUS_ACTIVE    = 3;
     const STATUS_COMPLETED = 4;
-    const STATUS_FAILED = 5;
+    const STATUS_FAILED    = 5;
 
     /**
      * {@inheritdoc}
@@ -61,29 +61,29 @@ class Tasks extends \yii\db\ActiveRecord
           [
             ['author_id'],
             'exist',
-            'skipOnError' => true,
-            'targetClass' => Users::class,
+            'skipOnError'     => true,
+            'targetClass'     => Users::class,
             'targetAttribute' => ['author_id' => 'id']
           ],
           [
             ['category_id'],
             'exist',
-            'skipOnError' => true,
-            'targetClass' => Categories::class,
+            'skipOnError'     => true,
+            'targetClass'     => Categories::class,
             'targetAttribute' => ['category_id' => 'id']
           ],
           [
             ['city_id'],
             'exist',
-            'skipOnError' => true,
-            'targetClass' => Cities::class,
+            'skipOnError'     => true,
+            'targetClass'     => Cities::class,
             'targetAttribute' => ['city_id' => 'id']
           ],
           [
             ['performer_id'],
             'exist',
-            'skipOnError' => true,
-            'targetClass' => Users::class,
+            'skipOnError'     => true,
+            'targetClass'     => Users::class,
             'targetAttribute' => ['performer_id' => 'id']
           ],
         ];
@@ -95,22 +95,22 @@ class Tasks extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-          'id' => 'ID',
-          'title' => 'Title',
-          'address' => 'Address',
-          'created_at' => 'Created At',
-          'update_at' => 'Update At',
-          'closed_at' => 'Closed At',
-          'budget' => 'Budget',
-          'city_id' => 'City ID',
-          'lan' => 'Lan',
-          'long' => 'Long',
-          'description' => 'Description',
-          'category_id' => 'Category ID',
+          'id'           => 'ID',
+          'title'        => 'Title',
+          'address'      => 'Address',
+          'created_at'   => 'Created At',
+          'update_at'    => 'Update At',
+          'closed_at'    => 'Closed At',
+          'budget'       => 'Budget',
+          'city_id'      => 'City ID',
+          'lan'          => 'Lan',
+          'long'         => 'Long',
+          'description'  => 'Description',
+          'category_id'  => 'Category ID',
           'performer_id' => 'Performer ID',
-          'author_id' => 'Author ID',
-          'status' => 'Status',
-          'remoteWork' => 'Remote Work',
+          'author_id'    => 'Author ID',
+          'status'       => 'Status',
+          'remoteWork'   => 'Remote Work',
         ];
     }
 
