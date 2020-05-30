@@ -29,7 +29,7 @@ class UsersController extends Controller
     public function actionView(int $id)
     {
         if (!$user = Users::findOne($id)) {
-            throw new NotFoundHttpException();
+            throw new NotFoundHttpException('page not found');
         }
 
         return $this->render('view', compact('user'));

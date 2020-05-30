@@ -23,14 +23,12 @@ class TasksController extends Controller
     {
         $categories = ArrayHelper::map(Categories::find()->select(['id', 'name'])->all(), 'id', 'name');
 
-//        var_dump($categories);
-
         $searchModel = new TasksFilterForms();
 
         $dataProvider = $searchModel->search(\Yii::$app->request->queryParams);
 
         $pagination = $dataProvider->getPagination();
-        $tasks = $dataProvider->getModels();
+        $tasks      = $dataProvider->getModels();
 
         return $this->render('index', compact('tasks', 'categories', 'searchModel', 'pagination'));
     }
@@ -38,7 +36,7 @@ class TasksController extends Controller
     public function actionView(int $id)
     {
         if (!($task = Tasks::findOne($id))) {
-            throw new NotFoundHttpException();
+            throw new NotFoundHttpException('page not found');
         }
 
         return $this->render('view', compact('task'));
