@@ -42,8 +42,8 @@ use Yii;
  */
 class Users extends \yii\db\ActiveRecord
 {
-    const ROLE_CUSTOMER = 'customer';
-    const ROLE_PERFORMER = 'performer';
+    const ROLE_CUSTOMER  = 'CUSTOMER';
+    const ROLE_PERFORMER = 'PERFORMER';
 
     const COUNTER_OPTIONS = [
       'withWord' => false
@@ -63,19 +63,19 @@ class Users extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-          [['first_name', 'last_name', 'password', 'birthday', 'role', 'phone', 'email'], 'required'],
+          [['first_name', 'last_name', 'city_id', 'password', 'role', 'email'], 'required'],
           [['biography', 'role', 'avatar'], 'string'],
           [['city_id', 'is_public', 'phone', 'visit_counter'], 'integer'],
           [['birthday', 'date_joined', 'last_activity'], 'safe'],
           [['first_name'], 'string', 'max' => 30],
-          [['last_name', 'email', 'skype', 'telegram'], 'string', 'max' => 50],
-          [['address'], 'string', 'max' => 255],
-          [['password'], 'string', 'max' => 32],
+          [['last_name'], 'string', 'max' => 40],
+          [['address', 'password'], 'string', 'max' => 255],
+          [['email', 'skype', 'telegram'], 'string', 'max' => 50],
           [
             ['city_id'],
             'exist',
-            'skipOnError' => true,
-            'targetClass' => Cities::class,
+            'skipOnError'     => true,
+            'targetClass'     => Cities::class,
             'targetAttribute' => ['city_id' => 'id']
           ],
         ];
@@ -87,25 +87,30 @@ class Users extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-          'id' => 'ID',
-          'first_name' => 'First Name',
-          'last_name' => 'Last Name',
-          'address' => 'Address',
-          'biography' => 'Biography',
-          'city_id' => 'City ID',
-          'password' => 'Password',
-          'birthday' => 'Birthday',
-          'role' => 'Role',
-          'is_public' => 'Is Public',
-          'avatar' => 'Avatar',
-          'date_joined' => 'Date Joined',
+          'id'            => 'ID',
+          'first_name'    => 'First Name',
+          'last_name'     => 'Last Name',
+          'address'       => 'Address',
+          'biography'     => 'Biography',
+          'city_id'       => 'City ID',
+          'password'      => 'Password',
+          'birthday'      => 'Birthday',
+          'role'          => 'Role',
+          'is_public'     => 'Is Public',
+          'avatar'        => 'Avatar',
+          'date_joined'   => 'Date Joined',
           'last_activity' => 'Last Activity',
-          'phone' => 'Phone',
-          'email' => 'Email',
-          'skype' => 'Skype',
-          'telegram' => 'Telegram',
+          'phone'         => 'Phone',
+          'email'         => 'Email',
+          'skype'         => 'Skype',
+          'telegram'      => 'Telegram',
           'visit_counter' => 'Visit Counter',
         ];
+    }
+
+    public static function findByUserName(string $userName)
+    {
+        return static::find()->where(['LIKE', "CONCAT(first_name, ' ', last_name)", $userName]);
     }
 
     /**
@@ -178,6 +183,11 @@ class Users extends \yii\db\ActiveRecord
         return $this->hasMany(Reviews::class, ['performer_id' => 'id']);
     }
 
+    public function getReviews(): array
+    {
+        return $this->isPerformer() ? $this->getReviewsPerformer()->all() : $this->getReviewsCustomer()->all();
+    }
+
     /**
      * Gets query for [[TasksCustomer]].
      *
@@ -196,6 +206,29 @@ class Users extends \yii\db\ActiveRecord
     public function getTasksPerformer()
     {
         return $this->hasMany(Tasks::class, ['performer_id' => 'id']);
+    }
+
+    public static function getPerformersHasTasksNow(): array
+    {
+        return Tasks::find()
+          ->distinct()
+          ->select('performer_id')
+          ->where(['status' => Tasks::STATUS_ACTIVE])
+          ->column();
+    }
+
+    public static function getPerformersHasReviews(): array
+    {
+        return Reviews::find()->distinct()->select(['performer_id'])->column();
+    }
+
+    public static function getBookmarkedUsersForUser(int $id): array
+    {
+        return BookmarkedUsers::find()
+          ->distinct()
+          ->select(['bookmarked_user_id'])
+          ->where(['user_id' => $id])
+          ->column();
     }
 
     /**
@@ -237,23 +270,27 @@ class Users extends \yii\db\ActiveRecord
     /*
      *  Gets average rating for performer
      */
-    public function getPerformerRating()
+    public function getRating()
     {
-        if (($reviewsCount = count($this->reviewsPerformer)) === 0) {
+        $reviews = $this->isPerformer() ? $this->reviewsPerformer : $this->reviewsCustomer;
+
+        if (($reviewsCount = count($reviews)) === 0) {
             return 0;
         }
 
         $rating = 0;
-        foreach ($this->reviewsPerformer as $review) {
+        foreach ($reviews as $review) {
             $rating += $review->rating;
         }
 
         return Yii::$app->formatter->asDecimal($rating / $reviewsCount, 2);
     }
 
-    public function getAge(array $options = self::COUNTER_OPTIONS): string
+    public function getAge(array $options = []): string
     {
-        $age = date('Y', time()) - date_create($this->birthday)->format('Y');
+        $options = array_merge(static::COUNTER_OPTIONS, $options);
+
+        $age = date('Y', time()) - Yii::$app->formatter->asDate($this->birthday, 'Y');
 
         if ($options['withWord']) {
             $terminations =
@@ -263,15 +300,17 @@ class Users extends \yii\db\ActiveRecord
                 2 => 'года',
                 5 => 'лет'
               ];
-            $age .= ' ' . WordsTerminations::getWordTermination($age, $terminations);;
-        }
 
+            $age .= ' ' . WordsTerminations::getWordTermination($age, $terminations);
+        }
         return $age;
     }
 
-    public function getCountTasks(array $options = self::COUNTER_OPTIONS)
+    public function getCountTasks(array $options = [])
     {
-        $counter = count($this->getTasksPerformer()->asArray()->all());
+        $options = array_merge(static::COUNTER_OPTIONS, $options);
+
+        $counter = $this->isPerformer() ? count($this->tasksPerformer) : count($this->tasksCustomer);
 
         if ($options['withWord']) {
             $terminations = [
@@ -287,9 +326,11 @@ class Users extends \yii\db\ActiveRecord
         return $counter;
     }
 
-    public function getCountReviews(array $options = self::COUNTER_OPTIONS)
+    public function getCountReviews(array $options = [])
     {
-        $counter = count($this->getReviewsPerformer()->asArray()->all());
+        $options = array_merge(static::COUNTER_OPTIONS, $options);
+
+        $counter = $this->isPerformer() ? count($this->reviewsPerformer) : count($this->reviewsCustomer);
 
         if ($options['withWord']) {
             $terminations = [
@@ -305,16 +346,18 @@ class Users extends \yii\db\ActiveRecord
         return $counter;
     }
 
-    public function getCountYearsOnSite(array $options = self::COUNTER_OPTIONS): string
+    public function getCountYearsOnSite(array $options = []): string
     {
+        $options = array_merge(static::COUNTER_OPTIONS, $options);
+
         $counter = date('Y', time()) - Yii::$app->formatter->asDate($this->date_joined, 'Y');
 
         if ($counter < 1) {
-            $counter = date('m', time()) - date_create($this->date_joined)->format('m');
+            $counter = date('m', time()) - Yii::$app->formatter->asDate($this->date_joined, 'm');
 
             // days
             if ($counter < 1) {
-                $counter = date('d', time()) - date_create($this->date_joined)->format('d');
+                $counter = date('d', time()) - Yii::$app->formatter->asDate($this->date_joined, 'd');
                 if ($options['withWord']) {
                     $terminations = [
                       0 => 'дней',
@@ -350,7 +393,31 @@ class Users extends \yii\db\ActiveRecord
                 return $counter . ' ' . WordsTerminations::getWordTermination($counter, $terminations);
             }
         }
-
         return $counter;
+    }
+
+    public function getFullName(): string
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+    public function setPassword(string $password): void
+    {
+        $this->password = \Yii::$app->getSecurity()->generatePasswordHash($password);
+    }
+
+    public function updateLastActivity(): void
+    {
+        $this->last_activity = \Yii::$app->formatter->asDate('now', 'php:Y-m-d H:i:s');
+    }
+
+    public function isPerformer(): bool
+    {
+        return $this->role === static::ROLE_PERFORMER;
+    }
+
+    public function isCustomer(): bool
+    {
+        return $this->role === static::ROLE_CUSTOMER;
     }
 }

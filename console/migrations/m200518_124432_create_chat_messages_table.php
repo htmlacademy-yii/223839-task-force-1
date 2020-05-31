@@ -12,6 +12,12 @@ class m200518_124432_create_chat_messages_table extends Migration
      */
     public function safeUp()
     {
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+        }
+
         $this->createTable('{{%chat_messages}}', [
           'id' => $this->primaryKey(),
           'chat_id' => $this->integer()->unsigned()->notNull(),
@@ -19,7 +25,7 @@ class m200518_124432_create_chat_messages_table extends Migration
           'recipient_id' => $this->integer()->unsigned()->notNull(),
           'created_at' => $this->timestamp()->notNull(),
           'text' => $this->text()->notNull()
-        ]);
+        ], $tableOptions);
 
         $this->createIndex(
           'author_id',

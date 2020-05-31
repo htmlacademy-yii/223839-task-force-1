@@ -2,9 +2,6 @@
 
 namespace frontend\models;
 
-use frontend\modules\WordsTerminations;
-use Yii;
-
 /**
  * This is the model class for table "tasks".
  *
@@ -34,15 +31,11 @@ use Yii;
  */
 class Tasks extends \yii\db\ActiveRecord
 {
-    const STATUS_NEW = 1;
-    const STATUS_CANCELED = 2;
-    const STATUS_ACTIVE = 3;
+    const STATUS_NEW       = 1;
+    const STATUS_CANCELED  = 2;
+    const STATUS_ACTIVE    = 3;
     const STATUS_COMPLETED = 4;
-    const STATUS_FAILED = 5;
-
-    const COUNTER_OPTIONS = [
-      'withWord' => false
-    ];
+    const STATUS_FAILED    = 5;
 
     /**
      * {@inheritdoc}
@@ -58,17 +51,41 @@ class Tasks extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-          [['title', 'city_id', 'description', 'category_id', 'performer_id', 'author_id', 'status'], 'required'],
+          [['title', 'city_id', 'description', 'category_id', 'author_id', 'status'], 'required'],
           [['created_at', 'update_at', 'closed_at'], 'safe'],
           [['budget', 'city_id', 'category_id', 'performer_id', 'author_id', 'status', 'remoteWork'], 'integer'],
           [['lan', 'long'], 'number'],
           [['description'], 'string'],
           [['title'], 'string', 'max' => 50],
           [['address'], 'string', 'max' => 100],
-          [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['author_id' => 'id']],
-          [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id']],
-          [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class, 'targetAttribute' => ['city_id' => 'id']],
-          [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['performer_id' => 'id']],
+          [
+            ['author_id'],
+            'exist',
+            'skipOnError'     => true,
+            'targetClass'     => Users::class,
+            'targetAttribute' => ['author_id' => 'id']
+          ],
+          [
+            ['category_id'],
+            'exist',
+            'skipOnError'     => true,
+            'targetClass'     => Categories::class,
+            'targetAttribute' => ['category_id' => 'id']
+          ],
+          [
+            ['city_id'],
+            'exist',
+            'skipOnError'     => true,
+            'targetClass'     => Cities::class,
+            'targetAttribute' => ['city_id' => 'id']
+          ],
+          [
+            ['performer_id'],
+            'exist',
+            'skipOnError'     => true,
+            'targetClass'     => Users::class,
+            'targetAttribute' => ['performer_id' => 'id']
+          ],
         ];
     }
 
@@ -78,23 +95,28 @@ class Tasks extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-          'id' => 'ID',
-          'title' => 'Title',
-          'address' => 'Address',
-          'created_at' => 'Created At',
-          'update_at' => 'Update At',
-          'closed_at' => 'Closed At',
-          'budget' => 'Budget',
-          'city_id' => 'City ID',
-          'lan' => 'Lan',
-          'long' => 'Long',
-          'description' => 'Description',
-          'category_id' => 'Category ID',
+          'id'           => 'ID',
+          'title'        => 'Title',
+          'address'      => 'Address',
+          'created_at'   => 'Created At',
+          'update_at'    => 'Update At',
+          'closed_at'    => 'Closed At',
+          'budget'       => 'Budget',
+          'city_id'      => 'City ID',
+          'lan'          => 'Lan',
+          'long'         => 'Long',
+          'description'  => 'Description',
+          'category_id'  => 'Category ID',
           'performer_id' => 'Performer ID',
-          'author_id' => 'Author ID',
-          'status' => 'Status',
-          'remoteWork' => 'Remote Work',
+          'author_id'    => 'Author ID',
+          'status'       => 'Status',
+          'remoteWork'   => 'Remote Work',
         ];
+    }
+
+    public static function getTasksResponses()
+    {
+        return Responses::find();
     }
 
     /**
@@ -155,21 +177,5 @@ class Tasks extends \yii\db\ActiveRecord
     public function getPerformer()
     {
         return $this->hasOne(Users::class, ['id' => 'performer_id']);
-    }
-
-    public function getTasksCounter(int $counter, array $options = self::COUNTER_OPTIONS) : string
-    {
-        if ($options['withWord']) {
-            $terminations = [
-              0 => 'ий',
-              1 => 'ие',
-              2 => 'ия',
-              5 => 'ий'
-            ];
-
-            $counter .= ' задан' . WordsTerminations::getWordTermination($counter, $terminations);
-        }
-
-        return $counter;
     }
 }

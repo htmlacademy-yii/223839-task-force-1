@@ -12,6 +12,12 @@ class m200518_124556_create_reviews_table extends Migration
      */
     public function safeUp()
     {
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+        }
+
         $this->createTable('{{%reviews}}', [
           'id' => $this->primaryKey()->unsigned(),
           'customer_id' => $this->integer()->unsigned()->notNull(),
@@ -20,7 +26,7 @@ class m200518_124556_create_reviews_table extends Migration
           'text' => $this->text()->null(),
           'rating' => $this->tinyInteger(1)->null(),
           'created_at' => $this->timestamp()->notNull()
-        ]);
+        ], $tableOptions);
 
         $this->createIndex(
           'customer_id',

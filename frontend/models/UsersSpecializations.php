@@ -2,7 +2,7 @@
 
 namespace frontend\models;
 
-use Yii;
+use yii\db\ActiveQuery;
 
 /**
  * This is the model class for table "users_specializations".
@@ -30,10 +30,22 @@ class UsersSpecializations extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['performer_id', 'category_id'], 'required'],
-            [['performer_id', 'category_id'], 'integer'],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::className(), 'targetAttribute' => ['category_id' => 'id']],
-            [['performer_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::className(), 'targetAttribute' => ['performer_id' => 'id']],
+          [['performer_id', 'category_id'], 'required'],
+          [['performer_id', 'category_id'], 'integer'],
+          [
+            ['category_id'],
+            'exist',
+            'skipOnError' => true,
+            'targetClass' => Categories::class,
+            'targetAttribute' => ['category_id' => 'id']
+          ],
+          [
+            ['performer_id'],
+            'exist',
+            'skipOnError' => true,
+            'targetClass' => Users::class,
+            'targetAttribute' => ['performer_id' => 'id']
+          ],
         ];
     }
 
@@ -43,10 +55,15 @@ class UsersSpecializations extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'performer_id' => 'Performer ID',
-            'category_id' => 'Category ID',
+          'id' => 'ID',
+          'performer_id' => 'Performer ID',
+          'category_id' => 'Category ID',
         ];
+    }
+
+    public static function getPerformersInCategories(array $categories): ActiveQuery
+    {
+        return static::find()->distinct()->select(['performer_id'])->where(['category_id' => $categories]);
     }
 
     /**
@@ -56,7 +73,7 @@ class UsersSpecializations extends \yii\db\ActiveRecord
      */
     public function getCategory()
     {
-        return $this->hasOne(Categories::className(), ['id' => 'category_id']);
+        return $this->hasOne(Categories::class, ['id' => 'category_id']);
     }
 
     /**
@@ -66,6 +83,6 @@ class UsersSpecializations extends \yii\db\ActiveRecord
      */
     public function getPerformer()
     {
-        return $this->hasOne(Users::className(), ['id' => 'performer_id']);
+        return $this->hasOne(Users::class, ['id' => 'performer_id']);
     }
 }

@@ -12,21 +12,27 @@ class m200518_121427_create_users_table extends Migration
      */
     public function safeUp()
     {
+        $tableOptions = null;
+        if ($this->db->driverName === 'mysql') {
+            // http://stackoverflow.com/questions/766809/whats-the-difference-between-utf8-general-ci-and-utf8-unicode-ci
+            $tableOptions = 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB';
+        }
+
         $this->createTable('{{%users}}', [
           'id' => $this->primaryKey()->unsigned(),
           'first_name' => $this->char(30)->notNull(),
-          'last_name' => $this->char(50)->notNull(),
+          'last_name' => $this->char(40)->notNull(),
           'address' => $this->string()->null(),
           'biography' => $this->text()->null(),
-          'city_id' => $this->integer()->unsigned()->null(),
-          'password' => $this->char(32)->notNull(),
-          'birthday' => $this->date()->notNull(),
+          'city_id' => $this->integer()->unsigned()->notNull(),
+          'password' => $this->char(255)->notNull(),
+          'birthday' => $this->date()->null(),
           'role' => "ENUM ('CUSTOMER', 'PERFORMER') NOT NULL",
           'is_public' => $this->tinyInteger(1)->unsigned()->defaultValue(1)->notNull(),
           'avatar' => $this->text()->defaultValue('placeholderUser.jpg')->notNull(),
           'date_joined' => $this->timestamp()->notNull(),
           'last_activity' => $this->timestamp()->notNull(),
-          'phone' => $this->bigInteger(12)->unsigned()->notNull(),
+          'phone' => $this->bigInteger(12)->unsigned()->null(),
           //          'phone' => $this->integer(11)->unsigned()->unique()->notNull(),
           //          'skype' => $this->char(50)->unique()->null(),
           //          'telegram' => $this->char(50)->unique()->null(),
@@ -35,7 +41,7 @@ class m200518_121427_create_users_table extends Migration
           'skype' => $this->char(50)->null(),
           'telegram' => $this->char(50)->null(),
           'visit_counter' => $this->integer()->unsigned()->defaultValue(0)->notNull()
-        ]);
+        ], $tableOptions);
 
         $this->createIndex(
           'city_id',

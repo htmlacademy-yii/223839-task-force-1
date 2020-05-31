@@ -5,7 +5,7 @@
 
 use yii\helpers\Html;
 
-$this->title = Html::encode($user->first_name) . ' ' . Html::encode($user->last_name);
+$this->title = Html::encode($user->getFullName());
 ?>
 
 <section class="content-view">
@@ -13,13 +13,13 @@ $this->title = Html::encode($user->first_name) . ' ' . Html::encode($user->last_
         <div class="user__card">
             <img src="../img/man-hat.png" width="120" height="120" alt="Аватар пользователя">
             <div class="content-view__headline">
-                <h1><?= Html::encode($user->first_name) . ' ' . Html::encode($user->last_name) ?></h1>
+                <h1><?= Html::encode($user->getFullName()) ?></h1>
 
                 <p>Россия, <?= $user->city->name ?>, <?= $user->getAge(['withWord' => true]) ?></p>
 
                 <div class="profile-mini__name five-stars__rate">
                     <?php
-                    $rating = $user->getPerformerRating();
+                    $rating = $user->getRating();
 
                     for ($i = 0; $i < 5; $i++) {
                         if ($i < floor($rating)) {
@@ -35,9 +35,7 @@ $this->title = Html::encode($user->first_name) . ' ' . Html::encode($user->last_
                 <b class="done-review">Получил <?= $user->getCountReviews(['withWord' => true]) ?></b>
             </div>
             <div class="content-view__headline user__card-bookmark user__card-bookmark--current">
-                <?= Html::tag('span',
-                  'Был на сайте ' . Yii::$app->formatter->asRelativeTime($user->last_activity)
-                ) ?>
+                <span>Был на сайте <?= Yii::$app->formatter->asRelativeTime($user->last_activity) ?></span>
                 <a href="#"><b></b></a>
             </div>
         </div>
@@ -74,10 +72,10 @@ $this->title = Html::encode($user->first_name) . ' ' . Html::encode($user->last_
         </div>
     </div>
     <div class="content-view__feedback">
-        <h2>Отзывы<span>(<?= $user->countReviews ?>)</span></h2>
+        <h2>Отзывы<span>(<?= $user->getCountReviews() ?>)</span></h2>
         <div class="content-view__feedback-wrapper reviews-wrapper">
             <?php
-            foreach ($user->reviewsPerformer as $review) : ?>
+            foreach ($user->getReviews() as $review) : ?>
                 <div class="feedback-card__reviews">
                     <p class="link-task link">Задание
                         <?= Html::a(
@@ -91,7 +89,7 @@ $this->title = Html::encode($user->first_name) . ' ' . Html::encode($user->last_
                         <div class="feedback-card__reviews-content">
                             <p class="link-name link">
                                 <?= Html::a(
-                                  Html::encode($review->customer->first_name) . ' ' . ($review->customer->last_name),
+                                  Html::encode($review->customer->getFullName()),
                                   ['users/view', 'id' => $review->customer->id],
                                   ['class' => 'link-regular']
                                 ) ?>

@@ -10,6 +10,8 @@ settings:
     colors: true
     memory_limit: 1024M
 modules:
+    enable:
+        -Db
     config:
         Yii2:
             configFile: 'config/codeception-local.php'

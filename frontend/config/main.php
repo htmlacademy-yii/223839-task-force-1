@@ -47,7 +47,10 @@ return [
 
           // tasks
           'tasks/search' => 'tasks/index',
-          'tasks/<id:\d+>' => 'tasks/view'
+          'tasks/<id:\d+>' => 'tasks/view',
+
+          // registration
+          'signup' => 'registration/register'
       ],
     ],
     'formatter' => [

@@ -636,10 +636,23 @@ footer {
     .input:disabled::-webkit-input-placeholder {
       color: #D4D9E2; }
 
-.input-danger + input {
+.input-danger > input {
   border-color: #FF116E; }
-  .input-danger + input + span {
-    color: #FF116E; }
+    .input-danger > label + input + span {
+        color: #FF116E; }
+    .input-danger > .help-block {
+        color: #FF116E; }
+    .input-danger > label {
+        color: #FF116E; }
+
+.input-danger > textarea {
+  border-color: #FF116E; }
+    .input-danger > label + textarea + span {
+        color: #FF116E; }
+    .input-danger > .help-block {
+        color: #FF116E; }
+    .input-danger > label {
+        color: #FF116E; }
 
 .input-middle {
   padding-top: 14px;
@@ -693,6 +706,7 @@ footer {
   margin-bottom: 10px; }
 
 .registration-town {
+  width: 100%;
   background-position: 325px 20px; }
 
 .checkbox__input + label::before {
@@ -848,6 +862,7 @@ footer {
   left: 7px; }
 
 .textarea {
+  width: 100%;
   padding: 14px 15px;
   resize: none;
   margin-bottom: 10px; }
@@ -1688,7 +1703,7 @@ footer {
 
 .clipart-woman {
   position: absolute;
-  bottom: 156px;
+  bottom: 160px;
   left: 411px; }
 
 .clipart-message {
