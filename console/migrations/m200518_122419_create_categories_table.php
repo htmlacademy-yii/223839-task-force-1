@@ -19,7 +19,7 @@ class m200518_122419_create_categories_table extends Migration
         }
 
         $this->createTable('{{%categories}}', [
-          'id' => $this->primaryKey()->unsigned(),
+          'id'   => $this->primaryKey()->unsigned(),
           'name' => $this->char(30)->unique()->notNull(),
           'icon' => $this->char(30)->unique()->notNull()
         ], $tableOptions);
@@ -31,6 +31,8 @@ class m200518_122419_create_categories_table extends Migration
           ],
           [
             ['Переводы', 'translation'],
+            ['События', 'event'],
+            ['Курьер', 'courier'],
             ['Уборка', 'clean'],
             ['Переезды', 'cargo'],
             ['Компьютерная помощь', 'neo'],

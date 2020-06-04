@@ -95,7 +95,7 @@ class m200518_123606_create_tasks_table extends Migration
 
 
         $insert = [];
-        for ($i = 0; $i <= 100; $i++) {
+        for ($i = 0; $i <= 500; $i++) {
             $faker = Faker\Factory::create('ru_RU');
             $insert[] = [
               $faker->text(40),
@@ -106,7 +106,7 @@ class m200518_123606_create_tasks_table extends Migration
               $faker->latitude,
               $faker->longitude,
               $faker->text(100),
-              $faker->numberBetween(1, 8),
+              $faker->numberBetween(1, 10),
               $faker->numberBetween(1, 100),
               $faker->numberBetween(1, 100),
               $faker->numberBetween(1, 5)

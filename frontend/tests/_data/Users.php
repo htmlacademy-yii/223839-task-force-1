@@ -10,7 +10,7 @@ return [
     'address' => 'ул. 1905 года, 89',
     'biography' => 'Non modi aut et ad voluptas sit ut amet. Dicta ut cupiditate a id hic fugit aut. Voluptatum non quam ut blanditiis vitae nesciunt. Sed rerum error voluptatem dolorum. Consequatur numquam natus voluptas deserunt. Vel quasi nisi ut non omnis est animi architecto. Eaque voluptas voluptas molestias quae illo hic. Maxime qui hic sit perferendis architecto. Quaerat quia iusto doloremque quod ipsam officiis. Et pariatur est earum id dolorem. Dolorem nulla perferendis quo animi ut.',
     'city_id' => 1,
-    'password' => 'dpkjvfqvtyz',
+    'password' => '$2y$13$Ne3BHns.oRjNRKy5WqK.qOoGUqIlaaLSeguwOYWoIXqd40yrYvbgO', // dpkjvfqvtyz,
     'birthday' => '1971-05-23',
     'role' => Users::ROLE_PERFORMER,
     'is_public' => 1,

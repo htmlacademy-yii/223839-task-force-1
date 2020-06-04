@@ -9,7 +9,7 @@ use frontend\tests\fixtures\CitiesFixtures;
 use frontend\tests\fixtures\TasksFixtures;
 use frontend\tests\fixtures\UsersFixtures;
 
-class SignUpFormTest extends \Codeception\Test\Unit
+class RegistrFormTest extends \Codeception\Test\Unit
 {
     /**
      * @var \frontend\tests\UnitTester

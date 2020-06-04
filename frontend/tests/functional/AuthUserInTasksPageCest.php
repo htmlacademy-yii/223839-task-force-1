@@ -10,7 +10,7 @@ use frontend\tests\fixtures\TasksFixtures;
 use frontend\tests\fixtures\UsersFixtures;
 use frontend\tests\FunctionalTester;
 
-class AuthorizedUserInTasksPage
+class AuthUserInTasksPageCest
 {
     public function _before(FunctionalTester $I)
     {
