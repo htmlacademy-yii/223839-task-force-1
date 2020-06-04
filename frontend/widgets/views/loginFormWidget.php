@@ -33,6 +33,7 @@ use yii\widgets\ActiveForm;
     <p>
         <?= $form->errorSummary($model) ?>
 
+
         <?= $form
           ->field($model, 'email', ['enableAjaxValidation' => true])
           ->input('email', [
@@ -49,7 +50,7 @@ use yii\widgets\ActiveForm;
     </p>
     <p>
         <?= $form
-          ->field($model, 'password', ['enableAjaxValidation' => true,])
+          ->field($model, 'password', ['enableAjaxValidation' => true)
           ->passwordInput([
             'class' => 'enter-form-email input input-middle',
             'style' => 'margin-bottom: 5px',
@@ -61,7 +62,6 @@ use yii\widgets\ActiveForm;
           ])
         ?>
     </p>
-
     <button class="button" id="login_button" name="login_submit" type="submit" value="login">Войти</button>
     <?php $form::end() ?>
     <button class="form-modal-close" type="button">Закрыть</button>

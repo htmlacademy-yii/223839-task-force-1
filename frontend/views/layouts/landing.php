@@ -73,8 +73,7 @@ AppAsset::register($this);
                 <p>Работа там, где ты!</p>
             </div>
 
-            <?php $loginForm = LoginFormWidget::begin() ?>
-            <?php $loginForm::end() ?>
+            <?= $loginForm = LoginFormWidget::widget() ?>
 
         </div>
     </header>
