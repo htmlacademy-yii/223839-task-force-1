@@ -50,7 +50,7 @@ use yii\widgets\ActiveForm;
     </p>
     <p>
         <?= $form
-          ->field($model, 'password', ['enableAjaxValidation' => true)
+          ->field($model, 'password', ['enableAjaxValidation' => true])
           ->passwordInput([
             'class' => 'enter-form-email input input-middle',
             'style' => 'margin-bottom: 5px',
