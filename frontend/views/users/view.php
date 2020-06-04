@@ -3,6 +3,7 @@
  * @var $user \frontend\models\Users;
  */
 
+use frontend\widgets\RatingWidget;
 use yii\helpers\Html;
 
 $this->title = Html::encode($user->getFullName());
@@ -18,18 +19,9 @@ $this->title = Html::encode($user->getFullName());
                 <p>Россия, <?= $user->city->name ?>, <?= $user->getAge(['withWord' => true]) ?></p>
 
                 <div class="profile-mini__name five-stars__rate">
-                    <?php
-                    $rating = $user->getRating();
 
-                    for ($i = 0; $i < 5; $i++) {
-                        if ($i < floor($rating)) {
-                            echo ' <span></span > ';
-                        } else {
-                            echo '<span class="star-disabled" ></span > ';
-                        }
-                    }
-                    echo "<b>{$rating}<b>";
-                    ?>
+                    <?= RatingWidget::widget(['rating' => $user->rating]) ?>
+
                 </div>
                 <b class="done-task">Получил <?= $user->getCountTasks(['withWord' => true]) ?></b>
                 <b class="done-review">Получил <?= $user->getCountReviews(['withWord' => true]) ?></b>

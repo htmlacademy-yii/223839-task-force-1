@@ -1,11 +1,12 @@
 <?php
 /* @var $this yii\web\View
- * @var $performer \frontend\models\Users
+ * @var $performer   \frontend\models\Users
  * @var $searchModel \frontend\models\forms\UsersFiltersForm
- * @var $categories \frontend\models\Categories
- * @var $pagination \yii\data\Pagination
+ * @var $categories  \frontend\models\Categories
+ * @var $pagination  \yii\data\Pagination
  */
 
+use frontend\widgets\RatingWidget;
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
 use yii\widgets\ActiveForm;
@@ -45,18 +46,9 @@ $this->title = "TaskForce";
                           ['class' => 'link-regular']
                         ) ?>
                     </p>
-                    <?php
-                    $rating = $performer->getRating();
 
-                    for ($i = 0; $i < 5; $i++) {
-                        if ($i < floor($rating)) {
-                            echo ' <span></span > ';
-                        } else {
-                            echo '<span class="star-disabled" ></span > ';
-                        }
-                    }
-                    echo "<b>{$rating}<b>";
-                    ?>
+                    <?= RatingWidget::widget(['rating' => $performer->rating]) ?>
+
                     <p class="user__search-content">
                         <?= HtmlPurifier::process($performer->biography) ?>
                     </p>
@@ -77,13 +69,13 @@ $this->title = "TaskForce";
 
     <div class='new-task__pagination'>
         <?= \yii\widgets\LinkPager::widget([
-          'pagination' => $pagination,
-          'options' => [
+          'pagination'       => $pagination,
+          'options'          => [
             'class' => 'new-task__pagination-list'
           ],
-          'prevPageLabel' => '',
-          'nextPageLabel' => '',
-          'pageCssClass' => 'pagination__item',
+          'prevPageLabel'    => '',
+          'nextPageLabel'    => '',
+          'pageCssClass'     => 'pagination__item',
           'prevPageCssClass' => 'pagination__item',
           'nextPageCssClass' => 'pagination__item'
         ]) ?>
@@ -93,14 +85,14 @@ $this->title = "TaskForce";
 <section class="search-task">
     <div class="search-task__wrapper">
         <?php
-        $form = ActiveForm::begin([
-          'method' => 'get',
-          'action' => ['users/search'],
+        $form            = ActiveForm::begin([
+          'method'  => 'get',
+          'action'  => ['users/search'],
           'options' => [
             'class' => 'search-task__form',
           ]
         ]);
-        $loadCategories = $searchModel->categories;
+        $loadCategories  = $searchModel->categories;
         $loadExtraFields = $searchModel->extraFields;
         ?>
 
@@ -118,7 +110,7 @@ $this->title = "TaskForce";
                   string $value
                 ) use ($loadCategories) : string {
                     $checked = ($checked === true) ? 'checked' : '';
-                    $id = "category-{$value}";
+                    $id      = "category-{$value}";
 
                     return "<input type='checkbox' id='{$id}' name='{$name}'
                     class='visually-hidden checkbox__input' value='{$value}' {$checked}>
@@ -140,7 +132,7 @@ $this->title = "TaskForce";
                   string $value
                 ) use ($loadExtraFields) : string {
                     $checked = ($checked === true) ? 'checked' : '';
-                    $id = "extraFields-{$value}";
+                    $id      = "extraFields-{$value}";
 
                     return "<input type='checkbox' id='{$id}' name='{$name}'
                     class='visually-hidden checkbox__input' value='{$value}' {$checked}>
