@@ -16,10 +16,11 @@ class SignupForm extends Model
     {
         return array_merge(
           static::usernameRules(),
-          static::emailRules(),
+          Users::emailRules(),
+          Users::passwordRules(),
           [
+            ['email', 'unique', 'targetClass' => Users::class, 'message' => "{attribute} {value} уже используется"],
             [['email', 'user_name', 'password', 'city_id'], 'required', 'message' => 'Поле обязательно для заполнения'],
-            [['password'], 'string', 'min' => 8, 'max' => 255],
           ]);
     }
 
@@ -45,16 +46,6 @@ class SignupForm extends Model
             'message' =>
               'Имя должно соответствовать шаблону Иван Иванов. Нельзя использовать цифры и специальные символы.'
           ],
-        ];
-    }
-
-    public static function emailRules(): array
-    {
-        return [
-          ['email', 'unique', 'targetClass' => Users::class, 'message' => "{attribute} {value} уже используется"],
-          //          ['email', 'email'],
-          ['email', 'match', 'pattern' => '/^([0-9a-zа-я\.]+@)([а-яa-z]{2,}\.)+([a-zа-я]{2,})+$/sui'],
-          [['email'], 'string', 'min' => 3, 'max' => 50],
         ];
     }
 

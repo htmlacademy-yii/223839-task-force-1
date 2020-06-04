@@ -27,23 +27,6 @@ class UsersFiltersForm extends Model
     public string $search      = '';
     public string $sort        = self::SORT_LAST_ACTIVITY;
 
-    public function attributeLabels()
-    {
-        return [
-          'categories'  => 'Категории',
-          'extraFields' => 'Дополнительно',
-          'sortOn'      => 'Сортировать по',
-          'search'      => 'Поиск по имени'
-        ];
-    }
-
-    public function rules()
-    {
-        return [
-          [['categories', 'extraFields', 'search'], 'safe']
-        ];
-    }
-
     public static function getExtraFieldsList(): array
     {
         return [
@@ -64,7 +47,24 @@ class UsersFiltersForm extends Model
         ];
     }
 
-    public function search(array $data): ActiveDataProvider
+    public function attributeLabels()
+    {
+        return [
+          'categories'  => 'Категории',
+          'extraFields' => 'Дополнительно',
+          'sortOn'      => 'Сортировать по',
+          'search'      => 'Поиск по имени'
+        ];
+    }
+
+    public function rules()
+    {
+        return [
+          [['categories', 'extraFields', 'search'], 'safe']
+        ];
+    }
+
+    public function search(array $data, int $pageSize = 5): ActiveDataProvider
     {
         $query = Users::find()
           ->select(['users.*'])
@@ -90,7 +90,7 @@ class UsersFiltersForm extends Model
 
         return new ActiveDataProvider([
           'query'      => $query,
-          'pagination' => ['pageSize' => 5],
+          'pagination' => ['pageSize' => $pageSize],
           'sort'       => [
             'attributes' => [
               'last_activity',
@@ -120,9 +120,7 @@ class UsersFiltersForm extends Model
 
     private function setSort(ActiveQuery $query, array $data): void
     {
-        $sorting = is_null(ArrayHelper::getValue($data, 'sort'))
-          ? static::SORT_LAST_ACTIVITY // default sorting
-          : ArrayHelper::getValue($data, 'sort');
+        $sorting = $this->getSorting($data);
 
         $sorts = [
           static::SORT_LAST_ACTIVITY => [$this, 'setSortLastActivity'],
@@ -191,7 +189,7 @@ class UsersFiltersForm extends Model
     {
         $search = (string)ArrayHelper::getValue($data, 'search');
 
-        if (isset($data['search']) && false === empty($search)) {
+        if (isset($data['search']) && !empty($search)) {
             $this->search = $search;
             $query->where(['id' => Users::findByUserName($search)->column()]);
         }
@@ -201,14 +199,14 @@ class UsersFiltersForm extends Model
     {
         $categories = ArrayHelper::getValue($data, 'categories');
 
-        if (isset($data['categories']) && false === empty($categories)) {
+        if (isset($data['categories']) && !empty($categories)) {
             $query->andFilterWhere(['id' => UsersSpecializations::getPerformersInCategories($categories)->column()]);
         }
     }
 
     private function setExtraFieldsFilters(ActiveQuery $query, array $data): void
     {
-        if (isset($data['extraFields']) && false === empty($extraFields = $this->getExtraFields($data))) {
+        if (isset($data['extraFields']) && !empty($extraFields = $this->getExtraFields($data))) {
             $extraFieldsFilters = [
               static::FREE_NOW    => [$this, 'setFreeNowExtraFieldsFilter'],
               static::ONLINE_NOW  => [$this, 'setOnlineNowExtraFieldsFilter'],
@@ -258,5 +256,12 @@ class UsersFiltersForm extends Model
     private function getFilterData(array $data)
     {
         return is_null($data = ArrayHelper::getValue($data, $this->formName())) ? [] : $data;
+    }
+
+    private function getSorting(array $data): string
+    {
+        return is_null(ArrayHelper::getValue($data, 'sort'))
+          ? static::SORT_LAST_ACTIVITY // default sorting
+          : ArrayHelper::getValue($data, 'sort');
     }
 }

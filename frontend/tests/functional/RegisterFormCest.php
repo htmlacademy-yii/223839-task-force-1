@@ -13,18 +13,18 @@ class SignUpFormCest
     public function _before(FunctionalTester $I)
     {
         $I->haveFixtures([
-          'users' => ['class' => UsersFixtures::class,],
+          'users'      => ['class' => UsersFixtures::class,],
           'categories' => ['class' => CategoriesFixtures::class],
-          'cities' => ['class' => CitiesFixtures::class],
-          'tasks' => ['class' => TasksFixtures::class]
+          'cities'     => ['class' => CitiesFixtures::class],
+          'tasks'      => ['class' => TasksFixtures::class]
         ]);
         $this->openRegisterPage($I);
     }
 
     public function openRegisterPage(FunctionalTester $I)
     {
-        $I->amOnPage(['/signup']);
-        $I->seeInCurrentUrl('/signup');
+        $I->amOnPage(['/register']);
+        $I->seeInCurrentUrl('/register');
         $I->seeResponseCodeIs(200);
         $I->see('Регистрация аккаунта');
     }
@@ -33,10 +33,10 @@ class SignUpFormCest
     public function registerUserRight(FunctionalTester $I)
     {
         $I->submitForm('form.registration__user-form', [
-          'SignupForm[email]' => 'bill.lading@usa.com',
+          'SignupForm[email]'     => 'bill.lading@usa.com',
           'SignupForm[user_name]' => 'Bill Lading',
-          'SignupForm[city_id]' => 1,
-          'SignupForm[password]' => 'dpkjvfqvtyz'
+          'SignupForm[city_id]'   => 1,
+          'SignupForm[password]'  => 'dpkjvfqvtyz'
         ]);
         $I->dontSee('error has occurred, try again');
         $I->seeInCurrentUrl('/');
@@ -46,12 +46,12 @@ class SignUpFormCest
     public function registerUserWrongUserName(FunctionalTester $I)
     {
         $I->submitForm('form.registration__user-form', [
-          'SignupForm[email]' => 'bill.lading@usa.com',
+          'SignupForm[email]'     => 'bill.lading@usa.com',
           'SignupForm[user_name]' => 'Bill Of Lading',
-          'SignupForm[city_id]' => 1,
-          'SignupForm[password]' => 'dpkjvfqvtyz'
+          'SignupForm[city_id]'   => 1,
+          'SignupForm[password]'  => 'dpkjvfqvtyz'
         ]);
-        $I->seeInCurrentUrl('/signup');
+        $I->seeInCurrentUrl('/register');
         $I->see('Имя должно соответствовать шаблону Иван Иванов.
          Нельзя использовать цифры и специальные символы.', '.help-block');
         $I->see('error has occurred, try again');
@@ -62,12 +62,12 @@ class SignUpFormCest
     public function registerUserWrongEmail(FunctionalTester $I)
     {
         $I->submitForm('form.registration__user-form', [
-          'SignupForm[email]' => 'bill.lading@21312.com',
+          'SignupForm[email]'     => 'bill.lading@21312.com',
           'SignupForm[user_name]' => 'Bill Lading',
-          'SignupForm[city_id]' => 1,
-          'SignupForm[password]' => 'dpkjvfqvtyz'
+          'SignupForm[city_id]'   => 1,
+          'SignupForm[password]'  => 'dpkjvfqvtyz'
         ]);
-        $I->seeInCurrentUrl('/signup');
+        $I->seeInCurrentUrl('/register');
         $I->see('Значение «email» неверно', '.help-block');
         $I->see('error has occurred, try again');
         $I->amOnPage('/');
@@ -78,7 +78,7 @@ class SignUpFormCest
     public function submitEmptyForm(FunctionalTester $I)
     {
         $I->submitForm('form.registration__user-form', []);
-        $I->seeInCurrentUrl('/signup');
+        $I->seeInCurrentUrl('/register');
         $I->see('Поле обязательно для заполнения', '.field-signupform-email.input-danger .help-block');
         $I->see('Поле обязательно для заполнения', '.field-signupform-user_name.input-danger .help-block');
         $I->see('', '.field-signupform-city_id .help-block');

@@ -2,26 +2,27 @@
 
 /* @var $this yii\web\View
  * @var $cities \frontend\models\Cities
- * @var $model \frontend\models\forms\SignupForm
+ * @var $model  \frontend\models\forms\SignupForm
  *
  */
 
 use yii\helpers\Html;
+use yii\widgets\ActiveForm;
 
-$this->title = 'Registration';
+$this->title = 'Регистрация аккаунта';
 ?>
 <section class="registration__user">
     <h1>Регистрация аккаунта</h1>
     <div class="registration-wrapper">
 
-        <?php
-        $form = \yii\widgets\ActiveForm::begin([
-          'method' => 'POST',
-          'action' => ['/signup'],
-          'id' => 'signup-form',
-          'errorCssClass' => 'input-danger',
+        <?php $form = ActiveForm::begin([
+          'method'                 => 'POST',
+          'action'                 => ['/auth/register'],
+          'id'                     => 'SignupForm',
+          'errorCssClass'          => 'input-danger',
           'enableClientValidation' => true,
-          'options' => [
+//          'validationStateOn'      => 'label',
+          'options'                => [
             'class' => 'registration__user-form form-create'
           ]
         ]) ?>
@@ -29,10 +30,10 @@ $this->title = 'Registration';
         <?= $form
           ->field($model, 'email')
           ->textarea([
-            'class' => 'input textarea',
-            'rows' => 1,
+            'autofocus'   => true,
+            'class'       => 'input textarea',
+            'rows'        => 1,
             'placeholder' => 'user@mail.ru',
-            'autofocus' => true,
           ])
           ->label('Электронная почта')
           ->error(['tag' => 'span'])
@@ -42,10 +43,11 @@ $this->title = 'Registration';
         <?= $form
           ->field($model, 'user_name')
           ->textarea([
-            'class' => 'input textarea',
-            'rows' => 1,
+            'class'       => 'input textarea',
+            'rows'        => 1,
             'placeholder' => 'Ваше Имя'
-          ])->label('Ваше имя и фамилия')
+          ])
+          ->label('Ваше имя и фамилия')
           ->error(['tag' => 'span'])
           ->hint('Введите ваше имя и фамилию', ['tag' => 'span'])
         ?>
@@ -54,9 +56,10 @@ $this->title = 'Registration';
         <?= $form
           ->field($model, 'city_id')
           ->dropDownList($cities, [
-            'class' => 'multiple-select input town-select registration-town',
-            'size' => 1
-          ])->label('Город проживания')
+            'class' => 'multiple-select input town-select auth-town registration-town',
+            'size'  => 1
+          ])
+          ->label('Город проживания')
           ->error(['tag' => 'span'])
           ->hint('Укажите город, чтобы находить подходящие задачи', ['tag' => 'span'])
         ?>
@@ -69,16 +72,13 @@ $this->title = 'Registration';
           ->hint('Длина пароля от 8 символов', ['tag' => 'span'])
         ?>
 
-        <?php
-        if (Yii::$app->session->hasFlash('error')) : ?>
+        <?php if (Yii::$app->session->hasFlash('error')) : ?>
             <?= Yii::$app->session->getFlash('error') ?>
-        <?php
-        endif; ?>
+        <?php endif; ?>
 
         <?= Html::submitButton('Создать аккаунт', ['class' => 'button button__registration']) ?>
 
-        <?php
-        $form::end() ?>
+        <?php $form::end() ?>
     </div>
 
 </section>

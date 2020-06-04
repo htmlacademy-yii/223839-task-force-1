@@ -24,23 +24,6 @@ class TasksFilterForms extends Model
     public int    $period      = self::CREATED_WEEK;
     public string $search      = '';
 
-    public function attributeLabels(): array
-    {
-        return [
-          'categories'  => 'Категории',
-          'extraFields' => 'Дополнительно',
-          'period'      => 'Период',
-          'search'      => 'Поиск по названию'
-        ];
-    }
-
-    public function rules(): array
-    {
-        return [
-          [['categories', 'extraFields', 'period', 'search'], 'safe'],
-        ];
-    }
-
     public static function getPeriodList(): array
     {
         return [
@@ -59,7 +42,24 @@ class TasksFilterForms extends Model
         ];
     }
 
-    public function search(array $data): ActiveDataProvider
+    public function attributeLabels(): array
+    {
+        return [
+          'categories'  => 'Категории',
+          'extraFields' => 'Дополнительно',
+          'period'      => 'Период',
+          'search'      => 'Поиск по названию'
+        ];
+    }
+
+    public function rules(): array
+    {
+        return [
+          [['categories', 'extraFields', 'period', 'search'], 'safe'],
+        ];
+    }
+
+    public function search(array $data, int $pageSize = 5): ActiveDataProvider
     {
         $query = Tasks::find()
           ->andWhere(['status' => Tasks::STATUS_NEW])
@@ -76,7 +76,7 @@ class TasksFilterForms extends Model
             $this->load($data);
         }
 
-        return new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => 5]]);
+        return new ActiveDataProvider(['query' => $query, 'pagination' => ['pageSize' => $pageSize]]);
     }
 
     private function getReadyDataToLoad(ActiveQuery $query, array $data): array
@@ -92,9 +92,9 @@ class TasksFilterForms extends Model
 
     private function setFilters(ActiveQuery $query, array $data): void
     {
-        $this->setExtraFieldsFilter($query, $data);
-
         $this->setCategoriesFilter($query, $data);
+
+        $this->setExtraFieldsFilter($query, $data);
 
         $this->setPeriodFilter($query, $data);
 
@@ -103,7 +103,7 @@ class TasksFilterForms extends Model
 
     private function setExtraFieldsFilter(ActiveQuery $query, array $data): void
     {
-        if (isset($data['extraFields']) && false === empty($extraFields = $this->getExtraFields($data))) {
+        if (isset($data['extraFields']) && !empty($extraFields = $this->getExtraFields($data))) {
             $extraFieldsFilters = [
               static::WITHOUT_RESPONSES => [$this, 'setWithoutResponsesExtraFieldsFilter'],
               static::REMOTE_WORK       => [$this, 'setRemoteWorkExtraFieldsFilter'],
@@ -131,7 +131,7 @@ class TasksFilterForms extends Model
 
     private function setCategoriesFilter(ActiveQuery $query, array $data): void
     {
-        if (isset($data['categories']) && false === empty($categories = $data['categories'])) {
+        if (isset($data['categories']) && !empty($categories = $data['categories'])) {
             $query->andFilterWhere(['category_id' => $categories]);
         }
     }
@@ -161,7 +161,7 @@ class TasksFilterForms extends Model
     {
         $search = (string)ArrayHelper::getValue($data, 'search');
 
-        if (isset($data['search']) && false === empty($search)) {
+        if (isset($data['search']) && !empty($search)) {
             $query->andFilterWhere(['LIKE', 'title', $search]);
         }
     }

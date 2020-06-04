@@ -4,43 +4,44 @@ namespace frontend\models;
 
 use frontend\modules\WordsTerminations;
 use Yii;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "users".
  *
- * @property int $id
- * @property string $first_name
- * @property string $last_name
- * @property string|null $address
- * @property string|null $biography
- * @property int|null $city_id
- * @property string $password
- * @property string $birthday
- * @property string $role
- * @property int $is_public
- * @property string $avatar
- * @property string $date_joined
- * @property string $last_activity
- * @property int $phone
- * @property string $email
- * @property string|null $skype
- * @property string|null $telegram
- * @property int $visit_counter
+ * @property int                    $id
+ * @property string                 $first_name
+ * @property string                 $last_name
+ * @property string|null            $address
+ * @property string|null            $biography
+ * @property int|null               $city_id
+ * @property string                 $password
+ * @property string                 $birthday
+ * @property string                 $role
+ * @property int                    $is_public
+ * @property string                 $avatar
+ * @property string                 $date_joined
+ * @property string                 $last_activity
+ * @property int                    $phone
+ * @property string                 $email
+ * @property string|null            $skype
+ * @property string|null            $telegram
+ * @property int                    $visit_counter
  *
- * @property BookmarkedUsers[] $bookmarkedUsers
- * @property BookmarkedUsers[] $bookmarkedUser
- * @property ChatMessages[] $chatMessagesAuthor
- * @property ChatMessages[] $chatMessagesRecipient
- * @property Responses[] $responses
- * @property Reviews[] $reviewsCustomer
- * @property Reviews[] $reviewsPerformer
- * @property Tasks[] $tasksCustomer
- * @property Tasks[] $tasksPerformer
- * @property Cities $city
- * @property UsersMedia[] $usersMedia
+ * @property BookmarkedUsers[]      $bookmarkedUsers
+ * @property BookmarkedUsers[]      $bookmarkedUser
+ * @property ChatMessages[]         $chatMessagesAuthor
+ * @property ChatMessages[]         $chatMessagesRecipient
+ * @property Responses[]            $responses
+ * @property Reviews[]              $reviewsCustomer
+ * @property Reviews[]              $reviewsPerformer
+ * @property Tasks[]                $tasksCustomer
+ * @property Tasks[]                $tasksPerformer
+ * @property Cities                 $city
+ * @property UsersMedia[]           $usersMedia
  * @property UsersSpecializations[] $usersSpecializations
  */
-class Users extends \yii\db\ActiveRecord
+class Users extends \yii\db\ActiveRecord implements IdentityInterface
 {
     const ROLE_CUSTOMER  = 'CUSTOMER';
     const ROLE_PERFORMER = 'PERFORMER';
@@ -54,7 +55,7 @@ class Users extends \yii\db\ActiveRecord
      */
     public static function tableName()
     {
-        return 'users';
+        return '{{%users}}';
     }
 
     /**
@@ -62,22 +63,41 @@ class Users extends \yii\db\ActiveRecord
      */
     public function rules()
     {
-        return [
-          [['first_name', 'last_name', 'city_id', 'password', 'role', 'email'], 'required'],
-          [['biography', 'role', 'avatar'], 'string'],
-          [['city_id', 'is_public', 'phone', 'visit_counter'], 'integer'],
-          [['birthday', 'date_joined', 'last_activity'], 'safe'],
-          [['first_name'], 'string', 'max' => 30],
-          [['last_name'], 'string', 'max' => 40],
-          [['address', 'password'], 'string', 'max' => 255],
-          [['email', 'skype', 'telegram'], 'string', 'max' => 50],
+        return array_merge(
+          static::emailRules(),
           [
-            ['city_id'],
-            'exist',
-            'skipOnError'     => true,
-            'targetClass'     => Cities::class,
-            'targetAttribute' => ['city_id' => 'id']
-          ],
+            [['first_name', 'last_name', 'city_id', 'password', 'role', 'email'], 'required'],
+            [['biography', 'role', 'avatar'], 'string'],
+            [['city_id', 'is_public', 'phone', 'visit_counter'], 'integer'],
+            [['birthday', 'date_joined', 'last_activity'], 'safe'],
+            [['first_name'], 'string', 'max' => 30],
+            [['last_name'], 'string', 'max' => 40],
+            [['skype', 'telegram'], 'string', 'max' => 50],
+            [
+              ['city_id'],
+              'exist',
+              'skipOnError'     => true,
+              'targetClass'     => Cities::class,
+              'targetAttribute' => ['city_id' => 'id']
+            ],
+          ]);
+
+//        ['phone', 'match', 'pattern' => '/^[\d]{11}/i',
+//         'message' => 'Номер телефона должен состоять из 11 цифр'],
+    }
+
+    public static function emailRules()
+    {
+        return [
+          ['email', 'match', 'pattern' => '/^([0-9a-zа-я\.]+@)([а-яa-z]{2,}\.)+([a-zа-я]{2,})+$/sui'],
+          [['email'], 'string', 'min' => 3, 'max' => 50],
+        ];
+    }
+
+    public static function passwordRules()
+    {
+        return [
+          [['password'], 'string', 'min' => 8, 'max' => 255],
         ];
     }
 
@@ -419,5 +439,35 @@ class Users extends \yii\db\ActiveRecord
     public function isCustomer(): bool
     {
         return $this->role === static::ROLE_CUSTOMER;
+    }
+
+    public function validatePassword(string $password): bool
+    {
+        return Yii::$app->getSecurity()->validatePassword($password, $this->password);
+    }
+
+    public static function findIdentity($id)
+    {
+        return static::findOne($id);
+    }
+
+    public function getId(): int
+    {
+        return $this->getPrimaryKey();
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        // TODO: Implement findIdentityByAccessToken() method.
+    }
+
+    public function getAuthKey()
+    {
+        // TODO: Implement getAuthKey() method.
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        // TODO: Implement validateAuthKey() method.
     }
 }

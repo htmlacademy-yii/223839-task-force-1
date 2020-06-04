@@ -3,24 +3,34 @@
 namespace frontend\tests\functional;
 
 use frontend\models\forms\TasksFilterForms;
-use frontend\models\forms\UsersFiltersForm;
+use frontend\models\Users;
 use frontend\tests\fixtures\CategoriesFixtures;
 use frontend\tests\fixtures\CitiesFixtures;
 use frontend\tests\fixtures\TasksFixtures;
 use frontend\tests\fixtures\UsersFixtures;
 use frontend\tests\FunctionalTester;
 
-class TasksIndexCest
+class AuthorizedUserInTasksPage
 {
     public function _before(FunctionalTester $I)
     {
         $I->haveFixtures([
-          'users' => ['class' => UsersFixtures::class,],
+          'users'      => ['class' => UsersFixtures::class,],
           'categories' => ['class' => CategoriesFixtures::class],
-          'cities' => ['class' => CitiesFixtures::class],
-          'tasks' => ['class' => TasksFixtures::class]
+          'cities'     => ['class' => CitiesFixtures::class],
+          'tasks'      => ['class' => TasksFixtures::class]
         ]);
+        $this->login($I);
         $this->openUsersPage($I);
+    }
+
+    public function login(FunctionalTester $I)
+    {
+        $user = Users::findOne(['email' => 'victoria.fix@mail.ru']);
+        \Yii::$app->user->login($user);
+
+        $I->amOnPage('/');
+        $I->see('Новые задания');
     }
 
     public function openUsersPage(FunctionalTester $I)
@@ -62,7 +72,7 @@ class TasksIndexCest
         $I->seeInCurrentUrl('/tasks');
 
         $I->seeCheckboxIsChecked('#extraFields-' . TasksFilterForms::WITHOUT_RESPONSES);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' .TasksFilterForms::REMOTE_WORK);
+        $I->dontSeeCheckboxIsChecked('#extraFields-' . TasksFilterForms::REMOTE_WORK);
         $I->seeInField('#tasksfilterforms-search', '');
     }
 
@@ -74,7 +84,7 @@ class TasksIndexCest
         $I->seeInCurrentUrl('/tasks');
 
         $I->dontSeeCheckboxIsChecked('#extraFields-' . TasksFilterForms::WITHOUT_RESPONSES);
-        $I->seeCheckboxIsChecked('#extraFields-' .TasksFilterForms::REMOTE_WORK);
+        $I->seeCheckboxIsChecked('#extraFields-' . TasksFilterForms::REMOTE_WORK);
         $I->seeInField('#tasksfilterforms-search', '');
     }
 
@@ -93,17 +103,17 @@ class TasksIndexCest
         $I->submitForm('form.search-task__form', [
           'TasksFilterForms[period]' => TasksFilterForms::ALL_TIME
         ]);
-        $I->seeOptionIsSelected('#tasksfilterforms-period','За все время');
+        $I->seeOptionIsSelected('#tasksfilterforms-period', 'За все время');
 
         $I->submitForm('form.search-task__form', [
           'TasksFilterForms[period]' => TasksFilterForms::CREATED_TODAY
         ]);
-        $I->seeOptionIsSelected('#tasksfilterforms-period','За день');
+        $I->seeOptionIsSelected('#tasksfilterforms-period', 'За день');
 
         $I->submitForm('form.search-task__form', [
           'TasksFilterForms[period]' => TasksFilterForms::CREATED_MONTH
         ]);
-        $I->seeOptionIsSelected('#tasksfilterforms-period','За месяц');
+        $I->seeOptionIsSelected('#tasksfilterforms-period', 'За месяц');
     }
 
     public function setCategoriesFilter(FunctionalTester $I)

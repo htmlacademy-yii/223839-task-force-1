@@ -3,11 +3,12 @@
 namespace frontend\controllers;
 
 use frontend\models\Cities;
+use frontend\models\forms\LoginForm;
 use frontend\models\forms\SignupForm;
 use yii\helpers\ArrayHelper;
 use yii\web\Controller;
 
-class RegistrationController extends Controller
+class SignupController extends Controller
 {
     public function actionRegister()
     {
@@ -27,5 +28,12 @@ class RegistrationController extends Controller
         $cities = ArrayHelper::map(Cities::find()->asArray()->all(), 'id', 'name');
 
         return $this->render('register', compact('model', 'cities'));
+    }
+
+    public function actionlogin()
+    {
+        $model = new LoginForm();
+
+        return $this->render('loginForm', compact('model'));
     }
 }

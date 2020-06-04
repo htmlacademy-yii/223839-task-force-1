@@ -6,15 +6,14 @@ use frontend\models\Categories;
 use frontend\models\forms\UsersFiltersForm;
 use frontend\models\Users;
 use yii\helpers\ArrayHelper;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
-class UsersController extends Controller
+class UsersController extends SecuredController
 {
     public function actionIndex()
     {
         $categories = ArrayHelper::map(Categories::find()->all(), 'id', 'name');
-        $sorts = UsersFiltersForm::getSortsList();
+        $sorts      = UsersFiltersForm::getSortsList();
 
         $searchModel = new UsersFiltersForm();
 
@@ -28,7 +27,7 @@ class UsersController extends Controller
 
     public function actionView(int $id)
     {
-        if (!$user = Users::findOne($id)) {
+        if (($user = Users::findOne($id)) === null) {
             throw new NotFoundHttpException('page not found');
         }
 
