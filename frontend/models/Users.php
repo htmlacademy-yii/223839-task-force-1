@@ -3,51 +3,57 @@
 namespace frontend\models;
 
 use frontend\modules\WordsTerminations;
+use frontend\traits\Rules;
 use Yii;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "users".
  *
- * @property int                    $id
- * @property string                 $first_name
- * @property string                 $last_name
- * @property string|null            $address
- * @property string|null            $biography
- * @property int|null               $city_id
- * @property string                 $password
- * @property string                 $birthday
- * @property string                 $role
- * @property int                    $is_public
- * @property string                 $avatar
- * @property string                 $date_joined
- * @property string                 $last_activity
- * @property int                    $phone
- * @property string                 $email
- * @property string|null            $skype
- * @property string|null            $telegram
- * @property int                    $visit_counter
+ * @property int $id
+ * @property string $first_name
+ * @property string $last_name
+ * @property string|null $address
+ * @property string|null $biography
+ * @property int|null $city_id
+ * @property string $password
+ * @property string $birthday
+ * @property string $role
+ * @property int $is_public
+ * @property string $avatar
+ * @property string $date_joined
+ * @property string $last_activity
+ * @property int $phone
+ * @property string $email
+ * @property string|null $skype
+ * @property string|null $telegram
+ * @property int $visit_counter
  *
- * @property BookmarkedUsers[]      $bookmarkedUsers
- * @property BookmarkedUsers[]      $bookmarkedUser
- * @property ChatMessages[]         $chatMessagesAuthor
- * @property ChatMessages[]         $chatMessagesRecipient
- * @property Responses[]            $responses
- * @property Reviews[]              $reviewsCustomer
- * @property Reviews[]              $reviewsPerformer
- * @property Tasks[]                $tasksCustomer
- * @property Tasks[]                $tasksPerformer
- * @property Cities                 $city
- * @property UsersMedia[]           $usersMedia
+ * @property BookmarkedUsers[] $bookmarkedUsers
+ * @property BookmarkedUsers[] $bookmarkedUser
+ * @property ChatMessages[] $chatMessagesAuthor
+ * @property ChatMessages[] $chatMessagesRecipient
+ * @property Responses[] $responses
+ * @property Reviews[] $reviewsCustomer
+ * @property Reviews[] $reviewsPerformer
+ * @property Tasks[] $tasksCustomer
+ * @property Tasks[] $tasksPerformer
+ * @property Cities $city
+ * @property UsersMedia[] $usersMedia
  * @property UsersSpecializations[] $usersSpecializations
  */
-class Users extends \yii\db\ActiveRecord implements IdentityInterface
+class Users extends ActiveRecord implements IdentityInterface
 {
-    const ROLE_CUSTOMER  = 'CUSTOMER';
-    const ROLE_PERFORMER = 'PERFORMER';
+    use Rules;
+
+    const
+        ROLE_CUSTOMER = 'CUSTOMER',
+        ROLE_PERFORMER = 'PERFORMER';
 
     const COUNTER_OPTIONS = [
-      'withWord' => false
+        'withWord' => false
     ];
 
     /**
@@ -64,41 +70,23 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return array_merge(
-          static::emailRules(),
-          [
-            [['first_name', 'last_name', 'city_id', 'password', 'role', 'email'], 'required'],
-            [['biography', 'role', 'avatar'], 'string'],
-            [['city_id', 'is_public', 'phone', 'visit_counter'], 'integer'],
-            [['birthday', 'date_joined', 'last_activity'], 'safe'],
-            [['first_name'], 'string', 'max' => 30],
-            [['last_name'], 'string', 'max' => 40],
-            [['skype', 'telegram'], 'string', 'max' => 50],
+            static::emailRules(),
             [
-              ['city_id'],
-              'exist',
-              'skipOnError'     => true,
-              'targetClass'     => Cities::class,
-              'targetAttribute' => ['city_id' => 'id']
-            ],
-          ]);
-
-//        ['phone', 'match', 'pattern' => '/^[\d]{11}/i',
-//         'message' => 'Номер телефона должен состоять из 11 цифр'],
-    }
-
-    public static function emailRules()
-    {
-        return [
-          ['email', 'match', 'pattern' => '/^([0-9a-zа-я\.]+@)([а-яa-z]{2,}\.)+([a-zа-я]{2,})+$/sui'],
-          [['email'], 'string', 'min' => 3, 'max' => 50],
-        ];
-    }
-
-    public static function passwordRules()
-    {
-        return [
-          [['password'], 'string', 'min' => 8, 'max' => 255],
-        ];
+                [['first_name', 'last_name', 'city_id', 'password', 'role', 'email'], 'required'],
+                [['biography', 'role', 'avatar'], 'string'],
+                [['city_id', 'is_public', 'phone', 'visit_counter'], 'integer'],
+                [['birthday', 'date_joined', 'last_activity'], 'safe'],
+                [['first_name'], 'string', 'max' => 30],
+                [['last_name'], 'string', 'max' => 40],
+                [['skype', 'telegram'], 'string', 'max' => 50],
+                [
+                    ['city_id'],
+                    'exist',
+                    'skipOnError'     => true,
+                    'targetClass'     => Cities::class,
+                    'targetAttribute' => ['city_id' => 'id']
+                ],
+            ]);
     }
 
     /**
@@ -107,24 +95,24 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     public function attributeLabels()
     {
         return [
-          'id'            => 'ID',
-          'first_name'    => 'First Name',
-          'last_name'     => 'Last Name',
-          'address'       => 'Address',
-          'biography'     => 'Biography',
-          'city_id'       => 'City ID',
-          'password'      => 'Password',
-          'birthday'      => 'Birthday',
-          'role'          => 'Role',
-          'is_public'     => 'Is Public',
-          'avatar'        => 'Avatar',
-          'date_joined'   => 'Date Joined',
-          'last_activity' => 'Last Activity',
-          'phone'         => 'Phone',
-          'email'         => 'Email',
-          'skype'         => 'Skype',
-          'telegram'      => 'Telegram',
-          'visit_counter' => 'Visit Counter',
+            'id'            => 'ID',
+            'first_name'    => 'First Name',
+            'last_name'     => 'Last Name',
+            'address'       => 'Address',
+            'biography'     => 'Biography',
+            'city_id'       => 'City ID',
+            'password'      => 'Password',
+            'birthday'      => 'Birthday',
+            'role'          => 'Role',
+            'is_public'     => 'Is Public',
+            'avatar'        => 'Avatar',
+            'date_joined'   => 'Date Joined',
+            'last_activity' => 'Last Activity',
+            'phone'         => 'Phone',
+            'email'         => 'Email',
+            'skype'         => 'Skype',
+            'telegram'      => 'Telegram',
+            'visit_counter' => 'Visit Counter',
         ];
     }
 
@@ -136,7 +124,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * Gets query for [[BookmarkedUsers]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getBookmarkedUsers()
     {
@@ -146,7 +134,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * Gets query for [[BookmarkedUser]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getBookmarkedUser()
     {
@@ -156,7 +144,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * Gets query for [[ChatMessagesAuthor]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getChatMessagesAuthor()
     {
@@ -166,7 +154,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * Gets query for [[ChatMessagesRecipient]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getChatMessagesRecipient()
     {
@@ -176,7 +164,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * Gets query for [[Responses]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getResponses()
     {
@@ -186,7 +174,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * Gets query for [[ReviewsCustomer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getReviewsCustomer()
     {
@@ -196,7 +184,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * Gets query for [[ReviewsPerformer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getReviewsPerformer()
     {
@@ -211,7 +199,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * Gets query for [[TasksCustomer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getTasksCustomer()
     {
@@ -221,7 +209,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * Gets query for [[TasksPerformer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getTasksPerformer()
     {
@@ -231,10 +219,10 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     public static function getPerformersHasTasksNow(): array
     {
         return Tasks::find()
-          ->distinct()
-          ->select('performer_id')
-          ->where(['status' => Tasks::STATUS_ACTIVE])
-          ->column();
+            ->distinct()
+            ->select('performer_id')
+            ->where(['status' => Tasks::STATUS_ACTIVE])
+            ->column();
     }
 
     public static function getPerformersHasReviews(): array
@@ -245,16 +233,16 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     public static function getBookmarkedUsersForUser(int $id): array
     {
         return BookmarkedUsers::find()
-          ->distinct()
-          ->select(['bookmarked_user_id'])
-          ->where(['user_id' => $id])
-          ->column();
+            ->distinct()
+            ->select(['bookmarked_user_id'])
+            ->where(['user_id' => $id])
+            ->column();
     }
 
     /**
      * Gets query for [[City]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCity()
     {
@@ -264,7 +252,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * Gets query for [[UsersMedia]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getUsersMedia()
     {
@@ -274,7 +262,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     /**
      * Gets query for [[UsersSpecializations]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getUsersSpecializations()
     {
@@ -284,17 +272,17 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     public function getCategories()
     {
         return $this->hasMany(Categories::class, ['id' => 'category_id'])
-          ->via('usersSpecializations');
+            ->via('usersSpecializations');
     }
 
-    /*
-     *  Gets average rating for performer
+    /**
+     *  Get average rating for performer
      */
     public function getRating()
     {
         $reviews = $this->isPerformer() ? $this->reviewsPerformer : $this->reviewsCustomer;
-
-        if (($reviewsCount = count($reviews)) === 0) {
+        $reviewsCount = count($reviews);
+        if ($reviewsCount === 0) {
             return 0;
         }
 
@@ -314,12 +302,12 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
 
         if ($options['withWord']) {
             $terminations =
-              [
-                0 => 'лет',
-                1 => 'год',
-                2 => 'года',
-                5 => 'лет'
-              ];
+                [
+                    0 => 'лет',
+                    1 => 'год',
+                    2 => 'года',
+                    5 => 'лет'
+                ];
 
             $age .= ' ' . WordsTerminations::getWordTermination($age, $terminations);
         }
@@ -334,10 +322,10 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
 
         if ($options['withWord']) {
             $terminations = [
-              0 => 'ов',
-              1 => '',
-              2 => 'а',
-              5 => 'ов'
+                0 => 'ов',
+                1 => '',
+                2 => 'а',
+                5 => 'ов'
             ];
 
             $counter .= ' заказ' . WordsTerminations::getWordTermination($counter, $terminations);
@@ -354,10 +342,10 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
 
         if ($options['withWord']) {
             $terminations = [
-              0 => 'ов',
-              1 => '',
-              2 => 'а',
-              5 => 'ов'
+                0 => 'ов',
+                1 => '',
+                2 => 'а',
+                5 => 'ов'
             ];
 
             $counter .= ' отзыв' . WordsTerminations::getWordTermination($counter, $terminations);
@@ -380,10 +368,10 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
                 $counter = date('d', time()) - Yii::$app->formatter->asDate($this->date_joined, 'd');
                 if ($options['withWord']) {
                     $terminations = [
-                      0 => 'дней',
-                      1 => 'день',
-                      2 => 'дня',
-                      5 => 'дней'
+                        0 => 'дней',
+                        1 => 'день',
+                        2 => 'дня',
+                        5 => 'дней'
                     ];
                     return $counter . ' ' . WordsTerminations::getWordTermination($counter, $terminations);
                 }
@@ -392,10 +380,10 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
             // month
             if ($options['withWord']) {
                 $terminations = [
-                  0 => 'ев',
-                  1 => '',
-                  2 => 'а',
-                  5 => 'ев'
+                    0 => 'ев',
+                    1 => '',
+                    2 => 'а',
+                    5 => 'ев'
                 ];
 
                 return $counter . ' месяц' . WordsTerminations::getWordTermination($counter, $terminations);
@@ -404,10 +392,10 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
             //years
             if ($options['withWord']) {
                 $terminations = [
-                  0 => 'лет',
-                  1 => 'год',
-                  2 => 'года',
-                  5 => 'лет'
+                    0 => 'лет',
+                    1 => 'год',
+                    2 => 'года',
+                    5 => 'лет'
                 ];
 
                 return $counter . ' ' . WordsTerminations::getWordTermination($counter, $terminations);
@@ -423,12 +411,12 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
 
     public function setPassword(string $password): void
     {
-        $this->password = \Yii::$app->getSecurity()->generatePasswordHash($password);
+        $this->password = Yii::$app->getSecurity()->generatePasswordHash($password);
     }
 
     public function updateLastActivity(): void
     {
-        $this->last_activity = \Yii::$app->formatter->asDate('now', 'php:Y-m-d H:i:s');
+        $this->last_activity = Yii::$app->formatter->asDate('now', 'php:Y-m-d H:i:s');
     }
 
     public function isPerformer(): bool

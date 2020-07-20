@@ -14,6 +14,6 @@ modules:
         Yii2:
             configFile: 'config/codeception-local.php'
         Db:
-            dsn: mysql:host=127.0.0.1;dbname=taskForceDB
+            dsn: mysql:host=mysql;dbname=taskforce
             user: root
-            password:
+            password: root

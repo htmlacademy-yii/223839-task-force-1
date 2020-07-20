@@ -28,9 +28,6 @@ class SiteController extends Controller
         $exception = \Yii::$app->errorHandler->exception;
 
         if ($exception !== null) {
-//            return \Yii::$app->user->isGuest
-//              ? $this->redirect('/')
-//              : $this->render('error', compact('exception'));
             return $this->render('error', compact('exception'));
         }
     }

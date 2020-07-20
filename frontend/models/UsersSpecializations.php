@@ -61,9 +61,13 @@ class UsersSpecializations extends \yii\db\ActiveRecord
         ];
     }
 
-    public static function getPerformersInCategories(array $categories): ActiveQuery
+    public static function getPerformersInCategories(array $categories): array
     {
-        return static::find()->distinct()->select(['performer_id'])->where(['category_id' => $categories]);
+        return static::find()
+            ->distinct()
+            ->select(['performer_id'])
+            ->where(['category_id' => $categories])
+            ->column();
     }
 
     /**

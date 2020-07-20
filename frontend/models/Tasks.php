@@ -2,6 +2,9 @@
 
 namespace frontend\models;
 
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
+
 /**
  * This is the model class for table "tasks".
  *
@@ -29,13 +32,14 @@ namespace frontend\models;
  * @property Cities $city
  * @property Users $performer
  */
-class Tasks extends \yii\db\ActiveRecord
+class Tasks extends ActiveRecord
 {
-    const STATUS_NEW       = 1;
-    const STATUS_CANCELED  = 2;
-    const STATUS_ACTIVE    = 3;
-    const STATUS_COMPLETED = 4;
-    const STATUS_FAILED    = 5;
+    const
+        STATUS_NEW = 1,
+        STATUS_CANCELED = 2,
+        STATUS_ACTIVE = 3,
+        STATUS_COMPLETED = 4,
+        STATUS_FAILED = 5;
 
     /**
      * {@inheritdoc}
@@ -51,41 +55,41 @@ class Tasks extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-          [['title', 'city_id', 'description', 'category_id', 'author_id', 'status'], 'required'],
-          [['created_at', 'update_at', 'closed_at'], 'safe'],
-          [['budget', 'city_id', 'category_id', 'performer_id', 'author_id', 'status', 'remoteWork'], 'integer'],
-          [['lan', 'long'], 'number'],
-          [['description'], 'string'],
-          [['title'], 'string', 'max' => 50],
-          [['address'], 'string', 'max' => 100],
-          [
-            ['author_id'],
-            'exist',
-            'skipOnError'     => true,
-            'targetClass'     => Users::class,
-            'targetAttribute' => ['author_id' => 'id']
-          ],
-          [
-            ['category_id'],
-            'exist',
-            'skipOnError'     => true,
-            'targetClass'     => Categories::class,
-            'targetAttribute' => ['category_id' => 'id']
-          ],
-          [
-            ['city_id'],
-            'exist',
-            'skipOnError'     => true,
-            'targetClass'     => Cities::class,
-            'targetAttribute' => ['city_id' => 'id']
-          ],
-          [
-            ['performer_id'],
-            'exist',
-            'skipOnError'     => true,
-            'targetClass'     => Users::class,
-            'targetAttribute' => ['performer_id' => 'id']
-          ],
+            [['title', 'city_id', 'description', 'category_id', 'author_id', 'status'], 'required'],
+            [['created_at', 'update_at', 'closed_at'], 'safe'],
+            [['budget', 'city_id', 'category_id', 'performer_id', 'author_id', 'status', 'remoteWork'], 'integer'],
+            [['lan', 'long'], 'number'],
+            [['description'], 'string'],
+            [['title'], 'string', 'max' => 50],
+            [['address'], 'string', 'max' => 100],
+            [
+                ['author_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Users::class,
+                'targetAttribute' => ['author_id' => 'id']
+            ],
+            [
+                ['category_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Categories::class,
+                'targetAttribute' => ['category_id' => 'id']
+            ],
+            [
+                ['city_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Cities::class,
+                'targetAttribute' => ['city_id' => 'id']
+            ],
+            [
+                ['performer_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Users::class,
+                'targetAttribute' => ['performer_id' => 'id']
+            ],
         ];
     }
 
@@ -95,22 +99,22 @@ class Tasks extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-          'id'           => 'ID',
-          'title'        => 'Title',
-          'address'      => 'Address',
-          'created_at'   => 'Created At',
-          'update_at'    => 'Update At',
-          'closed_at'    => 'Closed At',
-          'budget'       => 'Budget',
-          'city_id'      => 'City ID',
-          'lan'          => 'Lan',
-          'long'         => 'Long',
-          'description'  => 'Description',
-          'category_id'  => 'Category ID',
-          'performer_id' => 'Performer ID',
-          'author_id'    => 'Author ID',
-          'status'       => 'Status',
-          'remoteWork'   => 'Remote Work',
+            'id'           => 'ID',
+            'title'        => 'Title',
+            'address'      => 'Address',
+            'created_at'   => 'Created At',
+            'update_at'    => 'Update At',
+            'closed_at'    => 'Closed At',
+            'budget'       => 'Budget',
+            'city_id'      => 'City ID',
+            'lan'          => 'Lan',
+            'long'         => 'Long',
+            'description'  => 'Description',
+            'category_id'  => 'Category ID',
+            'performer_id' => 'Performer ID',
+            'author_id'    => 'Author ID',
+            'status'       => 'Status',
+            'remoteWork'   => 'Remote Work',
         ];
     }
 
@@ -122,7 +126,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Responses]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getResponses()
     {
@@ -132,7 +136,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Reviews]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getReviews()
     {
@@ -142,7 +146,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Author]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getAuthor()
     {
@@ -152,7 +156,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Category]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCategory()
     {
@@ -162,7 +166,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[City]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getCity()
     {
@@ -172,7 +176,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Performer]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getPerformer()
     {

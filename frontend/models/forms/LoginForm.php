@@ -3,32 +3,35 @@
 namespace frontend\models\forms;
 
 use frontend\models\Users;
+use frontend\traits\Rules;
 use yii\base\Model;
 
 class LoginForm extends Model
 {
+    use Rules;
+
     const WRONG_MESSAGE_EMAIL_AND_PASSWORD = 'Неправильный email или пароль';
 
-    public string $email        = '';
-    public string $password     = '';
+    public string $email    = '';
+    public string $password = '';
 
     private $user;
 
     public function rules()
     {
         return array_merge(
-          Users::emailRules(),
-          Users::passwordRules(), [
-          [['email', 'password'], 'required'],
-          ['password', 'validatePassword'],
+            static::emailRules(),
+            static::passwordRules(), [
+            [['email', 'password'], 'required'],
+            ['password', 'validatePassword'],
         ]);
     }
 
     public function attributeLabels()
     {
         return [
-          'email'    => 'email',
-          'password' => 'Пароль',
+            'email'    => 'email',
+            'password' => 'Пароль',
         ];
     }
 

@@ -13,8 +13,6 @@ class LoginFormWidget extends Widget
         if (\Yii::$app->user->isGuest) {
             $model = new LoginForm();
             return $this->render('loginFormWidget', compact('model'));
-        } else {
-            return;
         }
     }
 }

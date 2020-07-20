@@ -8,5 +8,5 @@ use yii\test\ActiveFixture;
 class CitiesFixtures extends ActiveFixture
 {
     public $modelClass = Cities::class;
-    public $dataFile = '@frontend/tests/_data/Cities.php';
+    public $dataFile = '@frontend/tests/_data/cities.php';
 }

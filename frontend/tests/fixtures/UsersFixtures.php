@@ -8,5 +8,5 @@ use yii\test\ActiveFixture;
 class UsersFixtures extends ActiveFixture
 {
     public $modelClass = Users::class;
-    public $dataFile = '@frontend/tests/_data/Users.php';
+    public $dataFile = '@frontend/tests/_data/users.php';
 }
