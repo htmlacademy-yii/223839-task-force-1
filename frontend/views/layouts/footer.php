@@ -1,6 +1,8 @@
 <?php
 
-use yii\helpers\Html; ?>
+use yii\helpers\Html;
+
+?>
 
 <footer class="page-footer">
     <div class="main-container page-footer__container">
