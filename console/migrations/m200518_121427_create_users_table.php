@@ -29,14 +29,10 @@ class m200518_121427_create_users_table extends Migration
           'birthday' => $this->date()->null(),
           'role' => "ENUM ('CUSTOMER', 'PERFORMER') NOT NULL",
           'is_public' => $this->tinyInteger(1)->unsigned()->defaultValue(1)->notNull(),
-          'avatar' => $this->text()->defaultValue('placeholderUser.jpg')->notNull(),
-          'date_joined' => $this->timestamp()->notNull(),
-          'last_activity' => $this->timestamp()->notNull(),
+          'avatar' => $this->string()->defaultValue('placeholderUser.jpg')->notNull(),
+          'date_joined' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP')->notNull(),
+          'last_activity' => $this->timestamp()->defaultExpression('CURRENT_TIMESTAMP'),
           'phone' => $this->bigInteger(12)->unsigned()->null(),
-          //          'phone' => $this->integer(11)->unsigned()->unique()->notNull(),
-          //          'skype' => $this->char(50)->unique()->null(),
-          //          'telegram' => $this->char(50)->unique()->null(),
-          //          'email' => $this->char(50)->unique()->notNull(),
           'email' => $this->char(50)->notNull(),
           'skype' => $this->char(50)->null(),
           'telegram' => $this->char(50)->null(),
@@ -62,20 +58,21 @@ class m200518_121427_create_users_table extends Migration
             $faker = Faker\Factory::create('ru_RU');
 
             $insert[] = [
-              $faker->firstName,
-              $faker->lastName,
-              $faker->streetAddress,
-              $faker->text(500),
-              $faker->numberBetween(1, 100),
-              $faker->password(8, 30),
-              $faker->date('Y-m-d'),
-              $faker->dateTimeBetween('-2 month')->format('Y-m-d'),
-              $i % 2 ? 'CUSTOMER' : 'PERFORMER',
-              $faker->unique()->numberBetween(70000000000, 79999999999),
-              $faker->unique(true)->email,
-              $faker->unique(true)->userName,
-              $faker->unique(true)->userName,
-              $faker->numberBetween(0, 1000),
+              $faker->firstName, // firstName
+              $faker->lastName, // lastName
+              $faker->streetAddress, // street
+              $faker->text(500), // bio
+              $faker->numberBetween(1, 100), // city
+              $faker->password(8, 30), // pass
+              $faker->dateTimeBetween('-2 month')->format('Y-m-d'), // date joined
+              $faker->date('Y-m-d'), // birthday
+              $faker->dateTimeBetween('-2 month')->format('Y-m-d'), // last-activity
+              $i % 2 ? 'CUSTOMER' : 'PERFORMER', // role
+              $faker->unique()->numberBetween(70000000000, 79999999999), // phone
+              $faker->unique(true)->email, //email
+              $faker->unique(true)->word, //skype
+              $faker->unique(true)->userName, // telegram
+              $faker->numberBetween(0, 1000), //visit counter
             ];
         }
         $this->batchInsert('users',
@@ -86,6 +83,7 @@ class m200518_121427_create_users_table extends Migration
             'biography',
             'city_id',
             'password',
+            'date_joined',
             'birthday',
             'last_activity',
             'role',

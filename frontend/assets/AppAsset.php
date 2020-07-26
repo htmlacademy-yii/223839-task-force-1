@@ -10,19 +10,18 @@ use yii\web\AssetBundle;
 class AppAsset extends AssetBundle
 {
     public $basePath = '@webroot';
-    public $baseUrl = '@web';
-    public $css = [
-      'css/normalize.css',
-      'css/style.css',
+    public $baseUrl  = '@web';
+    public $css      = [
+        'css/normalize.css',
+        'css/style.css',
     ];
-    public $js = [
-      'js/vue.js',
-      'js/main.js',
-      'js/dropzone.js',
-      'js/messenger.js'
+    public $js       = [
+        'js/vue.js',
+        'js/main.js',
+        'js/dropzone.js',
+        'js/messenger.js'
     ];
-    public $depends = [
-      'yii\web\YiiAsset',
-      'yii\bootstrap\BootstrapAsset',
+    public $depends  = [
+        'yii\web\YiiAsset',
     ];
 }

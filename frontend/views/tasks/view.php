@@ -3,6 +3,7 @@
  * @var $task \frontend\models\Tasks
  */
 
+use frontend\widgets\RatingWidget;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\HtmlPurifier;
@@ -84,18 +85,9 @@ $this->title = $task->title;
                                   ['class' => 'link-regular']
                                 ) ?>
                             </p>
-                            <?php
-                            $rating = $response->performer->getRating();
 
-                            for ($i = 0; $i < 5; $i++) {
-                                if ($i < floor($rating)) {
-                                    echo ' <span></span > ';
-                                } else {
-                                    echo '<span class="star-disabled" ></span > ';
-                                }
-                            }
-                            echo "<b>{$rating}<b>";
-                            ?>
+                            <?= RatingWidget::widget(['rating' => $response->performer->rating]) ?>
+
                         </div>
                         <span class="new-task__time">
                             <?= Yii::$app->formatter->asRelativeTime($response->response_date) ?>

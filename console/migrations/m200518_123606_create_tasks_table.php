@@ -84,7 +84,7 @@ class m200518_123606_create_tasks_table extends Migration
           'tasks',
           'city_id'
         );
-//
+
         $this->addForeignKey(
           'task_city_id',
           'tasks',
@@ -98,18 +98,18 @@ class m200518_123606_create_tasks_table extends Migration
         for ($i = 0; $i <= 100; $i++) {
             $faker = Faker\Factory::create('ru_RU');
             $insert[] = [
-              $faker->text(40),
-              $faker->streetAddress,
-              $faker->numberBetween(1099, 100000),
-              $faker->dateTimeBetween('-2 month')->format('Y-m-d'),
-              $faker->numberBetween(1, 100),
+              $faker->text(40), // title
+              $faker->streetAddress, // address
+              $faker->numberBetween(1099, 100000), //budget
+              $faker->dateTimeBetween('-2 month')->format('Y-m-d'), //created at
+              $faker->numberBetween(1, 100), // city_id
               $faker->latitude,
               $faker->longitude,
-              $faker->text(100),
-              $faker->numberBetween(1, 8),
-              $faker->numberBetween(1, 100),
-              $faker->numberBetween(1, 100),
-              $faker->numberBetween(1, 5)
+              $faker->text(100), //description
+              $faker->numberBetween(1, 10), // category
+              $faker->numberBetween(1, 100), // performer
+              $faker->numberBetween(1, 100), //author
+              $faker->numberBetween(1, 5) // status
             ];
         }
 
