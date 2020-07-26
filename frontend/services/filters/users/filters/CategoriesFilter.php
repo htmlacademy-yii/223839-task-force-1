@@ -1,25 +1,28 @@
 <?php
 
-namespace frontend\services\filters\users;
+namespace frontend\services\filters\users\filters;
 
 use frontend\models\UsersSpecializations;
 use frontend\services\filters\Filter;
+use yii\db\ActiveQuery;
 
-class CategoriesFilter extends Filter
+class CategoriesFilter implements Filter
 {
 
-    public function execute(): void
+    public function setFilter(ActiveQuery $query, array $data): ActiveQuery
     {
-        if (isset($this->data['categories'])) {
-            $categories = $this->data['categories'];
+        if (isset($data['categories'])) {
+            $categories = $data['categories'];
 
             if (!empty($categories)) {
                 $users = $this->getUsersWithCategory($categories);
-                $this->query->andFilterWhere([
+                $query->andFilterWhere([
                     'id' => $users
                 ]);
             }
         }
+
+        return $query;
     }
 
     private function getUsersWithCategory(array $categories)

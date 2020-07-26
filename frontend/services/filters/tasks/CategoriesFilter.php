@@ -3,17 +3,20 @@
 namespace frontend\services\filters\tasks;
 
 use frontend\services\filters\Filter;
+use yii\db\ActiveQuery;
 
-class CategoriesFilter extends Filter
+class CategoriesFilter implements Filter
 {
-    public function execute(): void
+    public function setFilter(ActiveQuery $query, array $data): ActiveQuery
     {
-        if (isset($this->data['categories'])) {
-            $categories = $this->data['categories'];
+        if (isset($data['categories'])) {
+            $categories = $data['categories'];
 
             if (!empty($categories)) {
-                $this->query->andFilterWhere(['category_id' => $categories]);
+                $query->andFilterWhere(['category_id' => $categories]);
             }
         }
+
+        return $query;
     }
 }

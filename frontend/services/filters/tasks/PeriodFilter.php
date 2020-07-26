@@ -4,27 +4,30 @@ namespace frontend\services\filters\tasks;
 
 use frontend\models\forms\TasksFilterForms as Form;
 use frontend\services\filters\Filter;
+use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\helpers\ArrayHelper;
 
-class PeriodFilter extends Filter
+class PeriodFilter implements Filter
 {
 
-    public function execute(): void
+    public function setFilter(ActiveQuery $query, array $data): ActiveQuery
     {
-        if (($period = (int)ArrayHelper::getValue($this->data, 'period')) === Form::ALL_TIME) {
-            return;
+        $period = (int)ArrayHelper::getValue($data, 'period');
+
+        if ($period === Form::ALL_TIME) {
+            return $query;
         }
 
         $periods = [
             Form::CREATED_TODAY => 'HOUR',
             Form::CREATED_WEEK  => 'DAY',
-            Form::CREATED_MONTH => 'MONTH'
+            Form::CREATED_MONTH => 'MONTH',
         ];
 
-        $date = ArrayHelper::keyExists($period, $periods) ? $periods[$period] : 'MONTH';
+        $date = key_exists($period, $periods) ? $periods[$period] : 'MONTH';
 
-        $this->query->andFilterWhere([
+        return $query->andFilterWhere([
             '>',
             'created_at',
             new Expression("CURRENT_TIMESTAMP - INTERVAL {$period} {$date}")

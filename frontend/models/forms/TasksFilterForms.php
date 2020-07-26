@@ -2,13 +2,12 @@
 
 namespace frontend\models\forms;
 
-use frontend\DTO\FilterFormDTO;
+use frontend\models\Tasks;
 use frontend\services\filters\tasks\CategoriesFilter;
 use frontend\services\filters\tasks\ExtraFieldsFilter;
 use frontend\services\filters\tasks\PeriodFilter;
 use frontend\services\filters\tasks\SearchFilter;
 use yii\data\ActiveDataProvider;
-use yii\db\ActiveQuery;
 
 class TasksFilterForms extends FilterForm
 {
@@ -62,28 +61,28 @@ class TasksFilterForms extends FilterForm
         ];
     }
 
-    public function search(FilterFormDTO $DTO): ActiveDataProvider
+    public function search(array $data, int $pageSize = 5): ActiveDataProvider
     {
-        if ($this->validate()) {
-            $this->load($DTO->getData());
-        }
+        $query = Tasks::find()
+            ->andWhere(['status' => Tasks::STATUS_NEW])
+            ->with(['city', 'category', 'responses'])
+            ->orderBy(['created_at' => SORT_DESC]);
 
-        $this->setFilters(
-            $DTO->getQuery(),
-            $this->getFormData($DTO->getData())
+        $query = $this->setFilters(
+            $query, $data,
+            new CategoriesFilter(),
+            new ExtraFieldsFilter(),
+            new PeriodFilter(),
+            new SearchFilter(),
         );
 
-        return new ActiveDataProvider([
-            'query'      => $DTO->getQuery(),
-            'pagination' => ['pageSize' => $DTO->getPageSize()]
-        ]);
-    }
+        if ($this->validate()) {
+            $this->load([$this->formName() => $data]);
+        }
 
-    private function setFilters(ActiveQuery $query, array $data): void
-    {
-        $this->setFilter(new CategoriesFilter($query, $data));
-        $this->setFilter(new ExtraFieldsFilter($query, $data));
-        $this->setFilter(new PeriodFilter($query, $data));
-        $this->setFilter(new SearchFilter($query, $data));
+        return new ActiveDataProvider([
+            'query'      => $query,
+            'pagination' => ['pageSize' => $pageSize]
+        ]);
     }
 }

@@ -2,17 +2,15 @@
 
 namespace frontend\models\forms;
 
-use frontend\DTO\FilterFormDTO;
-use frontend\services\filters\users\CategoriesFilter;
-use frontend\services\filters\users\ExtraFieldsFilter;
-use frontend\services\filters\users\SearchByUserNameFilter;
+use frontend\models\Users;
+use frontend\services\filters\users\filters\CategoriesFilter;
+use frontend\services\filters\users\filters\ExtraFieldsFilter;
+use frontend\services\filters\users\filters\SearchByUserNameFilter;
 use frontend\services\filters\users\sorts\CountOrdersSort;
 use frontend\services\filters\users\sorts\LastActivitySort;
 use frontend\services\filters\users\sorts\PopularSort;
 use frontend\services\filters\users\sorts\RatingSort;
 use yii\data\ActiveDataProvider;
-use yii\db\ActiveQuery;
-use yii\helpers\ArrayHelper;
 
 class UsersFiltersForm extends FilterForm
 {
@@ -70,29 +68,42 @@ class UsersFiltersForm extends FilterForm
         ];
     }
 
-    public function search(FilterFormDTO $DTO): ActiveDataProvider
+    public function search(array $data, int $pageSize = 5): ActiveDataProvider
     {
-        $this->setSorts(
-            $DTO->getQuery(),
-            $DTO->getData()
-        );
+        $query = Users::find()
+            ->select(['users.*'])
+            ->andWhere(['role' => Users::ROLE_PERFORMER])
+            ->with(['reviewsPerformer', 'tasksPerformer', 'usersSpecializations', 'categories']);
 
-        $this->setFilters(
-            $DTO->getQuery(),
-            $this->getFormData($DTO->getData())
-        );
-
-        if (!empty($this->getFormData($DTO->getData())['search'])) {
-            $this->clearFilters($DTO);
-        }
+        $data = $this->formatData($data);
 
         if ($this->validate()) {
-            $this->load($DTO->getData());
+            $this->load([$this->formName() => $data]);
         }
 
+        if (isset($data['sort'])) {
+            $query = $this->setFilters(
+                $query, $data,
+                [
+                    static::SORT_LAST_ACTIVITY => new LastActivitySort(),
+                    static::SORT_COUNT_ORDERS  => new CountOrdersSort(),
+                    static::SORT_POPULAR       => new PopularSort(),
+                    static::SORT_RATING        => new RatingSort()
+                ][$data['sort']]
+            );
+            $this->sort = $data['sort'];
+        }
+
+        $query = $this->setFilters(
+            $query, $data,
+            new CategoriesFilter(),
+            new ExtraFieldsFilter(),
+            new SearchByUserNameFilter(),
+        );
+
         return new ActiveDataProvider([
-            'query'      => $DTO->getQuery(),
-            'pagination' => ['pageSize' => $DTO->getPageSize()],
+            'query'      => $query,
+            'pagination' => ['pageSize' => $pageSize],
             'sort'       => [
                 'attributes' => [
                     'last_activity',
@@ -104,44 +115,14 @@ class UsersFiltersForm extends FilterForm
         ]);
     }
 
-    private function setSorts(ActiveQuery $query, array $data): void
+    private function formatData(array $data)
     {
-        $sorting = $this->getSorting($data);
+        $search = isset($data['search']) ? $data['search'] : '';
 
-        $sorts = [
-            static::SORT_LAST_ACTIVITY => new LastActivitySort($query),
-            static::SORT_RATING        => new RatingSort($query),
-            static::SORT_COUNT_ORDERS  => new CountOrdersSort($query),
-            static::SORT_POPULAR       => new PopularSort($query),
-        ];
-
-        if (ArrayHelper::keyExists($sorting, $sorts)) {
-            $sorts[$sorting]->execute();
-            $this->sort = $sorting;
+        if (!empty($search)) {
+            $data = ['search' => $search];
         }
-    }
 
-    private function setFilters(ActiveQuery $query, array $data): void
-    {
-        $this->setFilter(new CategoriesFilter($query, $data));
-        $this->setFilter(new ExtraFieldsFilter($query, $data));
-        $this->setFilter(new SearchByUserNameFilter($query, $data));
-    }
-
-
-    private function getSorting(array $data): string
-    {
-        $sort = ArrayHelper::getValue($data, 'sort');
-
-        return is_null($sort)
-            ? static::SORT_LAST_ACTIVITY // default sorting
-            : $sort;
-    }
-
-    private function clearFilters(FilterFormDTO $DTO): void
-    {
-        $data[$this->formName()]['search'] = $this->getFormData($DTO->getData())['search'];;
-
-        $DTO->setData($data);
+        return $data;
     }
 }

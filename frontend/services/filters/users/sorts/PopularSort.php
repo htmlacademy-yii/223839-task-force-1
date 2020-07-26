@@ -2,16 +2,13 @@
 
 namespace frontend\services\filters\users\sorts;
 
-use frontend\models\forms\UsersFiltersForm as Form;
-use frontend\services\filters\Sort;
+use frontend\services\filters\Filter;
+use yii\db\ActiveQuery;
 
-class PopularSort extends Sort
+class PopularSort implements Filter
 {
-
-    public function execute(): string
+    public function setFilter(ActiveQuery $query, array $data): ActiveQuery
     {
-        $this->query->orderBy(['visit_counter' => SORT_DESC]);
-
-        return Form::SORT_POPULAR;
+        return $query->orderBy(['visit_counter' => SORT_DESC]);
     }
 }

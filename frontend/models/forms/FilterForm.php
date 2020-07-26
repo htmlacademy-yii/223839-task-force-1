@@ -1,25 +1,20 @@
 <?php
 
-
 namespace frontend\models\forms;
 
 use frontend\services\filters\Filter;
+use frontend\services\filters\FilterDecorator;
 use yii\base\Model;
-use yii\helpers\ArrayHelper;
+use yii\db\ActiveQuery;
 
-class FilterForm extends Model
+abstract class FilterForm extends Model
 {
-    protected function getFormData(array $data): array
+    protected function setFilters(ActiveQuery $query, array $data, Filter...$filters): ActiveQuery
     {
-        $data = ArrayHelper::getValue($data, $this->formName());
+        foreach ([...$filters] as $filter) {
+            $query = (new FilterDecorator($filter))->setFilter($query, $data);
+        }
 
-        return is_null($data)
-            ? []
-            : $data;
-    }
-
-    protected function setFilter(Filter $filter): void
-    {
-        $filter->execute();
+        return $query;
     }
 }

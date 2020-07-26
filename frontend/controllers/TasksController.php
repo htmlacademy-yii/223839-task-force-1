@@ -22,21 +22,16 @@ class TasksController extends SecuredController
      */
     public function actionIndex()
     {
-        $categories = ArrayHelper::map(Categories::find()->select(['id', 'name'])->all(), 'id', 'name');
-
         $searchModel = new TasksFilterForms();
-        $query = Tasks::find()
-            ->andWhere(['status' => Tasks::STATUS_NEW])
-            ->with(['city', 'category', 'responses'])
-            ->orderBy(['created_at' => SORT_DESC]);
-        $data = Yii::$app->request->queryParams;
 
-        $dataProvider = $searchModel->search(new FilterFormDTO($query, $data));
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
-        $pagination = $dataProvider->getPagination();
-        $tasks = $dataProvider->getModels();
-
-        return $this->render('index', compact('tasks', 'categories', 'searchModel', 'pagination'));
+        return $this->render('index', [
+            'tasks'       => $dataProvider->getModels(),
+            'pagination'  => $dataProvider->getPagination(),
+            'searchModel' => $searchModel,
+            'categories'  => ArrayHelper::map(Categories::find()->select(['id', 'name'])->all(), 'id', 'name')
+        ]);
     }
 
     public function actionView(int $id)

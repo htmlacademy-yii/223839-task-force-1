@@ -30,22 +30,22 @@ class UsersSpecializations extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-          [['performer_id', 'category_id'], 'required'],
-          [['performer_id', 'category_id'], 'integer'],
-          [
-            ['category_id'],
-            'exist',
-            'skipOnError' => true,
-            'targetClass' => Categories::class,
-            'targetAttribute' => ['category_id' => 'id']
-          ],
-          [
-            ['performer_id'],
-            'exist',
-            'skipOnError' => true,
-            'targetClass' => Users::class,
-            'targetAttribute' => ['performer_id' => 'id']
-          ],
+            [['performer_id', 'category_id'], 'required'],
+            [['performer_id', 'category_id'], 'integer'],
+            [
+                ['category_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Categories::class,
+                'targetAttribute' => ['category_id' => 'id']
+            ],
+            [
+                ['performer_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Users::class,
+                'targetAttribute' => ['performer_id' => 'id']
+            ],
         ];
     }
 
@@ -55,19 +55,18 @@ class UsersSpecializations extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-          'id' => 'ID',
-          'performer_id' => 'Performer ID',
-          'category_id' => 'Category ID',
+            'id'           => 'ID',
+            'performer_id' => 'Performer ID',
+            'category_id'  => 'Category ID',
         ];
     }
 
-    public static function getPerformersInCategories(array $categories): array
+    public static function getPerformersInCategories(array $categories): ActiveQuery
     {
         return static::find()
             ->distinct()
             ->select(['performer_id'])
-            ->where(['category_id' => $categories])
-            ->column();
+            ->where(['category_id' => $categories]);
     }
 
     /**

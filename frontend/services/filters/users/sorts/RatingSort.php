@@ -2,18 +2,16 @@
 
 namespace frontend\services\filters\users\sorts;
 
-use frontend\models\forms\UsersFiltersForm as Form;
-use frontend\services\filters\Sort;
+use frontend\services\filters\Filter;
+use yii\db\ActiveQuery;
 
-class RatingSort extends Sort
+class RatingSort implements Filter
 {
-    public function execute(): string
+    public function setFilter(ActiveQuery $query, array $data): ActiveQuery
     {
-        $this->query->addSelect(['AVG(reviews.rating) AS rating'])
+        return $query->addSelect(['AVG(reviews.rating) AS rating'])
             ->joinWith('reviewsPerformer', false)
             ->groupBy('users.id')
             ->orderBy(['rating' => SORT_DESC]);
-
-        return Form::SORT_RATING;
     }
 }

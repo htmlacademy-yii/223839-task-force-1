@@ -2,18 +2,16 @@
 
 namespace frontend\services\filters\users\sorts;
 
-use frontend\models\forms\UsersFiltersForm as Form;
-use frontend\services\filters\Sort;
+use frontend\services\filters\Filter;
+use yii\db\ActiveQuery;
 
-class CountOrdersSort extends Sort
+class CountOrdersSort implements Filter
 {
-    public function execute(): string
+    public function setFilter(ActiveQuery $query, array $data): ActiveQuery
     {
-        $this->query->addSelect(['COUNT(tasks.performer_id) AS tasks_counter'])
+        return $query->addSelect(['COUNT(tasks.performer_id) AS tasks_counter'])
             ->joinWith('tasksPerformer', false)
             ->groupBy('users.id')
             ->orderBy(['tasks_counter' => SORT_DESC]);
-
-        return Form::SORT_COUNT_ORDERS;
     }
 }

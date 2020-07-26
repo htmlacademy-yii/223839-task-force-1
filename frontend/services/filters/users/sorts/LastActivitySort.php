@@ -2,15 +2,13 @@
 
 namespace frontend\services\filters\users\sorts;
 
-use frontend\models\forms\UsersFiltersForm as Form;
-use frontend\services\filters\Sort;
+use frontend\services\filters\Filter;
+use yii\db\ActiveQuery;
 
-class LastActivitySort extends Sort
+class LastActivitySort implements Filter
 {
-    public function execute(): string
+    public function setFilter(ActiveQuery $query, array $data): ActiveQuery
     {
-        $this->query->orderBy(['last_activity' => SORT_DESC]);
-
-        return Form::SORT_LAST_ACTIVITY;
+        return $query->orderBy(['last_activity' => SORT_DESC]);
     }
 }
