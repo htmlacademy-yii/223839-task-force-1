@@ -100,91 +100,90 @@ class AuthUserInUsersPageCest
         $I->seeElement('form.search-task__form');
         $I->see('Категории', 'form.search-task__form');
         $I->see('Дополнительно', 'form.search-task__form');
-        $I->seeElement('#extraFields-' . UsersFiltersForm::FREE_NOW, [
+        $I->seeElement('#' . UsersFiltersForm::FREE_NOW, [
           'value' => UsersFiltersForm::FREE_NOW
         ]);
-        $I->seeElement('#extraFields-' . UsersFiltersForm::ONLINE_NOW, [
+        $I->seeElement('#' . UsersFiltersForm::ONLINE_NOW, [
           'value' => UsersFiltersForm::ONLINE_NOW
         ]);
-        $I->seeElement('#extraFields-' . UsersFiltersForm::HAS_REVIEWS, [
+        $I->seeElement('#' . UsersFiltersForm::HAS_REVIEWS, [
           'value' => UsersFiltersForm::HAS_REVIEWS
         ]);
-        $I->seeElement('#extraFields-' . UsersFiltersForm::FAVORITES, [
+        $I->seeElement('#' . UsersFiltersForm::FAVORITES, [
           'value' => UsersFiltersForm::FAVORITES
         ]);
-        $I->seeElement('#usersfiltersform-search');
     }
 
     public function setFreeNowExtraFieldFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'UsersFiltersForm[extraFields]' => [UsersFiltersForm::FREE_NOW]
+          'extraFields' => [UsersFiltersForm::FREE_NOW]
         ]);
         $I->seeInCurrentUrl('/users');
 
-        $I->seeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::FREE_NOW);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::ONLINE_NOW);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::HAS_REVIEWS);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::FAVORITES);
-        $I->seeInField('#usersfiltersform-search', '');
+        $I->seeCheckboxIsChecked('#' . UsersFiltersForm::FREE_NOW);
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::ONLINE_NOW);
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::HAS_REVIEWS);
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::FAVORITES);
+        $I->seeInField('#searchByName', '');
     }
 
     public function setOnlineNowExtraFieldFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'UsersFiltersForm[extraFields]' => [UsersFiltersForm::ONLINE_NOW]
+          'extraFields' => [UsersFiltersForm::ONLINE_NOW]
         ]);
         $I->seeInCurrentUrl('/users');
 
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::FREE_NOW);
-        $I->seeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::ONLINE_NOW);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::HAS_REVIEWS);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::FAVORITES);
-        $I->seeInField('#usersfiltersform-search', '');
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::FREE_NOW);
+        $I->seeCheckboxIsChecked('#' . UsersFiltersForm::ONLINE_NOW);
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::HAS_REVIEWS);
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::FAVORITES);
+        $I->seeInField('#searchByName', '');
     }
 
     public function setHasReviewsExtraFieldFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'UsersFiltersForm[extraFields]' => [UsersFiltersForm::HAS_REVIEWS]
+          'extraFields' => [UsersFiltersForm::HAS_REVIEWS]
         ]);
         $I->seeInCurrentUrl('/users');
 
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::FREE_NOW);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::ONLINE_NOW);
-        $I->seeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::HAS_REVIEWS);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::FAVORITES);
-        $I->seeInField('#usersfiltersform-search', '');
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::FREE_NOW);
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::ONLINE_NOW);
+        $I->seeCheckboxIsChecked('#' . UsersFiltersForm::HAS_REVIEWS);
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::FAVORITES);
+        $I->seeInField('#searchByName', '');
     }
 
     public function setFavoritesExtraFieldFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'UsersFiltersForm[extraFields]' => [UsersFiltersForm::FAVORITES]
+          'extraFields' => [UsersFiltersForm::FAVORITES]
         ]);
         $I->seeInCurrentUrl('/users');
 
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::FREE_NOW);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::ONLINE_NOW);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::HAS_REVIEWS);
-        $I->seeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::FAVORITES);
-        $I->seeInField('#usersfiltersform-search', '');
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::FREE_NOW);
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::ONLINE_NOW);
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::HAS_REVIEWS);
+        $I->seeCheckboxIsChecked('#' . UsersFiltersForm::FAVORITES);
+        $I->seeInField('#searchByName', '');
     }
 
     public function setSearchFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'UsersFiltersForm[search]' => 'search'
+          'search' => 'search'
         ]);
         $I->seeInCurrentUrl('/users');
 
-        $I->seeInField('#usersfiltersform-search', 'search');
+        $I->seeInField('#searchByName', 'search');
     }
 
     public function setCategoriesFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'UsersFiltersForm[categories]' => [1, 2]
+          'categories' => [1, 2]
         ]);
 
         $I->seeCheckboxIsChecked('#category-1');
@@ -196,16 +195,16 @@ class AuthUserInUsersPageCest
     public function resetFiltersDueOfSearchFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'UsersFiltersForm[categories]'  => [1, 2],
-          'UsersFiltersForm[extraFields]' => [UsersFiltersForm::FAVORITES, UsersFiltersForm::HAS_REVIEWS],
-          'UsersFiltersForm[search]'      => 'Виктория Соловьева'
+          'categories'  => [1, 2],
+          'extraFields' => [UsersFiltersForm::FAVORITES, UsersFiltersForm::HAS_REVIEWS],
+          'search'      => 'Виктория Соловьева'
         ]);
 
         $I->dontSeeCheckboxIsChecked('#category-1');
         $I->dontSeeCheckboxIsChecked('#category-2');
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::ONLINE_NOW);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . UsersFiltersForm::HAS_REVIEWS);
-        $I->seeInField('#usersfiltersform-search', 'Виктория Соловьева');
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::ONLINE_NOW);
+        $I->dontSeeCheckboxIsChecked('#' . UsersFiltersForm::HAS_REVIEWS);
+        $I->seeInField('#searchByName', 'Виктория Соловьева');
         $I->see('Виктория Соловьева', 'p.link-name');
     }
 }

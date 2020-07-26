@@ -53,73 +53,70 @@ class AuthUserInTasksPageCest
         $I->seeElement('form.search-task__form');
         $I->see('Категории', 'form.search-task__form');
         $I->see('Дополнительно', 'form.search-task__form');
-        $I->seeElement('#extraFields-' . TasksFilterForms::WITHOUT_RESPONSES, [
+        $I->seeElement('input', [
           'value' => TasksFilterForms::WITHOUT_RESPONSES
         ]);
-        $I->seeElement('#extraFields-' . TasksFilterForms::REMOTE_WORK, [
+        $I->seeElement('input', [
           'value' => TasksFilterForms::REMOTE_WORK
         ]);
-        $I->seeElement('#tasksfilterforms-period');
-        $I->seeOptionIsSelected('#tasksfilterforms-period', 'За неделю');
-        $I->seeElement('#tasksfilterforms-search');
+        $I->seeElement('select', ['name' => 'period']);
+        $I->seeElement('input', ['name' => 'search']);
     }
 
     public function setWithoutResponsesExtraFieldFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'TasksFilterForms[extraFields]' => [TasksFilterForms::WITHOUT_RESPONSES]
+          'extraFields' => [TasksFilterForms::WITHOUT_RESPONSES]
         ]);
         $I->seeInCurrentUrl('/tasks');
 
-        $I->seeCheckboxIsChecked('#extraFields-' . TasksFilterForms::WITHOUT_RESPONSES);
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . TasksFilterForms::REMOTE_WORK);
-        $I->seeInField('#tasksfilterforms-search', '');
+        $I->seeCheckboxIsChecked('#' . TasksFilterForms::WITHOUT_RESPONSES);
+        $I->dontSeeCheckboxIsChecked('#' . TasksFilterForms::REMOTE_WORK);
     }
 
     public function setRemoteWorkExtraFieldFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'TasksFilterForms[extraFields]' => [TasksFilterForms::REMOTE_WORK]
+            'extraFields' => [TasksFilterForms::REMOTE_WORK]
         ]);
         $I->seeInCurrentUrl('/tasks');
 
-        $I->dontSeeCheckboxIsChecked('#extraFields-' . TasksFilterForms::WITHOUT_RESPONSES);
-        $I->seeCheckboxIsChecked('#extraFields-' . TasksFilterForms::REMOTE_WORK);
-        $I->seeInField('#tasksfilterforms-search', '');
+        $I->dontSeeCheckboxIsChecked('#' . TasksFilterForms::WITHOUT_RESPONSES);
+        $I->seeCheckboxIsChecked('#' . TasksFilterForms::REMOTE_WORK);
     }
 
     public function setSearchFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'TasksFilterForms[search]' => 'search'
+          'search' => 'search'
         ]);
         $I->seeInCurrentUrl('/tasks');
 
-        $I->seeInField('#tasksfilterforms-search', 'search');
+        $I->seeInField('#searchByName', 'search');
     }
 
     public function setPeriodFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'TasksFilterForms[period]' => TasksFilterForms::ALL_TIME
+          'period' => TasksFilterForms::ALL_TIME
         ]);
-        $I->seeOptionIsSelected('#tasksfilterforms-period', 'За все время');
+        $I->seeOptionIsSelected('#period-selector', 'За все время');
 
         $I->submitForm('form.search-task__form', [
-          'TasksFilterForms[period]' => TasksFilterForms::CREATED_TODAY
+          'period' => TasksFilterForms::CREATED_TODAY
         ]);
-        $I->seeOptionIsSelected('#tasksfilterforms-period', 'За день');
+        $I->seeOptionIsSelected('#period-selector', 'За день');
 
         $I->submitForm('form.search-task__form', [
-          'TasksFilterForms[period]' => TasksFilterForms::CREATED_MONTH
+          'period' => TasksFilterForms::CREATED_MONTH
         ]);
-        $I->seeOptionIsSelected('#tasksfilterforms-period', 'За месяц');
+        $I->seeOptionIsSelected('#period-selector', 'За месяц');
     }
 
     public function setCategoriesFilter(FunctionalTester $I)
     {
         $I->submitForm('form.search-task__form', [
-          'TasksFilterForms[categories]' => [1, 2]
+          'categories' => [1, 2]
         ]);
 
         $I->seeCheckboxIsChecked('#category-1');

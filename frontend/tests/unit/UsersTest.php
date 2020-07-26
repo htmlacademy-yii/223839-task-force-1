@@ -43,12 +43,9 @@ class UsersTest extends Unit
 
     public function testGetUserFullName()
     {
-        $user = $this->make(Users::class, [
-            'first_name' => 'Bill',
-            'last_name'  => 'Lading'
-        ]);
+        $user = Users::findOne($this->tester->grabFixture('users')[0]['id']);
 
-        $this->assertSame('Bill Lading', $user->getFullName());
+        $this->assertSame("{$user->first_name} {$user->last_name}", $user->getFullName());
     }
 
     public function testSaveCustomer()

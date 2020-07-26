@@ -4,6 +4,7 @@ namespace frontend\tests;
 
 use Codeception\Test\Unit;
 use frontend\models\forms\LoginForm;
+use frontend\models\Users;
 use frontend\tests\fixtures\CategoriesFixtures;
 use frontend\tests\fixtures\CitiesFixtures;
 use frontend\tests\fixtures\TasksFixtures;
@@ -25,6 +26,8 @@ class LoginFormTest extends Unit
             'cities'     => ['class' => CitiesFixtures::class],
             'tasks'      => ['class' => TasksFixtures::class]
         ]);
+
+
     }
 
     protected function _after()
@@ -34,14 +37,8 @@ class LoginFormTest extends Unit
     // tests
     public function testRightLogin()
     {
-        $model = $this->make(LoginForm::class, [
-            'email'    => 'victoria.fix@mail.ru',
-            'password' => 'dpkjvfqvtyz'
-        ]);
+        $user = Users::findOne($this->tester->grabFixture('users')[0]['id']);
 
-        $this->assertTrue($model->validate());
-
-        $user = $model->getUser();
         Yii::$app->user->login($user);
 
         $this->assertFalse(Yii::$app->user->isGuest);
